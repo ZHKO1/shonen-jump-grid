@@ -12,3 +12,22 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.custom-shape {
+  width: 200px;
+  height: 200px;
+  background-color: lightblue;
+  clip-path: polygon(0% 0%, 100% 0%, 80% 100%, 0% 100%);
+  position: relative;
+}
+
+.custom-shape-content {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  bottom: 2px;
+  right: 3px;
+  background-color: green;
+  clip-path: polygon(0% 0%, 100% 0%, 80% 100%, 0% 100%);
+}
+
