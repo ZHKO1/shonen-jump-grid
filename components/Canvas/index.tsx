@@ -67,6 +67,43 @@ const grids: GridConfig[] = [
   }
 ]
 
+/*
+const grids: GridConfig[] = [
+  {
+    "type": "rect",
+    "lt_x": 18,
+    "lt_y": 9,
+    "rb_x": 703,
+    "rb_y": 519
+  },
+  {
+    "type": "poly",
+    "path": [
+      { x: 18, y: 541 },
+      { x: 354, y: 541 },
+      { x: 354, y: 779 },
+      { x: 18, y: 692 },
+    ]
+  },
+  {
+    "type": "poly",
+    "path": [
+      { x: 18, y: 702 },
+      { x: 354, y: 789 },
+      { x: 354, y: 884 },
+      { x: 18, y: 884 },
+    ]
+  },
+  {
+    "type": "rect",
+    "lt_x": 365,
+    "lt_y": 541,
+    "rb_x": 703,
+    "rb_y": 884
+  }  
+]
+*/
+
 export default function Canvas() {
   return (
     <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-black">

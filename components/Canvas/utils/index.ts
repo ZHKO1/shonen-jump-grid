@@ -1,10 +1,15 @@
+import { Point } from "../grid";
 
 
 type Pos = "lt" | "rt" | "lb" | "rb";
-export function getPoint(path: { x: number, y: number }[], pos: Pos): { x: number, y: number } | null {
-    if (!path.length) {
-        return null;
-    }
+type PolyType = "horizon" | "vertical";
+/**
+ * 获取四边形所在容器的四个点的坐标
+ * @param path 
+ * @param pos 
+ * @returns 
+ */
+export function getPolyContainerPoint(path: [Point, Point, Point, Point], pos: Pos): Point {
     let point = { x: path[0].x, y: path[1].y }
     path.forEach(p => {
         switch (pos) {
@@ -29,16 +34,14 @@ export function getPoint(path: { x: number, y: number }[], pos: Pos): { x: numbe
     return point
 }
 
-type PolyType = "horizon" | "vertical";
-export function getPolyType(path: { x: number, y: number }[]): PolyType | null {
-    if (!path.length) {
-        return null;
-    }
-    let lt = getPoint(path, 'lt');
-    let rb = getPoint(path, 'rb');
-    if (!lt || !rb) {
-        return null;
-    }
+/**
+ * 判断四边形本身是水平还是垂直的
+ * @param path 
+ * @returns 
+ */
+export function getPolyType(path: [Point, Point, Point, Point]): PolyType {
+    let lt = getPolyContainerPoint(path, 'lt');
+    let rb = getPolyContainerPoint(path, 'rb');
     const isAdjust = (attr: "x" | "y") => {
         return (path.filter(point => point[attr] == lt[attr]).length > 1) && (path.filter(point => point[attr] == rb[attr]).length > 1);
     }
@@ -49,4 +52,106 @@ export function getPolyType(path: { x: number, y: number }[]): PolyType | null {
         return "vertical";
     }
     throw new Error("Invalid poly type")
+}
+
+/**
+ * 返回从左上角开始顺时针排序的四个点
+ * @param path 
+ * @returns 
+ */
+export function getPolyPointBySort(path: [Point, Point, Point, Point]): [Point, Point, Point, Point] {
+    let result = [];
+    if (getPolyType(path) === 'horizon') {
+        let lt_y = getPolyContainerPoint(path, 'lt').y;
+        let rb_y = getPolyContainerPoint(path, 'rb').y;
+        let topLine = path.filter(point => point.y == lt_y).sort((a, b) => a.x - b.x);
+        let bottomLine = path.filter(point => point.y == rb_y).sort((a, b) => b.x - a.x);
+        result = [...topLine, ...bottomLine];
+    } else {
+        let lt_x = getPolyContainerPoint(path, 'lt').x;
+        let rb_x = getPolyContainerPoint(path, 'rb').x;
+        let leftLine = path.filter(point => point.x == lt_x).sort((a, b) => a.y - b.y);
+        let rightLine = path.filter(point => point.x == rb_x).sort((a, b) => a.y - b.y);
+        result = [leftLine[0], ...rightLine, leftLine[1]];
+    }
+    return result as [Point, Point, Point, Point];
+}
+
+/**
+ * 返回计算x的函数
+ * 斜率公式: y = kx + b
+ * @param point1 
+ * @param point2 
+ * @param borderWidth 
+ * @param direct 如果是true，则向上平行调整，否则向下平行调整 
+ * @returns 
+ */
+function getXFromConentLineFunc(point1: Point, point2: Point, borderWidth: number, direct: boolean): (y: number) => number {
+    return (y: number) => {
+        let one = (direct ? +1 : -1);
+        if (point1.x === point2.x) {
+            return point1.x + one * borderWidth;
+        }
+        let k = (point1.y - point2.y) / (point1.x - point2.x);
+        let b = point1.y - k * point1.x;
+        let contentB = b + (k > 0 ? -1 * one : one) * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
+        return (y - contentB) / k;    
+    }
+}
+
+/**
+ * 返回计算y的函数
+ * 斜率公式: y = kx + b
+ * @param point1 
+ * @param point2 
+ * @param borderWidth 
+ * @param direct 如果是true，则向上平行调整，否则向下平行调整 
+ * @returns 
+ */
+function getYFromConentLineFunc(point1: Point, point2: Point, borderWidth: number, direct: boolean): (y: number) => number {
+    return (x: number) => {
+        let one = (direct ? +1 : -1);
+        if (point1.y === point2.y) {
+            return point1.y + one * borderWidth;
+        }
+        let k = (point1.y - point2.y) / (point1.x - point2.x);
+        let b = point1.y - k * point1.x;
+        let contentB = b + (k > 0 ? one : -1 * one) * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
+        return k * x + contentB;    
+    }
+}
+
+/**
+ * 返回四边形内容的clipPath
+ * 斜率公式: y = kx + b
+ * @param path 
+ * @param borderWidth 
+ * @returns 
+ */
+export function getPolyContentClipPath(path: [Point, Point, Point, Point], borderWidth: number): string {
+    let result = [];
+    let lt_x = getPolyContainerPoint(path, 'lt').x;
+    let lt_y = getPolyContainerPoint(path, 'lt').y;
+    let rb_x = getPolyContainerPoint(path, 'rb').x;
+    let rb_y = getPolyContainerPoint(path, 'rb').y;
+    let point0, point1, point2, point3;
+    if (getPolyType(path) === 'horizon') {
+        let getConentLeftLineX = getXFromConentLineFunc(path[0], path[3], borderWidth, true);
+        let getConentRightLineX = getXFromConentLineFunc(path[1], path[2], borderWidth, false);
+
+        point0 = { x: getConentLeftLineX(lt_y + borderWidth), y: lt_y + borderWidth };
+        point1 = { x: getConentRightLineX(lt_y + borderWidth), y: lt_y + borderWidth };
+        point2 = { x: getConentRightLineX(rb_y - borderWidth), y: rb_y - borderWidth };
+        point3 = { x: getConentLeftLineX(rb_y - borderWidth), y: rb_y - borderWidth };
+    } else {
+        let getConentTopLineY = getYFromConentLineFunc(path[0], path[1], borderWidth, true);
+        let getConentBottomLineY = getYFromConentLineFunc(path[3], path[2], borderWidth, false);
+
+        point0 = { y: getConentTopLineY(lt_x + borderWidth), x: lt_x + borderWidth };
+        point1 = { y: getConentTopLineY(rb_x - borderWidth), x: rb_x - borderWidth };
+        point2 = { y: getConentBottomLineY(rb_x - borderWidth), x: rb_x - borderWidth };
+        point3 = { y: getConentBottomLineY(lt_x + borderWidth), x: lt_x + borderWidth };
+    }
+    result = [point0, point1, point2, point3];
+    return `polygon(${result.map(p => `${p.x - lt_x}px ${p.y - lt_y}px`).join(',')})`;;
 }
