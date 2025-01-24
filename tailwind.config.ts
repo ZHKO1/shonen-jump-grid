@@ -12,6 +12,15 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      keyframes: {
+        focusBorderBreathe: {
+          '0%, 100%': { backgroundColor: 'red' },
+          '50%': { backgroundColor: 'white' },
+        },
+      },
+      animation: {
+        breathe: 'focusBorderBreathe 1.2s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

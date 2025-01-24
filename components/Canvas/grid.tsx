@@ -1,4 +1,7 @@
+'use client';
+import { MouseEventHandler, useRef, useState } from 'react';
 import { isDef } from '../utils';
+import useFocusGrid from './hooks/useFocusGrid';
 import { getPolyContainerPoint, getPolyContentClipPath, getPolyPointBySort } from './utils';
 
 export type Point = { x: number, y: number };
@@ -21,6 +24,8 @@ export type GridConfig = PolyGridConfig | RectGridConfig;
 const borderWidth = 4;
 
 function PolyGrid({ grid }: { grid: PolyGridConfig }) {
+    const gridRef = useRef<HTMLDivElement>(null);
+    const [isGridFocused, setGridFocus] = useFocusGrid(gridRef);
     let lt = getPolyContainerPoint(grid.path, 'lt');
     let rb = getPolyContainerPoint(grid.path, 'rb');
     if (!isDef(lt) || !isDef(rb)) {
@@ -38,14 +43,25 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
         height: `100%`,
         clipPath: getPolyContentClipPath(sortPath, borderWidth),
     }
+
+    const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
+        setGridFocus();
+        e.stopPropagation();
+    }
+
     return (
-        <div className="custom-grid absolute bg-gray-200" style={{ left, top, width, height, clipPath }}>
+        <div className={`custom-grid absolute ${isGridFocused ? "animate-breathe" : "bg-gray-200"}`} style={{ left, top, width, height, clipPath }}
+            ref={gridRef}
+            onClick={handleClick}
+        >
             <div className="custom-grid-content bg-white" style={{ ...contentStyle }}></div>
         </div>
     )
 }
 
 function RectGrid({ grid }: { grid: RectGridConfig }) {
+    const gridRef = useRef<HTMLDivElement>(null);
+    const [isGridFocused, setGridFocus] = useFocusGrid(gridRef);
     let left = grid.lt_x;
     let top = grid.lt_y;
     let width = grid.rb_x - grid.lt_x;
@@ -54,8 +70,18 @@ function RectGrid({ grid }: { grid: RectGridConfig }) {
         width: `calc(100% - ${borderWidth * 2}px)`,
         height: `calc(100% - ${borderWidth * 2}px)`,
     }
+
+    const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
+        setGridFocus();
+        e.stopPropagation();
+    }
+
     return (
-        <div className="custom-grid absolute bg-gray-200 flex flex-wrap content-center justify-center" style={{ left, top, width, height }}>
+        <div className={`custom-grid absolute ${isGridFocused ? "animate-breathe" : "bg-gray-200"} flex flex-wrap content-center justify-center`}
+            style={{ left, top, width, height }}
+            ref={gridRef}
+            onClick={handleClick}
+        >
             <div className="custom-grid-content bg-white" style={contentStyle}></div>
         </div>
     )
