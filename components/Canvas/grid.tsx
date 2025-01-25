@@ -1,7 +1,7 @@
 'use client';
 import { MouseEventHandler, useRef, useState } from 'react';
 import { isDef } from '../utils';
-import useFocusGrid from './hooks/useFocusGrid';
+import { useFocusGrid, useSplitGrid } from './hooks/index';
 import { getPolyContainerPoint, getPolyContentClipPath, getPolyPointBySort } from './utils';
 
 export type Point = { x: number, y: number };
@@ -62,6 +62,7 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
 function RectGrid({ grid }: { grid: RectGridConfig }) {
     const gridRef = useRef<HTMLDivElement>(null);
     const [isGridFocused, setGridFocus] = useFocusGrid(gridRef);
+    const [startPoint, endPoint] = useSplitGrid(gridRef, isGridFocused);
     let left = grid.lt_x;
     let top = grid.lt_y;
     let width = grid.rb_x - grid.lt_x;
@@ -83,6 +84,18 @@ function RectGrid({ grid }: { grid: RectGridConfig }) {
             onClick={handleClick}
         >
             <div className="custom-grid-content bg-white" style={contentStyle}></div>
+            {startPoint && endPoint && (
+                <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                    <line
+                        x1={startPoint.x}
+                        y1={startPoint.y}
+                        x2={endPoint.x}
+                        y2={endPoint.y}
+                        stroke="black"
+                        strokeWidth="2"
+                    />
+                </svg>
+            )}
         </div>
     )
 }
