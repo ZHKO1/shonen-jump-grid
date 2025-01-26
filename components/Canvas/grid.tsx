@@ -72,7 +72,7 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
     const gridRef = useRef<HTMLDivElement>(null);
     const [isGridFocused, setGridFocus] = useFocusGrid(gridRef, isDefaultFocused);
     const [startPoint, endPoint, isDrawing] = useDrawLine(isGridFocused);
-    let grids = (startPoint && endPoint) && getGridsBySplit(grid, [endPoint, { ...endPoint, x: endPoint.x + 20 }], borderWidth);
+    let grids = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth);
 
     let left = grid.lt_x;
     let top = grid.lt_y;
@@ -116,6 +116,9 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
 
                 }
                 {
+                    grids && (grids.map((grid, index) => (<Grid grid={grid} key={(new Date()).getTime() + "_" + index} isDefaultFocused />)))
+                }
+                {
                     /*
                     startPoint && endPoint && (
                         <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
@@ -130,9 +133,6 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
                         </svg>
                     )
                     */
-                }
-                {
-                    grids && (grids.map((grid, index) => (<Grid grid={grid} key={(new Date()).getTime() + "_" + index} isDefaultFocused />)))
                 }
             </>
         </>

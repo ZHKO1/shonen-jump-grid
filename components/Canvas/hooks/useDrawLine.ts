@@ -9,35 +9,43 @@ export function useDrawLine(isFocused: boolean) {
   const [endPoint, setEndPoint] = useState<Point | null>(null);
   const containerRef = useContext(ContainerContext).container;
   const mouseStateRef = useMouse(containerRef);
+  const resultRef = useRef<{ start?: Point, end?: Point }>({});
 
   const clean = () => {
+    resultRef.current = {};
     setStartPoint(null);
     setEndPoint(null);
     isDrawingRef.current = false;
   }
 
   useEffect(() => {
-    console.log("clean");
     clean();
 
     const handleMouseDown = (event: MouseEvent) => {
       if (!isFocused) return;
       isDrawingRef.current = true;
-      setStartPoint({ x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY });
+      resultRef.current.start = { x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY };
+      setStartPoint({ ...resultRef.current.start });
       setEndPoint(null);
     };
 
     const handleMouseMove = (event: MouseEvent) => {
       if (!isFocused) return;
       if (!isDrawingRef.current) return;
-      setEndPoint({ x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY });
+      resultRef.current.end = { x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY };
+      setEndPoint({ ...resultRef.current.end });
     };
 
     const handleMouseUp = (event: MouseEvent) => {
       if (!isFocused) return;
       if (!isDrawingRef.current) return;
       isDrawingRef.current = false;
-      setEndPoint({ x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY });
+      resultRef.current.end = { x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY };
+      if (resultRef.current.start!.x == resultRef.current.end!.x && resultRef.current.start!.y == resultRef.current.end!.y) {
+        clean();
+      } else {
+        setEndPoint({ ...resultRef.current.end });
+      }
     };
 
     document.addEventListener("mousedown", handleMouseDown);

@@ -82,7 +82,7 @@ export function getPolyPointBySort(path: [Point, Point, Point, Point]): [Point, 
  * @param point1 
  * @param point2 
  * @param borderWidth 
- * @param direct 如果是true，则向上平行调整，否则向下平行调整 
+ * @param direct 如果是true，则向右平行调整，否则向左平行调整 
  * @returns 
  */
 function getXFromConentLineFunc(point1: Point, point2: Point, borderWidth: number, direct: boolean = false): (y: number) => number {
@@ -93,7 +93,7 @@ function getXFromConentLineFunc(point1: Point, point2: Point, borderWidth: numbe
         }
         let k = (point1.y - point2.y) / (point1.x - point2.x);
         let b = point1.y - k * point1.x;
-        let contentB = b + (k > 0 ? -1 * one : one) * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
+        let contentB = b - (k > 0 ? one: -1 * one) * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
         return (y - contentB) / k;
     }
 }
@@ -115,7 +115,7 @@ function getYFromConentLineFunc(point1: Point, point2: Point, borderWidth: numbe
         }
         let k = (point1.y - point2.y) / (point1.x - point2.x);
         let b = point1.y - k * point1.x;
-        let contentB = b + (k > 0 ? one : -1 * one) * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
+        let contentB = b + one * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
         return k * x + contentB;
     }
 }
@@ -167,10 +167,13 @@ export function getGridsBySplit(grid: GridConfig, line: [Point, Point], borderWi
         let lt_y = grid.lt_y;
         let rb_x = grid.rb_x;
         let rb_y = grid.rb_y;
-        // 判断是否上下分割
         let getLineCrossY = getYFromConentLineFunc(line[0], line[1], 0);
         let leftCrossY = getLineCrossY(lt_x);
         let rightCrossY = getLineCrossY(rb_x);
+        let getLineCrossX = getXFromConentLineFunc(line[0], line[1], 0);
+        let topCrossX = getLineCrossX(lt_y);
+        let bottomCrossX = getLineCrossX(rb_y);
+        // 判断是否上下分割
         if ((leftCrossY > lt_y && leftCrossY < rb_y) && (rightCrossY > lt_y && rightCrossY < rb_y)) {
             if (leftCrossY == rightCrossY) {
                 return [
@@ -178,7 +181,34 @@ export function getGridsBySplit(grid: GridConfig, line: [Point, Point], borderWi
                     { type: 'rect', lt_x, lt_y: leftCrossY + Math.floor(borderWidth / 2), rb_x, rb_y, index: 1 }
                 ]
             } else {
-                return null
+                let getLineCrossY_ceil = getYFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), false);
+                let getLineCrossY_floor = getYFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), true);
+                let leftCrossY_ceil = getLineCrossY_ceil(lt_x);
+                let rightCrossY_ceil = getLineCrossY_ceil(rb_x);
+                let leftCrossY_floor = getLineCrossY_floor(lt_x);
+                let rightCrossY_floor = getLineCrossY_floor(rb_x);
+                return [
+                    { type: 'poly', path: [{ x: lt_x, y: lt_y }, { x: rb_x, y: lt_y }, { x: rb_x, y: rightCrossY_ceil }, { x: lt_x, y: leftCrossY_ceil }], index: 0 },
+                    { type: 'poly', path: [{ x: lt_x, y: leftCrossY_floor }, { x: rb_x, y: rightCrossY_floor }, { x: rb_x, y: rb_y }, { x: lt_x, y: rb_y }], index: 1 },
+                ]
+            }
+        } else if ((topCrossX > lt_x && topCrossX < rb_x) && (bottomCrossX > lt_x && bottomCrossX < rb_x)) {
+            if (topCrossX == bottomCrossX) {
+                return [
+                    { type: 'rect', lt_x, lt_y, rb_x: topCrossX - Math.floor(borderWidth / 2), rb_y, index: 0 },
+                    { type: 'rect', lt_x: topCrossX + Math.floor(borderWidth / 2), lt_y, rb_x, rb_y, index: 1 }
+                ]
+            } else {
+                let getLineCrossX_left = getXFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), false);
+                let getLineCrossX_right = getXFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), true);
+                let topCrossX_left = getLineCrossX_left(lt_y);
+                let bottomCrossX_left = getLineCrossX_left(rb_y);
+                let topCrossX_right = getLineCrossX_right(lt_y);
+                let bottomCrossX_right = getLineCrossX_right(rb_y);
+                return [
+                    { type: 'poly', path: [{ x: lt_x, y: lt_y }, { x: topCrossX_left, y: lt_y }, { x: bottomCrossX_left, y: rb_y }, { x: lt_x, y: rb_y }], index: 0 },
+                    { type: 'poly', path: [{ x: topCrossX_right, y: lt_y }, { x: rb_x, y: lt_y }, { x: rb_x, y: rb_y }, { x: bottomCrossX_right, y: rb_y }], index: 1 },
+                ]
             }
         }
     }
