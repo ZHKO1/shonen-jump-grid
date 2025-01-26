@@ -1,5 +1,4 @@
-import { Point } from "../grid";
-
+import { ComicConfig, GridConfig, Point } from "../grid";
 
 type Pos = "lt" | "rt" | "lb" | "rb";
 type PolyType = "horizon" | "vertical";
@@ -86,7 +85,7 @@ export function getPolyPointBySort(path: [Point, Point, Point, Point]): [Point, 
  * @param direct 如果是true，则向上平行调整，否则向下平行调整 
  * @returns 
  */
-function getXFromConentLineFunc(point1: Point, point2: Point, borderWidth: number, direct: boolean): (y: number) => number {
+function getXFromConentLineFunc(point1: Point, point2: Point, borderWidth: number, direct: boolean = false): (y: number) => number {
     return (y: number) => {
         let one = (direct ? +1 : -1);
         if (point1.x === point2.x) {
@@ -95,7 +94,7 @@ function getXFromConentLineFunc(point1: Point, point2: Point, borderWidth: numbe
         let k = (point1.y - point2.y) / (point1.x - point2.x);
         let b = point1.y - k * point1.x;
         let contentB = b + (k > 0 ? -1 * one : one) * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
-        return (y - contentB) / k;    
+        return (y - contentB) / k;
     }
 }
 
@@ -108,7 +107,7 @@ function getXFromConentLineFunc(point1: Point, point2: Point, borderWidth: numbe
  * @param direct 如果是true，则向上平行调整，否则向下平行调整 
  * @returns 
  */
-function getYFromConentLineFunc(point1: Point, point2: Point, borderWidth: number, direct: boolean): (y: number) => number {
+function getYFromConentLineFunc(point1: Point, point2: Point, borderWidth: number, direct: boolean = false): (y: number) => number {
     return (x: number) => {
         let one = (direct ? +1 : -1);
         if (point1.y === point2.y) {
@@ -117,7 +116,7 @@ function getYFromConentLineFunc(point1: Point, point2: Point, borderWidth: numbe
         let k = (point1.y - point2.y) / (point1.x - point2.x);
         let b = point1.y - k * point1.x;
         let contentB = b + (k > 0 ? one : -1 * one) * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
-        return k * x + contentB;    
+        return k * x + contentB;
     }
 }
 
@@ -154,4 +153,38 @@ export function getPolyContentClipPath(path: [Point, Point, Point, Point], borde
     }
     result = [point0, point1, point2, point3];
     return `polygon(${result.map(p => `${p.x - lt_x}px ${p.y - lt_y}px`).join(',')})`;;
+}
+
+/**
+ * 返回被分割的两个grid
+ * @param path 
+ * @param borderWidth 
+ * @returns 
+ */
+export function getGridsBySplit(grid: GridConfig, line: [Point, Point], borderWidth: number): [GridConfig, GridConfig] | null {
+    if (grid.type === 'rect') {
+        let lt_x = grid.lt_x;
+        let lt_y = grid.lt_y;
+        let rb_x = grid.rb_x;
+        let rb_y = grid.rb_y;
+        // 判断是否上下分割
+        let getLineCrossY = getYFromConentLineFunc(line[0], line[1], 0);
+        let leftCrossY = getLineCrossY(lt_x);
+        let rightCrossY = getLineCrossY(rb_x);
+        if ((leftCrossY > lt_y && leftCrossY < rb_y) && (rightCrossY > lt_y && rightCrossY < rb_y)) {
+            if (leftCrossY == rightCrossY) {
+                return [
+                    { type: 'rect', lt_x, lt_y, rb_x, rb_y: leftCrossY - Math.floor(borderWidth / 2), index: 0 },
+                    { type: 'rect', lt_x, lt_y: leftCrossY + Math.floor(borderWidth / 2), rb_x, rb_y, index: 1 }
+                ]
+            } else {
+                return null
+            }
+        }
+    }
+    return null;
+}
+
+export function getMaxIndexFromComicConfig(comicConfig: ComicConfig): number {
+    return Math.max(Math.max.apply(null, comicConfig.map(grid => grid.index)) || 0);
 }

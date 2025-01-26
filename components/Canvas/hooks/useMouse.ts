@@ -46,12 +46,12 @@ export function useMouse(gridRef: React.RefObject<HTMLDivElement | null>,) {
       stateRef.current = newState;
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
+    ref.current && document.addEventListener("mousemove", handleMouseMove);
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
+      ref.current && document.removeEventListener("mousemove", handleMouseMove);
     };
-  }, []);
+  }, [ref.current]);
 
   return stateRef;
 }

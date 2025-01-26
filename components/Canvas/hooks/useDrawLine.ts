@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from "react";
-import { MouseState, useMouse } from "./useMouse";
+import { useContext, useEffect, useRef, useState } from "react";
+import { useMouse } from "./useMouse";
+import { ContainerContext } from "../context/container";
 
 type Point = { x: number, y: number };
-export function useSplitGrid(gridRef: React.RefObject<HTMLDivElement | null>, isFocused: boolean) {
+export function useDrawLine(isFocused: boolean) {
   const isDrawingRef = useRef(false);
   const [startPoint, setStartPoint] = useState<Point | null>(null);
   const [endPoint, setEndPoint] = useState<Point | null>(null);
-  const mouseStateRef = useMouse(gridRef);
+  const containerRef = useContext(ContainerContext).container;
+  const mouseStateRef = useMouse(containerRef);
 
   const clean = () => {
     setStartPoint(null);
@@ -15,6 +17,7 @@ export function useSplitGrid(gridRef: React.RefObject<HTMLDivElement | null>, is
   }
 
   useEffect(() => {
+    console.log("clean");
     clean();
 
     const handleMouseDown = (event: MouseEvent) => {
@@ -46,7 +49,7 @@ export function useSplitGrid(gridRef: React.RefObject<HTMLDivElement | null>, is
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isFocused]);
+  }, [isFocused, containerRef.current]);
 
-  return [startPoint, endPoint] as const;
+  return [startPoint, endPoint, isDrawingRef.current] as const;
 }

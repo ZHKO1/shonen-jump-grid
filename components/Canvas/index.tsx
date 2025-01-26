@@ -1,17 +1,22 @@
+"use client";
 import { Grid, GridConfig } from "./grid";
+import { ContainerContext } from "./context/container";
+import { useEffect, useRef } from "react";
+import useStepsStore from '../store/step'
 
-const grids: GridConfig[] = [
+const defaultConfig: GridConfig[] = [
   {
     "type": "rect",
     "lt_x": 18,
     "lt_y": 18,
     "rb_x": 703,
-    "rb_y": 1063
+    "rb_y": 1063,
+    "index": 0,
   }
 ]
 
 /*
-const grids: GridConfig[] = [
+const defaultConfig: GridConfig[] = [
   {
     "type": "poly",
     "path": [
@@ -78,7 +83,7 @@ const grids: GridConfig[] = [
   }
 ]
 
-const grids: GridConfig[] = [
+const defaultConfig: GridConfig[] = [
   {
     "type": "rect",
     "lt_x": 18,
@@ -115,10 +120,18 @@ const grids: GridConfig[] = [
 */
 
 export default function Canvas() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { addStep, getCurrentStep } = useStepsStore();
+  const step = getCurrentStep();
+  useEffect(() => {
+    addStep({type: "init", comicConfig: defaultConfig});
+  }, []);
   return (
     <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-black">
-      <div className="canvas-content w-[720px] h-full bg-gray-100 relative overflow-hidden after:absolute after:border-2 after:top-0 after:left-0 after:right-0 after:bottom-0 after:border-gray-400 after:pointer-events-none">
-        {grids.map((grid, index) => (<Grid grid={grid} key={index} />))}
+      <div ref={containerRef} className="canvas-content w-[720px] h-full bg-gray-100 relative overflow-hidden after:absolute after:border-2 after:top-0 after:left-0 after:right-0 after:bottom-0 after:border-gray-400 after:pointer-events-none">
+        <ContainerContext.Provider value={{ container: containerRef }}>
+          {step && step.comicConfig.map((grid) => (<Grid grid={grid} key={grid.index} />))}
+        </ContainerContext.Provider>
       </div>
     </div>
   );

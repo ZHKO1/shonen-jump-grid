@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 
-export function useFocusGrid(gridRef: React.RefObject<HTMLDivElement | null>) {
-  const [isFocused, setFocused] = useState(false);
+export function useFocusGrid(gridRef: React.RefObject<HTMLDivElement | null>, isDefaultFocused: boolean = false) {
+  const [isFocused, setFocused] = useState(isDefaultFocused);
   const mouseStatusRef = useRef({ drag: false, click: false });
 
-  const setGridFocus = () => {
-    if (!isFocused) {
-      setFocused(true);
+  const setGridFocus = (val: boolean) => {
+    if (val) {
+      !isFocused && setFocused(true);
+    } else {
+      setFocused(false);
     }
   }
 
@@ -14,13 +16,13 @@ export function useFocusGrid(gridRef: React.RefObject<HTMLDivElement | null>) {
     const handleDocumentMouseDown = (event: MouseEvent) => {
       mouseStatusRef.current = { drag: false, click: true };
     }
-  
+
     const handleDocumentMouseMove = (event: MouseEvent) => {
       if (mouseStatusRef.current.click) {
         mouseStatusRef.current.drag = true;
       }
     }
-  
+
     const handleClickOutside = (event: MouseEvent) => {
       try {
         if (mouseStatusRef.current.click) {
@@ -44,7 +46,7 @@ export function useFocusGrid(gridRef: React.RefObject<HTMLDivElement | null>) {
       document.removeEventListener("mousemove", handleDocumentMouseMove);
       document.removeEventListener("mouseup", handleClickOutside);
     };
-  }, [isFocused]);
+  }, [isFocused, gridRef.current]);
 
   return [isFocused, setGridFocus] as const;
 
