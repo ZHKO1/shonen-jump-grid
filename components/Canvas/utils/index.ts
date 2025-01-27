@@ -1,4 +1,4 @@
-import { ComicConfig, GridConfig, Point } from "../grid";
+import { ComicConfig, GridConfig, Point, PolyGridPoint, RectGridPoint } from "../grid";
 
 type Pos = "lt" | "rt" | "lb" | "rb";
 type PolyType = "horizon" | "vertical";
@@ -93,7 +93,7 @@ function getXFromConentLineFunc(point1: Point, point2: Point, borderWidth: numbe
         }
         let k = (point1.y - point2.y) / (point1.x - point2.x);
         let b = point1.y - k * point1.x;
-        let contentB = b - (k > 0 ? one: -1 * one) * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
+        let contentB = b - (k > 0 ? one : -1 * one) * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
         return (y - contentB) / k;
     }
 }
@@ -121,38 +121,80 @@ function getYFromConentLineFunc(point1: Point, point2: Point, borderWidth: numbe
 }
 
 /**
- * 返回四边形内容的clipPath
- * 斜率公式: y = kx + b
+ * 返回rect的绘制点
  * @param path 
  * @param borderWidth 
  * @returns 
  */
-export function getPolyContentClipPath(path: [Point, Point, Point, Point], borderWidth: number): string {
+export function getRectGridPoint({ lt_x, lt_y, rb_x, rb_y }: RectGridPoint, borderWidth: number): { outside: RectGridPoint, inside: RectGridPoint } {
+    return {
+        outside: {
+            lt_x: lt_x - Math.floor(borderWidth / 2),
+            lt_y: lt_y - Math.floor(borderWidth / 2),
+            rb_x: rb_x + Math.floor(borderWidth / 2),
+            rb_y: rb_y + Math.floor(borderWidth / 2),
+        },
+        inside: {
+            lt_x: lt_x + Math.floor(borderWidth / 2),
+            lt_y: lt_y + Math.floor(borderWidth / 2),
+            rb_x: rb_x - Math.floor(borderWidth / 2),
+            rb_y: rb_y - Math.floor(borderWidth / 2),
+        }
+    };
+}
+
+/**
+ * 返回poly的绘制点
+ * @param path 
+ * @param borderWidth 
+ * @returns 
+ */
+export function getPolyGridPoint(path: PolyGridPoint["path"], borderWidth: number): { outside: PolyGridPoint["path"], inside: PolyGridPoint["path"] } {
     let result = [];
+    const adjust = Math.floor(borderWidth / 2);
     let lt_x = getPolyContainerPoint(path, 'lt').x;
     let lt_y = getPolyContainerPoint(path, 'lt').y;
     let rb_x = getPolyContainerPoint(path, 'rb').x;
     let rb_y = getPolyContainerPoint(path, 'rb').y;
     let point0, point1, point2, point3;
     if (getPolyType(path) === 'horizon') {
-        let getConentLeftLineX = getXFromConentLineFunc(path[0], path[3], borderWidth, true);
-        let getConentRightLineX = getXFromConentLineFunc(path[1], path[2], borderWidth, false);
-
-        point0 = { x: getConentLeftLineX(lt_y + borderWidth), y: lt_y + borderWidth };
-        point1 = { x: getConentRightLineX(lt_y + borderWidth), y: lt_y + borderWidth };
-        point2 = { x: getConentRightLineX(rb_y - borderWidth), y: rb_y - borderWidth };
-        point3 = { x: getConentLeftLineX(rb_y - borderWidth), y: rb_y - borderWidth };
+        return {
+            outside: getPointFromHorizonPoly("out"),
+            inside: getPointFromHorizonPoly("in"),
+        };
     } else {
-        let getConentTopLineY = getYFromConentLineFunc(path[0], path[1], borderWidth, true);
-        let getConentBottomLineY = getYFromConentLineFunc(path[3], path[2], borderWidth, false);
-
-        point0 = { y: getConentTopLineY(lt_x + borderWidth), x: lt_x + borderWidth };
-        point1 = { y: getConentTopLineY(rb_x - borderWidth), x: rb_x - borderWidth };
-        point2 = { y: getConentBottomLineY(rb_x - borderWidth), x: rb_x - borderWidth };
-        point3 = { y: getConentBottomLineY(lt_x + borderWidth), x: lt_x + borderWidth };
+        return {
+            outside: getPointFromVerticalPoly("out"),
+            inside: getPointFromVerticalPoly("in"),
+        };
     }
-    result = [point0, point1, point2, point3];
-    return `polygon(${result.map(p => `${p.x - lt_x}px ${p.y - lt_y}px`).join(',')})`;;
+
+
+    function getPointFromHorizonPoly(type: "out" | "in"): PolyGridPoint["path"] {
+        const one = type == "out" ? -1 : 1;
+        let getConentLeftLineX = getXFromConentLineFunc(path[0], path[3], adjust, type == "out" ? false : true);
+        let getConentRightLineX = getXFromConentLineFunc(path[1], path[2], adjust, type == "out" ? true : false);
+
+        point0 = { x: getConentLeftLineX(lt_y + one * adjust), y: lt_y + one * adjust };
+        point1 = { x: getConentRightLineX(lt_y + one * adjust), y: lt_y + one * adjust };
+        point2 = { x: getConentRightLineX(rb_y - one * adjust), y: rb_y - one * adjust };
+        point3 = { x: getConentLeftLineX(rb_y - one * adjust), y: rb_y - one * adjust };
+
+        return [point0, point1, point2, point3];
+    }
+
+    function getPointFromVerticalPoly(type: "out" | "in"): PolyGridPoint["path"] {
+        const one = type == "out" ? -1 : 1;
+        let getConentTopLineY = getYFromConentLineFunc(path[0], path[1], adjust, type == "out" ? false : true);
+        let getConentBottomLineY = getYFromConentLineFunc(path[3], path[2], adjust, type == "out" ? true : false);
+
+        point0 = { y: getConentTopLineY(lt_x + one * adjust), x: lt_x + one * adjust };
+        point1 = { y: getConentTopLineY(rb_x - one * adjust), x: rb_x - one * adjust };
+        point2 = { y: getConentBottomLineY(rb_x - one * adjust), x: rb_x - one * adjust };
+        point3 = { y: getConentBottomLineY(lt_x + one * adjust), x: lt_x + one * adjust };
+
+        return [point0, point1, point2, point3];
+    }
 }
 
 /**

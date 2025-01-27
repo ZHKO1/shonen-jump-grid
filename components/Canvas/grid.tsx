@@ -2,7 +2,7 @@
 import { MouseEventHandler, use, useEffect, useRef, useState } from 'react';
 import { isDef } from '../utils';
 import { useFocusGrid, useDrawLine } from './hooks/index';
-import { getGridsBySplit, getMaxIndexFromComicConfig, getPolyContainerPoint, getPolyContentClipPath, getPolyPointBySort } from './utils';
+import { getGridsBySplit, getMaxIndexFromComicConfig, getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort, getRectGridPoint } from './utils';
 import useStepsStore from '../store/step';
 
 export type Point = { x: number, y: number };
@@ -11,44 +11,50 @@ export type GridShareConfig = {
     index: number,
 }
 
+export type PolyGridPoint = {
+    path: [Point, Point, Point, Point],
+}
+
 export type PolyGridConfig = {
     type: 'poly',
-    path: [Point, Point, Point, Point],
-} & GridShareConfig
+} & GridShareConfig & PolyGridPoint
 
-export type RectGridConfig = {
-    type: 'rect',
+export type RectGridPoint = {
     lt_x: number,
     lt_y: number,
     rb_x: number,
     rb_y: number,
-} & GridShareConfig
+}
+
+export type RectGridConfig = {
+    type: 'rect',
+} & GridShareConfig & RectGridPoint
 
 export type GridConfig = (PolyGridConfig | RectGridConfig);
 
 export type ComicConfig = GridConfig[];
 
-const borderWidth = 4;
+const borderWidth = 6;
 
 function PolyGrid({ grid }: { grid: PolyGridConfig }) {
     const gridRef = useRef<HTMLDivElement>(null);
     const [isGridFocused, setGridFocus] = useFocusGrid(gridRef);
-    let lt = getPolyContainerPoint(grid.path, 'lt');
-    let rb = getPolyContainerPoint(grid.path, 'rb');
-    if (!isDef(lt) || !isDef(rb)) {
+    const { outside, inside } = getPolyGridPoint(grid.path, borderWidth);
+    let lt_outside = getPolyContainerPoint(outside, 'lt');
+    let rb_outside = getPolyContainerPoint(outside, 'rb');
+    if (!isDef(lt_outside) || !isDef(rb_outside)) {
         return null;
-
     }
-    let left = lt.x;
-    let top = lt.y;
-    let width = rb.x - lt.x;
-    let height = rb.y - lt.y;
-    let sortPath = getPolyPointBySort(grid.path);
+    let left = lt_outside.x;
+    let top = lt_outside.y;
+    let width = rb_outside.x - lt_outside.x;
+    let height = rb_outside.y - lt_outside.y;
+    let sortPath = getPolyPointBySort(outside);
     let clipPath = `polygon(${sortPath.map(p => `${p.x - left}px ${p.y - top}px`).join(',')})`;
     let contentStyle = {
         width: `100%`,
         height: `100%`,
-        clipPath: getPolyContentClipPath(sortPath, borderWidth),
+        clipPath: `polygon(${inside.map(p => `${p.x - left}px ${p.y - top}px`).join(',')})`,
     }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -57,7 +63,7 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
     }
 
     return (
-        <div className={`custom-grid absolute ${isGridFocused ? "animate-breathe" : "bg-gray-200"}`} style={{ left, top, width, height, clipPath }}
+        <div className={`opacity-60 custom-grid absolute ${isGridFocused ? "animate-breathe" : "bg-gray-200"}`} style={{ left, top, width, height, clipPath }}
             ref={gridRef}
             onClick={handleClick}
         >
@@ -72,12 +78,15 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
     const gridRef = useRef<HTMLDivElement>(null);
     const [isGridFocused, setGridFocus] = useFocusGrid(gridRef, isDefaultFocused);
     const [startPoint, endPoint, isDrawing] = useDrawLine(isGridFocused);
-    let grids = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth);
+    const { outside, inside } = getRectGridPoint({
+        ...grid
+    }, borderWidth);
+    let grids = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth * 2);
 
-    let left = grid.lt_x;
-    let top = grid.lt_y;
-    let width = grid.rb_x - grid.lt_x;
-    let height = grid.rb_y - grid.lt_y;
+    let left = outside.lt_x;
+    let top = outside.lt_y;
+    let width = outside.rb_x - outside.lt_x;
+    let height = outside.rb_y - outside.lt_y;
     let contentStyle = {
         width: `calc(100% - ${borderWidth * 2}px)`,
         height: `calc(100% - ${borderWidth * 2}px)`,
@@ -106,7 +115,7 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
         <>
             <>
                 {
-                    <div className={`custom-grid absolute ${grids ? "hidden" : ""} ${isGridFocused && !grids ? "animate-breathe" : "bg-gray-200"} flex flex-wrap content-center justify-center`}
+                    <div className={`opacity-60 custom-grid absolute ${grids ? "hidden" : ""} ${isGridFocused && !grids ? "animate-breathe" : "bg-gray-200"} flex flex-wrap content-center justify-center`}
                         style={{ left, top, width, height }}
                         ref={gridRef}
                         onClick={handleClick}
