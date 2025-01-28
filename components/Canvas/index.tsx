@@ -240,7 +240,7 @@ export default function Canvas() {
   }, []);
   return (
     <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-black">
-      <div ref={containerRef} className="canvas-content w-[720px] h-full bg-gray-100 relative overflow-hidden after:absolute after:border-2 after:top-0 after:left-0 after:right-0 after:bottom-0 after:border-gray-400 after:pointer-events-none">
+      <div ref={containerRef} className="canvas-content w-[720px] h-[1080px] bg-gray-100 relative overflow-hidden after:absolute after:border-2 after:top-0 after:left-0 after:right-0 after:bottom-0 after:border-gray-400 after:pointer-events-none">
         <ContainerContext.Provider value={{ container: containerRef }}>
           {step && step.comicConfig.map((grid) => (<Grid grid={grid} key={grid.index} />))}
         </ContainerContext.Provider>

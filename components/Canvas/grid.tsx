@@ -37,6 +37,8 @@ export type ComicConfig = GridConfig[];
 const borderWidth = 6;
 
 function PolyGrid({ grid }: { grid: PolyGridConfig }) {
+    const { addStep, getCurrentStep } = useStepsStore();
+    const currentStep = getCurrentStep();
     const gridRef = useRef<HTMLDivElement>(null);
     const [isGridFocused, setGridFocus] = useFocusGrid(gridRef);
     const { outside, inside } = getPolyGridPoint(grid.path, borderWidth);
@@ -45,6 +47,9 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
     if (!isDef(lt_outside) || !isDef(rb_outside)) {
         return null;
     }
+    const [startPoint, endPoint, isDrawing] = useDrawLine(isGridFocused);
+    let grids = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth * 2);
+
     let left = lt_outside.x;
     let top = lt_outside.y;
     let width = rb_outside.x - lt_outside.x;
@@ -62,13 +67,49 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
         e.stopPropagation();
     }
 
+    useEffect(() => {
+        if (!isDrawing && startPoint && endPoint) {
+            if (currentStep && grids) {
+                const comicConfig = currentStep.comicConfig;
+                const maxIndex = getMaxIndexFromComicConfig(comicConfig);
+                const newComicConfig = [...comicConfig.filter(grid_ => grid_.index != grid.index), ...grids.map((grid_, index) => ({ ...grid_, index: maxIndex + index + 1 }))];
+                addStep({
+                    type: "split",
+                    comicConfig: newComicConfig,
+                });
+            }
+        }
+    }, [isDrawing]);
+
     return (
-        <div className={`opacity-60 custom-grid absolute ${isGridFocused ? "animate-breathe" : "bg-gray-200"}`} style={{ left, top, width, height, clipPath }}
-            ref={gridRef}
-            onClick={handleClick}
-        >
-            <div className="custom-grid-content bg-white" style={{ ...contentStyle }}></div>
-        </div>
+        <>
+            {
+                <div className={`opacity-60 custom-grid absolute ${isGridFocused ? "animate-breathe" : "bg-gray-200"}`} style={{ left, top, width, height, clipPath }}
+                    ref={gridRef}
+                    onClick={handleClick}
+                >
+                    <div className="custom-grid-content bg-white" style={{ ...contentStyle }}></div>
+                </div>
+            }
+            {
+                grids && (grids.map((grid, index) => (<Grid grid={grid} key={(new Date()).getTime() + "_" + index} isDefaultFocused />)))
+            }
+            {
+                startPoint && endPoint && (
+                    <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                        <line
+                            x1={startPoint.x}
+                            y1={startPoint.y}
+                            x2={endPoint.x}
+                            y2={endPoint.y}
+                            stroke="black"
+                            strokeWidth="2"
+                        />
+                    </svg>
+                )
+            }
+        </>
+
     )
 }
 
@@ -78,7 +119,7 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
     const gridRef = useRef<HTMLDivElement>(null);
     const [isGridFocused, setGridFocus] = useFocusGrid(gridRef, isDefaultFocused);
     const [startPoint, endPoint, isDrawing] = useDrawLine(isGridFocused);
-    const { outside, inside } = getRectGridPoint({
+    const { outside } = getRectGridPoint({
         ...grid
     }, borderWidth);
     let grids = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth * 2);
@@ -113,39 +154,36 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
 
     return (
         <>
-            <>
-                {
-                    <div className={`opacity-60 custom-grid absolute ${grids ? "hidden" : ""} ${isGridFocused && !grids ? "animate-breathe" : "bg-gray-200"} flex flex-wrap content-center justify-center`}
-                        style={{ left, top, width, height }}
-                        ref={gridRef}
-                        onClick={handleClick}
-                    >
-                        <div className="custom-grid-content bg-white" style={contentStyle}></div>
-                    </div>
+            {
+                <div className={`opacity-60 custom-grid absolute ${grids ? "hidden" : ""} ${isGridFocused && !grids ? "animate-breathe" : "bg-gray-200"} flex flex-wrap content-center justify-center`}
+                    style={{ left, top, width, height }}
+                    ref={gridRef}
+                    onClick={handleClick}
+                >
+                    <div className="custom-grid-content bg-white" style={contentStyle}></div>
+                </div>
 
-                }
-                {
-                    grids && (grids.map((grid, index) => (<Grid grid={grid} key={(new Date()).getTime() + "_" + index} isDefaultFocused />)))
-                }
-                {
-                    /*
-                    startPoint && endPoint && (
-                        <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-                            <line
-                                x1={startPoint.x}
-                                y1={startPoint.y}
-                                x2={endPoint.x}
-                                y2={endPoint.y}
-                                stroke="black"
-                                strokeWidth="2"
-                            />
-                        </svg>
-                    )
-                    */
-                }
-            </>
+            }
+            {
+                grids && (grids.map((grid, index) => (<Grid grid={grid} key={(new Date()).getTime() + "_" + index} isDefaultFocused />)))
+            }
+            {
+                /*
+                startPoint && endPoint && (
+                    <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                        <line
+                            x1={startPoint.x}
+                            y1={startPoint.y}
+                            x2={endPoint.x}
+                            y2={endPoint.y}
+                            stroke="black"
+                            strokeWidth="2"
+                        />
+                    </svg>
+                )
+                */
+            }
         </>
-
     )
 }
 
