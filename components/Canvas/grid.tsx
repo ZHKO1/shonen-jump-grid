@@ -68,9 +68,10 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
     }
 
     return (
-        <>
+        <div>
             {
-                <div className={`opacity-60 custom-grid absolute ${isGridFocused ? "animate-breathe" : "bg-gray-200"}`} style={{ left, top, width, height, clipPath }}
+                <div className={`opacity-60 custom-grid absolute ${isGridFocused ? "animate-breathe" : "bg-gray-200"}`}
+                    style={{ left, top, width, height, clipPath }}
                     ref={gridRef}
                     onClick={handleClick}
                 >
@@ -96,7 +97,7 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
                 )
                 */
             }
-        </>
+        </div>
 
     )
 }
@@ -124,7 +125,7 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
     }
 
     return (
-        <>
+        <div>
             {
                 <div className={`opacity-60 custom-grid absolute ${grids ? "hidden" : ""} ${isGridFocused && !grids ? "animate-breathe" : "bg-gray-200"} flex flex-wrap content-center justify-center`}
                     style={{ left, top, width, height }}
@@ -154,33 +155,47 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
                 )
                 */
             }
-        </>
+        </div>
     )
 }
 
 function SplitContainer({ grid }: { grid: GridConfig }) {
+    const [isFocused, setFocus] = useState(false);
     let split_result = grid.split_result;
     let startPoint = grid.split_line?.[0];
     let endPoint = grid.split_line?.[1];
-    return (<>
-        {
-            split_result && (split_result.map(grid_ => (<Grid grid={grid_} key={grid_.id} />)))
-        }
+    return (<div>
         {
             startPoint && endPoint && (
-                <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                <svg className={`absolute top-0 left-0 w-full h-full ${isFocused ? "opacity-100" : "opacity-0"}`}
+                    style={{ pointerEvents: "none" }}>
                     <line
                         x1={startPoint.x}
                         y1={startPoint.y}
                         x2={endPoint.x}
                         y2={endPoint.y}
-                        stroke="black"
-                        strokeWidth="2"
+                        stroke="gray"
+                        strokeWidth="4"
+                        strokeDasharray={5}
+                        pointerEvents="all"
+                        onClick={() => setFocus(true)}
                     />
                 </svg>
             )
         }
-    </>)
+        {
+            split_result && (split_result.map(grid_ => (<Grid grid={grid_} key={grid_.id} />)))
+        }
+        {
+            isFocused && startPoint && endPoint && (
+                <>
+                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer' style={{ left: startPoint.x - 5, top: startPoint.y - 5 }}></div>
+                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer' style={{ left: (startPoint.x + endPoint.x) / 2 - 5, top: (startPoint.y + endPoint.y) / 2 - 5 }}></div>
+                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer' style={{ left: endPoint.x - 5, top: endPoint.y - 5 }}></div>
+                </>
+            )
+        }
+    </div>)
 }
 
 

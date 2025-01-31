@@ -8,7 +8,7 @@ export function useSplit(grid: GridConfig, isGridFocused: boolean, spaceWidth: n
   const { addStep, getCurrentStep } = useStepsStore();
   const currentStep = getCurrentStep();
   const [startPoint, endPoint, isDrawing] = useDrawLine(isGridFocused);
-  let grids = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], spaceWidth);
+  let { grids, line } = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], spaceWidth) || {};
 
   useEffect(() => {
     if (!isDrawing && startPoint && endPoint) {
@@ -18,7 +18,7 @@ export function useSplit(grid: GridConfig, isGridFocused: boolean, spaceWidth: n
 
         const newGrid = getGridFromComicConfig(newComicConfig, grid.id);
         if (newGrid) {
-          newGrid.split_line = [startPoint, endPoint];
+          newGrid.split_line = JSON.parse(JSON.stringify(line));
           newGrid.split_result = JSON.parse(JSON.stringify(grids)).map((grid_: GridConfig, index: number) => ({
             ...grid_,
             id: grid.id + "_" + index
