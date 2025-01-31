@@ -2,13 +2,16 @@
 import { MouseEventHandler, use, useEffect, useRef, useState } from 'react';
 import { isDef } from '../utils';
 import { useFocusGrid, useDrawLine } from './hooks/index';
-import { getGridsBySplit, getMaxIndexFromComicConfig, getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort, getRectGridPoint } from './utils';
+import { getGridsBySplit, getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort, getRectGridPoint } from './utils';
 import useStepsStore from '../store/step';
+import { useSplit } from './hooks/useSplit';
 
 export type Point = { x: number, y: number };
 
 export type GridShareConfig = {
-    index: number,
+    id: string | number,
+    split_line?: [Point, Point],
+    split_result?: [GridConfig, GridConfig],
 }
 
 export type PolyGridPoint = {
@@ -37,8 +40,6 @@ export type ComicConfig = GridConfig[];
 const borderWidth = 6;
 
 function PolyGrid({ grid }: { grid: PolyGridConfig }) {
-    const { addStep, getCurrentStep } = useStepsStore();
-    const currentStep = getCurrentStep();
     const gridRef = useRef<HTMLDivElement>(null);
     const [isGridFocused, setGridFocus] = useFocusGrid(gridRef);
     const { outside, inside } = getPolyGridPoint(grid.path, borderWidth);
@@ -47,8 +48,7 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
     if (!isDef(lt_outside) || !isDef(rb_outside)) {
         return null;
     }
-    const [startPoint, endPoint, isDrawing] = useDrawLine(isGridFocused);
-    let grids = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth * 2);
+    let grids = useSplit(grid, isGridFocused, borderWidth * 2);
 
     let left = lt_outside.x;
     let top = lt_outside.y;
@@ -67,20 +67,6 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
         e.stopPropagation();
     }
 
-    useEffect(() => {
-        if (!isDrawing && startPoint && endPoint) {
-            if (currentStep && grids) {
-                const comicConfig = currentStep.comicConfig;
-                const maxIndex = getMaxIndexFromComicConfig(comicConfig);
-                const newComicConfig = [...comicConfig.filter(grid_ => grid_.index != grid.index), ...grids.map((grid_, index) => ({ ...grid_, index: maxIndex + index + 1 }))];
-                addStep({
-                    type: "split",
-                    comicConfig: newComicConfig,
-                });
-            }
-        }
-    }, [isDrawing]);
-
     return (
         <>
             {
@@ -95,6 +81,7 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
                 grids && (grids.map((grid, index) => (<Grid grid={grid} key={(new Date()).getTime() + "_" + index} isDefaultFocused />)))
             }
             {
+                /*
                 startPoint && endPoint && (
                     <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
                         <line
@@ -107,6 +94,7 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
                         />
                     </svg>
                 )
+                */
             }
         </>
 
@@ -114,15 +102,12 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
 }
 
 function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, isDefaultFocused?: boolean }) {
-    const { addStep, getCurrentStep } = useStepsStore();
-    const currentStep = getCurrentStep();
     const gridRef = useRef<HTMLDivElement>(null);
     const [isGridFocused, setGridFocus] = useFocusGrid(gridRef, isDefaultFocused);
-    const [startPoint, endPoint, isDrawing] = useDrawLine(isGridFocused);
     const { outside } = getRectGridPoint({
         ...grid
     }, borderWidth);
-    let grids = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth * 2);
+    let grids = useSplit(grid, isGridFocused, borderWidth * 2);
 
     let left = outside.lt_x;
     let top = outside.lt_y;
@@ -137,20 +122,6 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
         setGridFocus(true);
         e.stopPropagation();
     }
-
-    useEffect(() => {
-        if (!isDrawing && startPoint && endPoint) {
-            if (currentStep && grids) {
-                const comicConfig = currentStep.comicConfig;
-                const maxIndex = getMaxIndexFromComicConfig(comicConfig);
-                const newComicConfig = [...comicConfig.filter(grid_ => grid_.index != grid.index), ...grids.map((grid_, index) => ({ ...grid_, index: maxIndex + index + 1 }))];
-                addStep({
-                    type: "split",
-                    comicConfig: newComicConfig,
-                });
-            }
-        }
-    }, [isDrawing]);
 
     return (
         <>
@@ -187,8 +158,36 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
     )
 }
 
+function SplitContainer({ grid }: { grid: GridConfig }) {
+    let split_result = grid.split_result;
+    let startPoint = grid.split_line?.[0];
+    let endPoint = grid.split_line?.[1];
+    return (<>
+        {
+            split_result && (split_result.map(grid_ => (<Grid grid={grid_} key={grid_.id} />)))
+        }
+        {
+            startPoint && endPoint && (
+                <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                    <line
+                        x1={startPoint.x}
+                        y1={startPoint.y}
+                        x2={endPoint.x}
+                        y2={endPoint.y}
+                        stroke="black"
+                        strokeWidth="2"
+                    />
+                </svg>
+            )
+        }
+    </>)
+}
+
 
 export function Grid({ grid, isDefaultFocused }: { grid: GridConfig, isDefaultFocused?: boolean }) {
+    if (grid.split_line && grid.split_result && grid.split_result.length > 0) {
+        return <SplitContainer grid={grid} />;
+    }
     if (grid.type === 'poly') {
         return <PolyGrid grid={grid} />;
     } else if (grid.type === 'rect') {

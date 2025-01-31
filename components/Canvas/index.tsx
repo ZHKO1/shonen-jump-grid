@@ -14,7 +14,7 @@ const defaultConfig: GridConfig[] = [
     "lt_y": 18,
     "rb_x": 703,
     "rb_y": 1063,
-    "index": 0,
+    "id": 0,
   }
 ]
 
@@ -27,7 +27,7 @@ const defaultConfig1: GridConfig[] = [
       { x: 136, y: 521 },
       { x: 18, y: 521 },
     ],
-    index: 0
+    "id": 0
   },
   {
     "type": "poly",
@@ -37,7 +37,7 @@ const defaultConfig1: GridConfig[] = [
       { x: 486, y: 521 },
       { x: 146, y: 521 },
     ],
-    index: 1
+    "id": 1
   },
   {
     "type": "poly",
@@ -47,7 +47,7 @@ const defaultConfig1: GridConfig[] = [
       { x: 703, y: 248 },
       { x: 559, y: 248 },
     ],
-    index: 2
+    "id": 2
   },
   {
     "type": "poly",
@@ -57,7 +57,7 @@ const defaultConfig1: GridConfig[] = [
       { x: 726, y: 521 },
       { x: 498, y: 521 },
     ],
-    index: 3
+    "id": 3
   },
   {
     "type": "rect",
@@ -65,7 +65,7 @@ const defaultConfig1: GridConfig[] = [
     "lt_y": 556,
     "rb_x": 579,
     "rb_y": 1063,
-    index: 4
+    "id": 4
   },
   {
     "type": "rect",
@@ -73,7 +73,7 @@ const defaultConfig1: GridConfig[] = [
     "lt_y": 556,
     "rb_x": 703,
     "rb_y": 747,
-    index: 5
+    "id": 5
   },
   {
     "type": "rect",
@@ -81,7 +81,7 @@ const defaultConfig1: GridConfig[] = [
     "lt_y": 757,
     "rb_x": 703,
     "rb_y": 895,
-    index: 6
+    "id": 6
   },
   {
     "type": "rect",
@@ -89,7 +89,7 @@ const defaultConfig1: GridConfig[] = [
     "lt_y": 905,
     "rb_x": 703,
     "rb_y": 1063,
-    index: 7
+    "id": 7
   }
 ]
 
@@ -100,7 +100,7 @@ const defaultConfig2: GridConfig[] = [
     "lt_y": 9,
     "rb_x": 703,
     "rb_y": 519,
-    index: 0,
+    "id": 0,
   },
   {
     "type": "poly",
@@ -110,7 +110,7 @@ const defaultConfig2: GridConfig[] = [
       { x: 354, y: 779 },
       { x: 18, y: 692 },
     ],
-    index: 1,
+    "id": 1,
   },
   {
     "type": "poly",
@@ -120,7 +120,7 @@ const defaultConfig2: GridConfig[] = [
       { x: 354, y: 884 },
       { x: 18, y: 884 },
     ],
-    index: 2,
+    "id": 2,
   },
   {
     "type": "rect",
@@ -128,7 +128,7 @@ const defaultConfig2: GridConfig[] = [
     "lt_y": 541,
     "rb_x": 703,
     "rb_y": 884,
-    index: 3,
+    "id": 3,
   }
 ]
 
@@ -139,7 +139,7 @@ const defaultConfig3: GridConfig[] = [
     "lt_y": 878,
     "rb_x": 526,
     "rb_y": 1062,
-    index: 0,
+    "id": 0,
   },
   {
     "type": "rect",
@@ -147,7 +147,7 @@ const defaultConfig3: GridConfig[] = [
     "lt_y": 555,
     "rb_x": 703,
     "rb_y": 1062,
-    index: 1,
+    "id": 1,
   },
   {
     "type": "poly",
@@ -157,7 +157,7 @@ const defaultConfig3: GridConfig[] = [
       { x: 314, y: 858 },
       { x: 18, y: 858 },
     ],
-    index: 2
+    "id": 2
   },
   {
     "type": "poly",
@@ -167,7 +167,7 @@ const defaultConfig3: GridConfig[] = [
       { x: 526, y: 858 },
       { x: 328, y: 858 }
     ],
-    index: 3
+    "id": 3
   },
   {
     "type": "rect",
@@ -175,7 +175,7 @@ const defaultConfig3: GridConfig[] = [
     "lt_y": 397,
     "rb_x": 195,
     "rb_y": 523,
-    index: 4
+    "id": 4
   },
   {
     "type": "poly",
@@ -185,7 +185,7 @@ const defaultConfig3: GridConfig[] = [
       { x: 486, y: 523 },
       { x: 205, y: 523 }
     ],
-    index: 5
+    "id": 5
   },
   {
     "type": "poly",
@@ -195,7 +195,7 @@ const defaultConfig3: GridConfig[] = [
       { x: 703, y: 523 },
       { x: 497, y: 523 }
     ],
-    index: 6
+    "id": 6
   },
   {
     "type": "rect",
@@ -203,7 +203,7 @@ const defaultConfig3: GridConfig[] = [
     "lt_y": 158,
     "rb_x": 703,
     "rb_y": 380,
-    index: 7
+    "id": 7
   },
   {
     "type": "rect",
@@ -211,7 +211,7 @@ const defaultConfig3: GridConfig[] = [
     "lt_y": 18,
     "rb_x": 255,
     "rb_y": 141,
-    index: 8
+    "id": 8
   },
   {
     "type": "rect",
@@ -219,7 +219,7 @@ const defaultConfig3: GridConfig[] = [
     "lt_y": 18,
     "rb_x": 544,
     "rb_y": 141,
-    index: 9
+    "id": 9
   },
   {
     "type": "rect",
@@ -227,7 +227,7 @@ const defaultConfig3: GridConfig[] = [
     "lt_y": 18,
     "rb_x": 703,
     "rb_y": 141,
-    index: 10
+    "id": 10
   }
 ]
 
@@ -242,7 +242,7 @@ export default function Canvas() {
     <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-black">
       <div ref={containerRef} className="canvas-content w-[720px] h-[1080px] bg-gray-100 relative overflow-hidden after:absolute after:border-2 after:top-0 after:left-0 after:right-0 after:bottom-0 after:border-gray-400 after:pointer-events-none">
         <ContainerContext.Provider value={{ container: containerRef }}>
-          {step && step.comicConfig.map((grid) => (<Grid grid={grid} key={grid.index} />))}
+          {step && step.comicConfig.map((grid) => (<Grid grid={grid} key={grid.id} />))}
         </ContainerContext.Provider>
       </div>
     </div>

@@ -212,8 +212,8 @@ export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], 
     if ((leftCrossY > lt_y && leftCrossY < rb_y) && (rightCrossY > lt_y && rightCrossY < rb_y)) {
         if (leftCrossY == rightCrossY) {
             return [
-                { type: 'rect', lt_x, lt_y, rb_x, rb_y: leftCrossY - Math.floor(borderWidth / 2), index: 0 },
-                { type: 'rect', lt_x, lt_y: leftCrossY + Math.floor(borderWidth / 2), rb_x, rb_y, index: 1 }
+                { type: 'rect', lt_x, lt_y, rb_x, rb_y: leftCrossY - Math.floor(borderWidth / 2), id: 0 },
+                { type: 'rect', lt_x, lt_y: leftCrossY + Math.floor(borderWidth / 2), rb_x, rb_y, id: 1 }
             ]
         } else {
             let getLineCrossY_ceil = getYFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), false);
@@ -223,15 +223,15 @@ export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], 
             let leftCrossY_floor = getLineCrossY_floor(lt_x);
             let rightCrossY_floor = getLineCrossY_floor(rb_x);
             return [
-                { type: 'poly', path: [{ x: lt_x, y: lt_y }, { x: rb_x, y: lt_y }, { x: rb_x, y: rightCrossY_ceil }, { x: lt_x, y: leftCrossY_ceil }], index: 0 },
-                { type: 'poly', path: [{ x: lt_x, y: leftCrossY_floor }, { x: rb_x, y: rightCrossY_floor }, { x: rb_x, y: rb_y }, { x: lt_x, y: rb_y }], index: 1 },
+                { type: 'poly', path: [{ x: lt_x, y: lt_y }, { x: rb_x, y: lt_y }, { x: rb_x, y: rightCrossY_ceil }, { x: lt_x, y: leftCrossY_ceil }], id: 0 },
+                { type: 'poly', path: [{ x: lt_x, y: leftCrossY_floor }, { x: rb_x, y: rightCrossY_floor }, { x: rb_x, y: rb_y }, { x: lt_x, y: rb_y }], id: 1 },
             ]
         }
     } else if ((topCrossX > lt_x && topCrossX < rb_x) && (bottomCrossX > lt_x && bottomCrossX < rb_x)) {
         if (topCrossX == bottomCrossX) {
             return [
-                { type: 'rect', lt_x, lt_y, rb_x: topCrossX - Math.floor(borderWidth / 2), rb_y, index: 0 },
-                { type: 'rect', lt_x: topCrossX + Math.floor(borderWidth / 2), lt_y, rb_x, rb_y, index: 1 }
+                { type: 'rect', lt_x, lt_y, rb_x: topCrossX - Math.floor(borderWidth / 2), rb_y, id: 0 },
+                { type: 'rect', lt_x: topCrossX + Math.floor(borderWidth / 2), lt_y, rb_x, rb_y, id: 1 }
             ]
         } else {
             let getLineCrossX_left = getXFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), false);
@@ -241,8 +241,8 @@ export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], 
             let topCrossX_right = getLineCrossX_right(lt_y);
             let bottomCrossX_right = getLineCrossX_right(rb_y);
             return [
-                { type: 'poly', path: [{ x: lt_x, y: lt_y }, { x: topCrossX_left, y: lt_y }, { x: bottomCrossX_left, y: rb_y }, { x: lt_x, y: rb_y }], index: 0 },
-                { type: 'poly', path: [{ x: topCrossX_right, y: lt_y }, { x: rb_x, y: lt_y }, { x: rb_x, y: rb_y }, { x: bottomCrossX_right, y: rb_y }], index: 1 },
+                { type: 'poly', path: [{ x: lt_x, y: lt_y }, { x: topCrossX_left, y: lt_y }, { x: bottomCrossX_left, y: rb_y }, { x: lt_x, y: rb_y }], id: 0 },
+                { type: 'poly', path: [{ x: topCrossX_right, y: lt_y }, { x: rb_x, y: lt_y }, { x: rb_x, y: rb_y }, { x: bottomCrossX_right, y: rb_y }], id: 1 },
             ]
         }
     }
@@ -269,8 +269,8 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
             let getLeftLineCrossX = getXFromConentLineFunc(point0, point3, 0);
             let getRightLineCrossX = getXFromConentLineFunc(point1, point2, 0);
             return [
-                { type: 'poly', path: [point0, point1, { x: getRightLineCrossX(line[0].y - adjust), y: line[0].y - adjust }, { x: getLeftLineCrossX(line[0].y - adjust), y: line[0].y - adjust }], index: 0 },
-                { type: 'poly', path: [{ x: getLeftLineCrossX(line[0].y + adjust), y: line[0].y + adjust }, { x: getRightLineCrossX(line[0].y + adjust), y: line[0].y + adjust }, point2, point3], index: 0 },
+                { type: 'poly', path: [point0, point1, { x: getRightLineCrossX(line[0].y - adjust), y: line[0].y - adjust }, { x: getLeftLineCrossX(line[0].y - adjust), y: line[0].y - adjust }], id: 0 },
+                { type: 'poly', path: [{ x: getLeftLineCrossX(line[0].y + adjust), y: line[0].y + adjust }, { x: getRightLineCrossX(line[0].y + adjust), y: line[0].y + adjust }, point2, point3], id: 0 },
             ]
         }
         let topCrossX = getLineCrossX(lt_y);
@@ -278,8 +278,8 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
         if ((topCrossX > point0.x && topCrossX < point1.x) && (bottomCrossX > point3.x && bottomCrossX < point2.x)) {
             if (topCrossX == bottomCrossX) {
                 return [
-                    { type: 'poly', path: [point0, { x: topCrossX - adjust, y: lt_y }, { x: topCrossX - adjust, y: rb_y }, point3], index: 0 },
-                    { type: 'poly', path: [{ x: topCrossX + adjust, y: lt_y }, point1, point2, { x: topCrossX + adjust, y: rb_y }], index: 1 },
+                    { type: 'poly', path: [point0, { x: topCrossX - adjust, y: lt_y }, { x: topCrossX - adjust, y: rb_y }, point3], id: 0 },
+                    { type: 'poly', path: [{ x: topCrossX + adjust, y: lt_y }, point1, point2, { x: topCrossX + adjust, y: rb_y }], id: 1 },
                 ]
             } else {
                 let getLineCrossX_left = getXFromConentLineFunc(line[0], line[1], adjust, false);
@@ -289,8 +289,8 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
                 let topCrossX_right = getLineCrossX_right(lt_y);
                 let bottomCrossX_right = getLineCrossX_right(rb_y);
                 return [
-                    { type: 'poly', path: [point0, { x: topCrossX_left, y: lt_y }, { x: bottomCrossX_left, y: rb_y }, point3], index: 0 },
-                    { type: 'poly', path: [{ x: topCrossX_right, y: lt_y }, point1, point2, { x: bottomCrossX_right, y: rb_y }], index: 1 },
+                    { type: 'poly', path: [point0, { x: topCrossX_left, y: lt_y }, { x: bottomCrossX_left, y: rb_y }, point3], id: 0 },
+                    { type: 'poly', path: [{ x: topCrossX_right, y: lt_y }, point1, point2, { x: bottomCrossX_right, y: rb_y }], id: 1 },
                 ]
             }
         }
@@ -299,8 +299,8 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
             let getTopLineCrossY = getYFromConentLineFunc(point0, point1, 0);
             let getBottomLineCrossY = getYFromConentLineFunc(point2, point3, 0);
             return [
-                { type: 'poly', path: [point0, { x: line[0].x - adjust, y: getTopLineCrossY(line[0].x - adjust) }, { x: line[0].x - adjust, y: getBottomLineCrossY(line[0].x - adjust) }, point3], index: 0 },
-                { type: 'poly', path: [{ x: line[0].x + adjust, y: getTopLineCrossY(line[0].x + adjust) }, point1, point2, { x: line[0].x + adjust, y: getBottomLineCrossY(line[0].x + adjust) }], index: 1 },
+                { type: 'poly', path: [point0, { x: line[0].x - adjust, y: getTopLineCrossY(line[0].x - adjust) }, { x: line[0].x - adjust, y: getBottomLineCrossY(line[0].x - adjust) }, point3], id: 0 },
+                { type: 'poly', path: [{ x: line[0].x + adjust, y: getTopLineCrossY(line[0].x + adjust) }, point1, point2, { x: line[0].x + adjust, y: getBottomLineCrossY(line[0].x + adjust) }], id: 1 },
             ]
         }
         let leftCrossY = getLineCrossY(lt_x);
@@ -308,8 +308,8 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
         if ((leftCrossY > point0.y && leftCrossY < point3.y) && (rightCrossY > point1.y && rightCrossY < point2.y)) {
             if (leftCrossY == rightCrossY) {
                 return [
-                    { type: 'poly', path: [point0, point1, { x: rb_x, y: leftCrossY - adjust }, { x: lt_x, y: leftCrossY - adjust }], index: 0 },
-                    { type: 'poly', path: [{ x: lt_x, y: leftCrossY + adjust }, { x: rb_x, y: leftCrossY + adjust }, point2, point3], index: 1 },
+                    { type: 'poly', path: [point0, point1, { x: rb_x, y: leftCrossY - adjust }, { x: lt_x, y: leftCrossY - adjust }], id: 0 },
+                    { type: 'poly', path: [{ x: lt_x, y: leftCrossY + adjust }, { x: rb_x, y: leftCrossY + adjust }, point2, point3], id: 1 },
                 ]
             } else {
                 let getLineCrossY_floor = getYFromConentLineFunc(line[0], line[1], adjust, true);
@@ -319,8 +319,8 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
                 let leftCrossY_floor = getLineCrossY_floor(lt_x);
                 let rightCrossY_floor = getLineCrossY_floor(rb_x);
                 return [
-                    { type: 'poly', path: [point0, point1, { x: rb_x, y: rightCrossY_ceil }, { x: lt_x, y: leftCrossY_ceil }], index: 0 },
-                    { type: 'poly', path: [{ x: lt_x, y: leftCrossY_floor }, { x: rb_x, y: rightCrossY_floor }, point2, point3], index: 1 },
+                    { type: 'poly', path: [point0, point1, { x: rb_x, y: rightCrossY_ceil }, { x: lt_x, y: leftCrossY_ceil }], id: 0 },
+                    { type: 'poly', path: [{ x: lt_x, y: leftCrossY_floor }, { x: rb_x, y: rightCrossY_floor }, point2, point3], id: 1 },
                 ]
             }
         }
@@ -344,6 +344,25 @@ export function getGridsBySplit(grid: GridConfig, line: [Point, Point], borderWi
     return null;
 }
 
-export function getMaxIndexFromComicConfig(comicConfig: ComicConfig): number {
-    return Math.max(Math.max.apply(null, comicConfig.map(grid => grid.index)) || 0);
+export function getGridFromComicConfig(comicConfig: ComicConfig, targetId: string | number): GridConfig | null {
+    for (let i = 0; i < comicConfig.length; i++) {
+        let grid = comicConfig[i];
+        let result_ = deepfind(grid);
+        if (result_) return result_;
+    }
+    return null;
+
+    function deepfind(grid: GridConfig): GridConfig | null {
+        if (grid.id == targetId) {
+            return grid;
+        }
+        if (grid.split_line && grid.split_result && grid.split_result.length > 0) {
+            for (let i = 0; i < grid.split_result.length; i++) {
+                let grid_ = grid.split_result[i];
+                let result_ = deepfind(grid_);
+                if (result_) return result_;
+            }
+        }
+        return null;
+    }
 }
