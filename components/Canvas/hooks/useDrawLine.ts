@@ -32,21 +32,37 @@ export function useDrawLine(isFocused: boolean) {
     const handleMouseMove = (event: MouseEvent) => {
       if (!isFocused) return;
       if (!isDrawingRef.current) return;
-      resultRef.current.end = { x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY };
-      setEndPoint({ ...resultRef.current.end });
+      updateEndPoint();
     };
 
     const handleMouseUp = (event: MouseEvent) => {
       if (!isFocused) return;
       if (!isDrawingRef.current) return;
       isDrawingRef.current = false;
-      resultRef.current.end = { x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY };
+      //resultRef.current.end = { x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY };
+      updateEndPoint();
       if (resultRef.current.start!.x == resultRef.current.end!.x && resultRef.current.start!.y == resultRef.current.end!.y) {
         clean();
-      } else {
-        setEndPoint({ ...resultRef.current.end });
       }
     };
+
+    function updateEndPoint() {
+      resultRef.current.end = { x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY };
+      let point1 = resultRef.current.start!;
+      let point2 = resultRef.current.end!;
+      let k = (point1.y - point2.y) / (point1.x - point2.x);
+      if (point1.y !== point2.y && point1.x == point2.x) {
+        setEndPoint({ ...point2 });
+        return;
+      }
+      if (k > -0.1 && k < 0.1) {
+        setEndPoint({ ...point2, y: point1.y });
+      } else if (k < -12 || k > 12) {
+        setEndPoint({ ...point2, x: point1.x });
+      } else {
+        setEndPoint({ ...point2 });
+      }
+    }
 
     document.addEventListener("mousedown", handleMouseDown);
     document.addEventListener("mousemove", handleMouseMove);
