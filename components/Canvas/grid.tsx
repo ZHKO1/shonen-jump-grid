@@ -3,8 +3,8 @@ import { MouseEventHandler, use, useEffect, useRef, useState } from 'react';
 import { isDef } from '../utils';
 import { useFocusGrid, useDrawLine } from './hooks/index';
 import { getGridsBySplit, getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort, getRectGridPoint } from './utils';
-import useStepsStore from '../store/step';
 import { useSplit } from './hooks/useSplit';
+import useFocusStore from '../store/focus';
 
 export type Point = { x: number, y: number };
 
@@ -41,14 +41,17 @@ const borderWidth = 6;
 
 function PolyGrid({ grid }: { grid: PolyGridConfig }) {
     const gridRef = useRef<HTMLDivElement>(null);
-    const [isGridFocused, setGridFocus] = useFocusGrid(gridRef);
+    // const [isGridFocused, setGridFocus] = useFocusGrid(gridRef);
+    const { getFocusId, setFocusId } = useFocusStore();
+    const isFocused = getFocusId() === grid.id;
+    
     const { outside, inside } = getPolyGridPoint(grid.path, borderWidth);
     let lt_outside = getPolyContainerPoint(outside, 'lt');
     let rb_outside = getPolyContainerPoint(outside, 'rb');
     if (!isDef(lt_outside) || !isDef(rb_outside)) {
         return null;
     }
-    let grids = useSplit(grid, isGridFocused, borderWidth * 2);
+    let grids = useSplit(grid, isFocused, borderWidth * 2);
 
     let left = lt_outside.x;
     let top = lt_outside.y;
@@ -63,14 +66,14 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
     }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
-        setGridFocus(true);
-        e.stopPropagation();
+        setFocusId(grid.id);
+        e.nativeEvent.stopImmediatePropagation();
     }
 
     return (
         <div>
             {
-                <div className={`opacity-60 custom-grid absolute ${isGridFocused ? "animate-breathe" : "bg-gray-200"}`}
+                <div className={`opacity-60 custom-grid absolute ${isFocused ? "animate-breathe" : "bg-gray-200"}`}
                     style={{ left, top, width, height, clipPath }}
                     ref={gridRef}
                     onClick={handleClick}
@@ -79,7 +82,7 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
                 </div>
             }
             {
-                grids && (grids.map((grid, index) => (<Grid grid={grid} key={(new Date()).getTime() + "_" + index} isDefaultFocused />)))
+                grids && (grids.map((grid_, index) => (<Grid grid={{...grid_, id: (new Date()).getTime() + "_" + index}} key={(new Date()).getTime() + "_" + index} isDefaultFocused />)))
             }
             {
                 /*
@@ -104,11 +107,13 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
 
 function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, isDefaultFocused?: boolean }) {
     const gridRef = useRef<HTMLDivElement>(null);
-    const [isGridFocused, setGridFocus] = useFocusGrid(gridRef, isDefaultFocused);
+    // const [isGridFocused, setGridFocus] = useFocusGrid(gridRef, isDefaultFocused);
+    const { getFocusId, setFocusId } = useFocusStore();
+    const isFocused = getFocusId() === grid.id;
     const { outside } = getRectGridPoint({
         ...grid
     }, borderWidth);
-    let grids = useSplit(grid, isGridFocused, borderWidth * 2);
+    let grids = useSplit(grid, isFocused, borderWidth * 2);
 
     let left = outside.lt_x;
     let top = outside.lt_y;
@@ -120,14 +125,15 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
     }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
-        setGridFocus(true);
-        e.stopPropagation();
+        console.log("handleClick");
+        setFocusId(grid.id);
+        e.nativeEvent.stopImmediatePropagation();
     }
 
     return (
         <div>
             {
-                <div className={`opacity-60 custom-grid absolute ${grids ? "hidden" : ""} ${isGridFocused && !grids ? "animate-breathe" : "bg-gray-200"} flex flex-wrap content-center justify-center`}
+                <div className={`opacity-60 custom-grid absolute ${grids ? "hidden" : ""} ${isFocused && !grids ? "animate-breathe" : "bg-gray-200"} flex flex-wrap content-center justify-center`}
                     style={{ left, top, width, height }}
                     ref={gridRef}
                     onClick={handleClick}
@@ -137,7 +143,7 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
 
             }
             {
-                grids && (grids.map((grid, index) => (<Grid grid={grid} key={(new Date()).getTime() + "_" + index} isDefaultFocused />)))
+                grids && (grids.map((grid_, index) => (<Grid grid={{...grid_, id: (new Date()).getTime() + "_" + index}} key={(new Date()).getTime() + "_" + index} isDefaultFocused />)))
             }
             {
                 /*
@@ -164,6 +170,12 @@ function SplitContainer({ grid }: { grid: GridConfig }) {
     let split_result = grid.split_result;
     let startPoint = grid.split_line?.[0];
     let endPoint = grid.split_line?.[1];
+
+    const handleClickLine: MouseEventHandler<SVGLineElement> = (e) => {
+        setFocus(true)
+        e.nativeEvent.stopImmediatePropagation();
+    }
+
     return (<div>
         {
             startPoint && endPoint && (
@@ -174,11 +186,20 @@ function SplitContainer({ grid }: { grid: GridConfig }) {
                         y1={startPoint.y}
                         x2={endPoint.x}
                         y2={endPoint.y}
+                        stroke="white"
+                        strokeWidth="4"
+                        pointerEvents="all"
+                        onClick={handleClickLine}
+                    />
+                    <line
+                        x1={startPoint.x}
+                        y1={startPoint.y}
+                        x2={endPoint.x}
+                        y2={endPoint.y}
                         stroke="gray"
                         strokeWidth="4"
                         strokeDasharray={5}
-                        pointerEvents="all"
-                        onClick={() => setFocus(true)}
+                        pointerEvents="none"
                     />
                 </svg>
             )

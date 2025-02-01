@@ -4,6 +4,7 @@ import { ContainerContext } from "./context/container";
 import { useEffect, useRef } from "react";
 import useStepsStore from '../store/step';
 import Image from 'next/image'
+import useFocusStore from "../store/focus";
 
 
 
@@ -232,11 +233,24 @@ const defaultConfig3: GridConfig[] = [
 ]
 
 export default function Canvas() {
+  const { clean } = useFocusStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const { addStep, getCurrentStep } = useStepsStore();
   const step = getCurrentStep();
+
+  const handleDocumentClick = (e: MouseEvent) => {
+    console.log("handleDocumentClick");
+    clean();
+  }
+
   useEffect(() => {
     addStep({ type: "init", comicConfig: defaultConfig });
+
+    document.addEventListener("click", handleDocumentClick);
+
+    return () => {
+      document.removeEventListener("click", handleDocumentClick);
+    };
   }, []);
   return (
     <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-black">
