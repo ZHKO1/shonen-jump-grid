@@ -39,7 +39,7 @@ export type ComicConfig = GridConfig[];
 
 const borderWidth = 6;
 
-function PolyGrid({ grid }: { grid: PolyGridConfig }) {
+function PolyGrid({ grid, border = false }: { grid: PolyGridConfig, border?: boolean }) {
     const gridRef = useRef<HTMLDivElement>(null);
     // const [isGridFocused, setGridFocus] = useFocusGrid(gridRef);
     const { getFocusId, setFocusId } = useFocusStore();
@@ -73,7 +73,7 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
     return (
         <div>
             {
-                <div className={`opacity-60 custom-grid absolute ${isFocused ? "animate-breathe" : "bg-gray-200"}`}
+                <div className={`opacity-60 custom-grid absolute ${(isFocused && !grids || border) ? "animate-breathe" : "bg-gray-200"}`}
                     style={{ left, top, width, height, clipPath }}
                     ref={gridRef}
                     onClick={handleClick}
@@ -82,7 +82,7 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
                 </div>
             }
             {
-                grids && (grids.map((grid_, index) => (<Grid grid={{...grid_, id: (new Date()).getTime() + "_" + index}} key={(new Date()).getTime() + "_" + index} isDefaultFocused />)))
+                grids && (grids.map((grid_, index) => (<Grid grid={{ ...grid_, id: (new Date()).getTime() + "_" + index }} key={(new Date()).getTime() + "_" + index} border={true} />)))
             }
             {
                 /*
@@ -105,7 +105,7 @@ function PolyGrid({ grid }: { grid: PolyGridConfig }) {
     )
 }
 
-function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, isDefaultFocused?: boolean }) {
+function RectGrid({ grid, border = false }: { grid: RectGridConfig, border?: boolean }) {
     const gridRef = useRef<HTMLDivElement>(null);
     // const [isGridFocused, setGridFocus] = useFocusGrid(gridRef, isDefaultFocused);
     const { getFocusId, setFocusId } = useFocusStore();
@@ -133,7 +133,7 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
     return (
         <div>
             {
-                <div className={`opacity-60 custom-grid absolute ${grids ? "hidden" : ""} ${isFocused && !grids ? "animate-breathe" : "bg-gray-200"} flex flex-wrap content-center justify-center`}
+                <div className={`opacity-60 custom-grid absolute ${grids ? "hidden" : ""} ${(isFocused && !grids || border) ? "animate-breathe" : "bg-gray-200"} flex flex-wrap content-center justify-center`}
                     style={{ left, top, width, height }}
                     ref={gridRef}
                     onClick={handleClick}
@@ -143,7 +143,7 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
 
             }
             {
-                grids && (grids.map((grid_, index) => (<Grid grid={{...grid_, id: (new Date()).getTime() + "_" + index}} key={(new Date()).getTime() + "_" + index} isDefaultFocused />)))
+                grids && (grids.map((grid_, index) => (<Grid grid={{ ...grid_, id: (new Date()).getTime() + "_" + index }} key={(new Date()).getTime() + "_" + index} border={true} />)))
             }
             {
                 /*
@@ -165,21 +165,25 @@ function RectGrid({ grid, isDefaultFocused = false }: { grid: RectGridConfig, is
     )
 }
 
-function SplitContainer({ grid }: { grid: GridConfig }) {
-    const [isFocused, setFocus] = useState(false);
+function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: boolean }) {
+    const { getFocusId, setFocusId, clean } = useFocusStore();
+    const isFocused = getFocusId() === grid.id;
     let split_result = grid.split_result;
     let startPoint = grid.split_line?.[0];
     let endPoint = grid.split_line?.[1];
 
     const handleClickLine: MouseEventHandler<SVGLineElement> = (e) => {
-        setFocus(true)
+        clean();
+        setTimeout(() => {
+            setFocusId(grid.id);
+        });
         e.nativeEvent.stopImmediatePropagation();
     }
 
     return (<div>
         {
             startPoint && endPoint && (
-                <svg className={`absolute top-0 left-0 w-full h-full ${isFocused ? "opacity-100" : "opacity-0"}`}
+                <svg className={`absolute top-0 left-0 w-full h-full ${(isFocused) ? "opacity-100" : "opacity-0"}`}
                     style={{ pointerEvents: "none" }}>
                     <line
                         x1={startPoint.x}
@@ -205,7 +209,7 @@ function SplitContainer({ grid }: { grid: GridConfig }) {
             )
         }
         {
-            split_result && (split_result.map(grid_ => (<Grid grid={grid_} key={grid_.id} />)))
+            split_result && (split_result.map(grid_ => (<Grid grid={grid_} key={grid_.id} border={isFocused || border} />)))
         }
         {
             isFocused && startPoint && endPoint && (
@@ -220,14 +224,14 @@ function SplitContainer({ grid }: { grid: GridConfig }) {
 }
 
 
-export function Grid({ grid, isDefaultFocused }: { grid: GridConfig, isDefaultFocused?: boolean }) {
+export function Grid({ grid, border }: { grid: GridConfig, border?: boolean }) {
     if (grid.split_line && grid.split_result && grid.split_result.length > 0) {
-        return <SplitContainer grid={grid} />;
+        return <SplitContainer grid={grid} border={border} />;
     }
     if (grid.type === 'poly') {
-        return <PolyGrid grid={grid} />;
+        return <PolyGrid grid={grid} border={border} />;
     } else if (grid.type === 'rect') {
-        return <RectGrid grid={grid} isDefaultFocused={isDefaultFocused} />;
+        return <RectGrid grid={grid} border={border} />;
     } else {
         return null;
     }
