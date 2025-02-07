@@ -1,8 +1,7 @@
 'use client';
 import { MouseEventHandler, use, useEffect, useRef, useState } from 'react';
 import { isDef } from '../utils';
-import { useFocusGrid, useDrawLine } from './hooks/index';
-import { getGridsBySplit, getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort, getRectGridPoint } from './utils';
+import { getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort, getRectGridPoint } from './utils';
 import { useSplit } from './hooks/useSplit';
 import useFocusStore from '../store/focus';
 

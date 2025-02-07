@@ -1,6 +1,7 @@
 // https://github.com/uidotdev/usehooks/blob/main/index.js useMouse
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useContext } from "react";
+import { ContainerContext } from "../context/container";
 
 export type MouseState = {
   x: number,
@@ -11,7 +12,9 @@ export type MouseState = {
   elementPositionY: number
 };
 
-export function useMouse(gridRef: React.RefObject<HTMLDivElement | null>,) {
+export function useMouse() {
+  const gridRef = useContext(ContainerContext).container;
+
   const stateRef = useRef<MouseState>({
     x: 0,
     y: 0,
