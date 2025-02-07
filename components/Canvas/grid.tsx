@@ -124,7 +124,6 @@ function RectGrid({ grid, border = false }: { grid: RectGridConfig, border?: boo
     }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
-        console.log("handleClick");
         setFocusId(grid.id);
         e.nativeEvent.stopImmediatePropagation();
     }

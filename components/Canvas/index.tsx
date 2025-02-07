@@ -239,7 +239,6 @@ export default function Canvas() {
   const step = getCurrentStep();
 
   const handleDocumentClick = (e: MouseEvent) => {
-    console.log("handleDocumentClick");
     clean();
   }
 

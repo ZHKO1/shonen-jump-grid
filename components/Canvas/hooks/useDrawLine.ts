@@ -1,66 +1,83 @@
 import { useEffect, useRef, useState } from "react";
 import { useMouse } from "./useMouse";
+import type { Point } from '../grid';
+import { useLatest } from "@/components/hooks/useLatest";
 
-type Point = { x: number, y: number };
+type DrawState = {
+  isDrawing: boolean;
+  start: Point | null;
+  end: Point | null;
+};
+
 export function useDrawLine(isFocused: boolean) {
-  const isDrawingRef = useRef(false);
-  const [startPoint, setStartPoint] = useState<Point | null>(null);
-  const [endPoint, setEndPoint] = useState<Point | null>(null);
   const mouseStateRef = useMouse();
-  const resultRef = useRef<{ start?: Point, end?: Point }>({});
+  const [drawState, setDrawState] = useState<DrawState>({
+    isDrawing: false,
+    start: null,
+    end: null
+  });
+  const latestDrawState = useLatest(drawState);
 
-  const clean = () => {
-    resultRef.current = {};
-    setStartPoint(null);
-    setEndPoint(null);
-    isDrawingRef.current = false;
-  }
+  const getAdjustedEndPoint = (start: Point, end: Point): Point => {
+    const deltaX = end.x - start.x;
+    const deltaY = end.y - start.y;
+
+    if (deltaX === 0) return { ...end };
+
+    const slope = deltaY / deltaX;
+
+    if (Math.abs(slope) < 0.1) return { x: end.x, y: start.y };
+    if (Math.abs(slope) > 12) return { x: start.x, y: end.y };
+
+    return { ...end };
+  };
 
   useEffect(() => {
-    clean();
-
-    const handleMouseDown = (event: MouseEvent) => {
-      if (!isFocused) return;
-      isDrawingRef.current = true;
-      resultRef.current.start = { x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY };
-      setStartPoint({ ...resultRef.current.start });
-      setEndPoint(null);
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!isFocused) return;
-      if (!isDrawingRef.current) return;
-      updateEndPoint();
-    };
-
-    const handleMouseUp = (event: MouseEvent) => {
-      if (!isFocused) return;
-      if (!isDrawingRef.current) return;
-      isDrawingRef.current = false;
-      //resultRef.current.end = { x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY };
-      updateEndPoint();
-      if (resultRef.current.start!.x == resultRef.current.end!.x && resultRef.current.start!.y == resultRef.current.end!.y) {
-        clean();
-      }
-    };
-
-    function updateEndPoint() {
-      resultRef.current.end = { x: mouseStateRef.current.elementX, y: mouseStateRef.current.elementY };
-      let point1 = resultRef.current.start!;
-      let point2 = resultRef.current.end!;
-      let k = (point1.y - point2.y) / (point1.x - point2.x);
-      if (point1.y !== point2.y && point1.x == point2.x) {
-        setEndPoint({ ...point2 });
-        return;
-      }
-      if (k > -0.1 && k < 0.1) {
-        setEndPoint({ ...point2, y: point1.y });
-      } else if (k < -12 || k > 12) {
-        setEndPoint({ ...point2, x: point1.x });
-      } else {
-        setEndPoint({ ...point2 });
-      }
+    if (!isFocused) {
+      setDrawState({ isDrawing: false, start: null, end: null });
+      return;
     }
+
+    const handleMouseDown = () => {
+      const start = {
+        x: mouseStateRef.current.elementX,
+        y: mouseStateRef.current.elementY
+      };
+      setDrawState({ isDrawing: true, start, end: null });
+    };
+
+    const handleMouseMove = () => {
+      let { start, isDrawing } = latestDrawState.current;
+      if (!isDrawing || !start) return;
+
+      const newEnd = {
+        x: mouseStateRef.current.elementX,
+        y: mouseStateRef.current.elementY
+      };
+
+      setDrawState(prev => ({
+        ...prev,
+        end: getAdjustedEndPoint(prev.start!, newEnd)
+      }));
+    };
+
+    const handleMouseUp = () => {
+      let { start, isDrawing } = latestDrawState.current;
+      if (!isDrawing || !start) return;
+
+      const newEnd = {
+        x: mouseStateRef.current.elementX,
+        y: mouseStateRef.current.elementY
+      };
+
+      // 检查是否为无效线（起点终点相同）
+      if (start.x === newEnd.x &&
+        start.y === newEnd.y) {
+        setDrawState({ isDrawing: false, start: null, end: null });
+      } else {
+        setDrawState(prev => ({ ...prev, end: getAdjustedEndPoint(prev.start!, newEnd), isDrawing: false }));
+      }
+    };
 
     document.addEventListener("mousedown", handleMouseDown);
     document.addEventListener("mousemove", handleMouseMove);
@@ -73,5 +90,5 @@ export function useDrawLine(isFocused: boolean) {
     };
   }, [isFocused]);
 
-  return [startPoint, endPoint, isDrawingRef.current] as const;
+  return [drawState.start, drawState.end, drawState.isDrawing] as const;
 }
