@@ -11,10 +11,11 @@ type DrawState = {
 
 export function useDrawLine(isFocused: boolean) {
   const mouseStateRef = useMouse();
+  const mouseDownTimeRef = useRef<number>(0);
   const [drawState, setDrawState] = useState<DrawState>({
     isDrawing: false,
     start: null,
-    end: null
+    end: null,
   });
   const latestDrawState = useLatest(drawState);
 
@@ -32,13 +33,24 @@ export function useDrawLine(isFocused: boolean) {
     return { ...end };
   };
 
+  const checkTimeElapsed = () => {
+    if (mouseDownTimeRef.current) {
+      if (Date.now() - mouseDownTimeRef.current > 200) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   useEffect(() => {
     if (!isFocused) {
+      mouseDownTimeRef.current = 0;
       setDrawState({ isDrawing: false, start: null, end: null });
       return;
     }
 
     const handleMouseDown = () => {
+      mouseDownTimeRef.current = Date.now();
       const start = {
         x: mouseStateRef.current.elementX,
         y: mouseStateRef.current.elementY
@@ -49,6 +61,10 @@ export function useDrawLine(isFocused: boolean) {
     const handleMouseMove = () => {
       let { start, isDrawing } = latestDrawState.current;
       if (!isDrawing || !start) return;
+
+      if (!checkTimeElapsed()) {
+        return;
+      }
 
       const newEnd = {
         x: mouseStateRef.current.elementX,
@@ -65,6 +81,12 @@ export function useDrawLine(isFocused: boolean) {
       let { start, isDrawing } = latestDrawState.current;
       if (!isDrawing || !start) return;
 
+      if (!checkTimeElapsed()) {
+        mouseDownTimeRef.current = 0;
+        setDrawState({ isDrawing: false, start: null, end: null });
+        return;
+      }
+
       const newEnd = {
         x: mouseStateRef.current.elementX,
         y: mouseStateRef.current.elementY
@@ -77,6 +99,7 @@ export function useDrawLine(isFocused: boolean) {
       } else {
         setDrawState(prev => ({ ...prev, end: getAdjustedEndPoint(prev.start!, newEnd), isDrawing: false }));
       }
+      mouseDownTimeRef.current = 0;
     };
 
     document.addEventListener("mousedown", handleMouseDown);
