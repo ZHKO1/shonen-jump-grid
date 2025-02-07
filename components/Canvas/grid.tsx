@@ -212,9 +212,9 @@ function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: b
         {
             isFocused && startPoint && endPoint && (
                 <>
-                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer' style={{ left: startPoint.x - 5, top: startPoint.y - 5 }}></div>
-                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer' style={{ left: (startPoint.x + endPoint.x) / 2 - 5, top: (startPoint.y + endPoint.y) / 2 - 5 }}></div>
-                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer' style={{ left: endPoint.x - 5, top: endPoint.y - 5 }}></div>
+                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' style={{ left: startPoint.x, top: startPoint.y }}></div>
+                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' style={{ left: (startPoint.x + endPoint.x) / 2, top: (startPoint.y + endPoint.y) / 2 }}></div>
+                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' style={{ left: endPoint.x, top: endPoint.y }}></div>
                 </>
             )
         }
