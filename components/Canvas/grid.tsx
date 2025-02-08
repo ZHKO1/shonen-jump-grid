@@ -43,7 +43,7 @@ function PolyGrid({ grid, border = false }: { grid: PolyGridConfig, border?: boo
     // const [isGridFocused, setGridFocus] = useFocusGrid(gridRef);
     const { getFocusId, setFocusId } = useFocusStore();
     const isFocused = getFocusId() === grid.id;
-    
+
     const { outside, inside } = getPolyGridPoint(grid.path, borderWidth);
     let lt_outside = getPolyContainerPoint(outside, 'lt');
     let rb_outside = getPolyContainerPoint(outside, 'rb');
@@ -170,12 +170,18 @@ function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: b
     let startPoint = grid.split_line?.[0];
     let endPoint = grid.split_line?.[1];
 
-    const handleClickLine: MouseEventHandler<SVGLineElement> = (e) => {
-        clean();
-        setTimeout(() => {
-            setFocusId(grid.id);
-        });
-        e.nativeEvent.stopImmediatePropagation();
+    const handleClickLine: MouseEventHandler<Element> = (e) => {
+        try {
+            if (isFocused) {
+                return;
+            }
+            clean();
+            setTimeout(() => {
+                setFocusId(grid.id);
+            });
+        } finally {
+            e.nativeEvent.stopImmediatePropagation();
+        }
     }
 
     return (<div>
@@ -212,9 +218,9 @@ function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: b
         {
             isFocused && startPoint && endPoint && (
                 <>
-                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' style={{ left: startPoint.x, top: startPoint.y }}></div>
-                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' style={{ left: (startPoint.x + endPoint.x) / 2, top: (startPoint.y + endPoint.y) / 2 }}></div>
-                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' style={{ left: endPoint.x, top: endPoint.y }}></div>
+                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' onClick={handleClickLine} style={{ left: startPoint.x, top: startPoint.y }}></div>
+                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' onClick={handleClickLine} style={{ left: (startPoint.x + endPoint.x) / 2, top: (startPoint.y + endPoint.y) / 2 }}></div>
+                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' onClick={handleClickLine} style={{ left: endPoint.x, top: endPoint.y }}></div>
                 </>
             )
         }
