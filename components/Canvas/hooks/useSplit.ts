@@ -18,11 +18,9 @@ export function useSplit(grid: GridConfig, isGridFocused: boolean, spaceWidth: n
 
         const newGrid = getGridFromComicConfig(newComicConfig, grid.id);
         if (newGrid) {
-          newGrid.split_line = JSON.parse(JSON.stringify(line));
-          newGrid.split_result = JSON.parse(JSON.stringify(grids)).map((grid_: GridConfig, index: number) => ({
-            ...grid_,
-            id: grid.id + "_" + index
-          }));
+          newGrid.splitLine = JSON.parse(JSON.stringify(line));
+          newGrid.splitResult = JSON.parse(JSON.stringify(grids));
+          newGrid.splitSpaceWidth = spaceWidth;
           addStep({
             type: "split",
             comicConfig: newComicConfig,

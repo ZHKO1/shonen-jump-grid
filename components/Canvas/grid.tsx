@@ -1,16 +1,20 @@
 'use client';
-import { MouseEventHandler, use, useEffect, useRef, useState } from 'react';
+import { MouseEventHandler, use, useContext, useEffect, useRef, useState } from 'react';
 import { isDef } from '../utils';
-import { getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort, getRectGridPoint } from './utils';
+import { getGridsBySplit, getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort, getRectGridPoint, isGridSplited } from './utils';
 import { useSplit } from './hooks/useSplit';
 import useFocusStore from '../store/focus';
+import { useDraggable } from '../hooks';
+import { ContainerContext } from './context/container';
+import useStepsStore from '../store/step';
 
 export type Point = { x: number, y: number };
 
 export type GridShareConfig = {
     id: string | number,
-    split_line?: [Point, Point],
-    split_result?: [GridConfig, GridConfig],
+    splitLine?: [Point, Point],
+    splitResult?: [GridConfig, GridConfig],
+    splitSpaceWidth?: number,
 }
 
 export type PolyGridPoint = {
@@ -163,12 +167,43 @@ function RectGrid({ grid, border = false }: { grid: RectGridConfig, border?: boo
     )
 }
 
+function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, isDrawing: boolean) => void }) {
+    const pointRef = useRef<HTMLDivElement>(null);
+    const gridRef = useContext(ContainerContext).container;
+    const [, ,] = useDraggable(pointRef, {
+        initialValue: { x: point.x - 5, y: point.y - 5 },
+        containerElement: gridRef,
+        preventDefault: true,
+        stopPropagation: true,
+        onMove(position, event) {
+            onChange({
+                x: position.x + 5,
+                y: position.y + 5,
+            }, true);
+        },
+        onEnd(position, event) {
+            onChange({
+                x: position.x + 5,
+                y: position.y + 5,
+            }, false);
+        },
+    });
+    return (
+        <div ref={pointRef} className='absolute size-[10px] rounded-full bg-black cursor-pointer' style={{ left: point.x - 5, top: point.y - 5 }}></div>
+    )
+}
+
 function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: boolean }) {
+    const { addStep, getCurrentStep } = useStepsStore();
     const { getFocusId, setFocusId, clean } = useFocusStore();
     const isFocused = getFocusId() === grid.id;
-    let split_result = grid.split_result;
-    let startPoint = grid.split_line?.[0];
-    let endPoint = grid.split_line?.[1];
+
+    let splitResult = grid.splitResult;
+    let [isDrawing, setIsDrawing] = useState(false);
+    let [startPoint, setStartPoint] = useState(grid.splitLine?.[0]);
+    let endPoint = grid.splitLine?.[1];
+
+    let { grids, line } = isDrawing && (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth * 2) || { grids: splitResult, line: grid.splitLine };
 
     const handleClickLine: MouseEventHandler<Element> = (e) => {
         try {
@@ -181,6 +216,23 @@ function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: b
             });
         } finally {
             e.nativeEvent.stopImmediatePropagation();
+        }
+    }
+
+    const handleDragglePoint = (type: "start" | "end" | "middle") => {
+        return (point: Point, newIsDrawing: boolean) => {
+            switch (type) {
+                case "start":
+                    setStartPoint(point);
+                    break;
+                case "end":
+                    // setEndPoint(point);
+                    break;
+            }
+            setIsDrawing(newIsDrawing)
+            if (!newIsDrawing) {
+
+            }
         }
     }
 
@@ -213,12 +265,12 @@ function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: b
             )
         }
         {
-            split_result && (split_result.map(grid_ => (<Grid grid={grid_} key={grid_.id} border={isFocused || border} />)))
+            grids && (grids.map(grid_ => (<Grid grid={grid_} key={grid_.id} border={isFocused || border} />)))
         }
         {
             isFocused && startPoint && endPoint && (
                 <>
-                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' onClick={handleClickLine} style={{ left: startPoint.x, top: startPoint.y }}></div>
+                    <SplitPoint point={startPoint} onChange={handleDragglePoint("start")} />
                     <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' onClick={handleClickLine} style={{ left: (startPoint.x + endPoint.x) / 2, top: (startPoint.y + endPoint.y) / 2 }}></div>
                     <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' onClick={handleClickLine} style={{ left: endPoint.x, top: endPoint.y }}></div>
                 </>
@@ -229,7 +281,7 @@ function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: b
 
 
 export function Grid({ grid, border }: { grid: GridConfig, border?: boolean }) {
-    if (grid.split_line && grid.split_result && grid.split_result.length > 0) {
+    if (isGridSplited(grid)) {
         return <SplitContainer grid={grid} border={border} />;
     }
     if (grid.type === 'poly') {
