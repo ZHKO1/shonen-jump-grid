@@ -22,9 +22,9 @@ const useStepsStore = create(
           }))
         },
         getCurrentStep: () => {
-          let currentIndex = get().currentIndex;
+          const currentIndex = get().currentIndex;
           if (currentIndex < 0) return null;
-          let step = get().steps[currentIndex];
+          const step = get().steps[currentIndex];
           return step;
         },
         nextStep: () => {

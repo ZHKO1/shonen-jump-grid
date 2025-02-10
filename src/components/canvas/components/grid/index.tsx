@@ -1,11 +1,5 @@
 'use client';
-import { MouseEventHandler, use, useContext, useEffect, useRef, useState } from 'react';
-import { isDef } from '../../../../utils';
-import { getAdjustedPoint, getGridFromComicConfig, getGridsBySplit, getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort, getRectGridPoint, isGridSplited } from './utils';
-import useFocusStore from '../../../../store/focus';
-import { useDraggable } from '../../../../hooks';
-import { ContainerContext } from '../../context/container';
-import useStepsStore from '../../../../store/step';
+import { isGridSplited } from './utils';
 import { GridConfig } from './types';
 import SplitContainer from './SplitContainer';
 import RectGrid from './RectGrid';

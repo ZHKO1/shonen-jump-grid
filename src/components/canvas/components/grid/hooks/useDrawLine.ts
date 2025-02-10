@@ -46,7 +46,7 @@ export function useDrawLine(isFocused: boolean) {
     };
 
     const handleMouseMove = () => {
-      let { start, isDrawing } = latestDrawState.current;
+      const { start, isDrawing } = latestDrawState.current;
       if (!isDrawing || !start) return;
 
       if (!checkTimeElapsed()) {
@@ -65,7 +65,7 @@ export function useDrawLine(isFocused: boolean) {
     };
 
     const handleMouseUp = () => {
-      let { start, isDrawing } = latestDrawState.current;
+      const { start, isDrawing } = latestDrawState.current;
       if (!isDrawing || !start) return;
 
       if (!checkTimeElapsed()) {

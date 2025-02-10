@@ -28,7 +28,7 @@ export function useMouse() {
 
   useLayoutEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
-      let newState = {
+      const newState = {
         x: event.pageX,
         y: event.pageY,
       } as MouseState;

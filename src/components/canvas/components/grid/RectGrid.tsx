@@ -14,13 +14,13 @@ export default function RectGrid({ grid, border = false }: { grid: RectGridConfi
     const { outside } = getRectGridPoint({
         ...grid
     }, borderWidth);
-    let grids = useSplit(grid, isFocused, borderWidth * 2);
+    const grids = useSplit(grid, isFocused, borderWidth * 2);
 
-    let left = outside.lt_x;
-    let top = outside.lt_y;
-    let width = outside.rb_x - outside.lt_x;
-    let height = outside.rb_y - outside.lt_y;
-    let contentStyle = {
+    const left = outside.lt_x;
+    const top = outside.lt_y;
+    const width = outside.rb_x - outside.lt_x;
+    const height = outside.rb_y - outside.lt_y;
+    const contentStyle = {
         width: `calc(100% - ${borderWidth * 2}px)`,
         height: `calc(100% - ${borderWidth * 2}px)`,
     }

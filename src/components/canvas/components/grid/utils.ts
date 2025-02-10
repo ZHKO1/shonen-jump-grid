@@ -9,7 +9,7 @@ type PolyType = "horizon" | "vertical";
  * @returns 
  */
 export function getPolyContainerPoint(path: [Point, Point, Point, Point], pos: Pos): Point {
-    let point = { x: path[0].x, y: path[1].y }
+    const point = { x: path[0].x, y: path[1].y }
     path.forEach(p => {
         switch (pos) {
             case "lt":
@@ -39,8 +39,8 @@ export function getPolyContainerPoint(path: [Point, Point, Point, Point], pos: P
  * @returns 
  */
 export function getPolyType(path: [Point, Point, Point, Point]): PolyType {
-    let lt = getPolyContainerPoint(path, 'lt');
-    let rb = getPolyContainerPoint(path, 'rb');
+    const lt = getPolyContainerPoint(path, 'lt');
+    const rb = getPolyContainerPoint(path, 'rb');
     const isAdjust = (attr: "x" | "y") => {
         return (path.filter(point => point[attr] == lt[attr]).length > 1) && (path.filter(point => point[attr] == rb[attr]).length > 1);
     }
@@ -61,16 +61,16 @@ export function getPolyType(path: [Point, Point, Point, Point]): PolyType {
 export function getPolyPointBySort(path: [Point, Point, Point, Point]): [Point, Point, Point, Point] {
     let result = [];
     if (getPolyType(path) === 'horizon') {
-        let lt_y = getPolyContainerPoint(path, 'lt').y;
-        let rb_y = getPolyContainerPoint(path, 'rb').y;
-        let topLine = path.filter(point => point.y == lt_y).sort((a, b) => a.x - b.x);
-        let bottomLine = path.filter(point => point.y == rb_y).sort((a, b) => b.x - a.x);
+        const lt_y = getPolyContainerPoint(path, 'lt').y;
+        const rb_y = getPolyContainerPoint(path, 'rb').y;
+        const topLine = path.filter(point => point.y == lt_y).sort((a, b) => a.x - b.x);
+        const bottomLine = path.filter(point => point.y == rb_y).sort((a, b) => b.x - a.x);
         result = [...topLine, ...bottomLine];
     } else {
-        let lt_x = getPolyContainerPoint(path, 'lt').x;
-        let rb_x = getPolyContainerPoint(path, 'rb').x;
-        let leftLine = path.filter(point => point.x == lt_x).sort((a, b) => a.y - b.y);
-        let rightLine = path.filter(point => point.x == rb_x).sort((a, b) => a.y - b.y);
+        const lt_x = getPolyContainerPoint(path, 'lt').x;
+        const rb_x = getPolyContainerPoint(path, 'rb').x;
+        const leftLine = path.filter(point => point.x == lt_x).sort((a, b) => a.y - b.y);
+        const rightLine = path.filter(point => point.x == rb_x).sort((a, b) => a.y - b.y);
         result = [leftLine[0], ...rightLine, leftLine[1]];
     }
     return result as [Point, Point, Point, Point];
@@ -87,13 +87,13 @@ export function getPolyPointBySort(path: [Point, Point, Point, Point]): [Point, 
  */
 function getXFromConentLineFunc(point1: Point, point2: Point, borderWidth: number, direct: boolean = false): (y: number) => number {
     return (y: number) => {
-        let one = (direct ? +1 : -1);
+        const one = (direct ? +1 : -1);
         if (point1.x === point2.x) {
             return point1.x + one * borderWidth;
         }
-        let k = (point1.y - point2.y) / (point1.x - point2.x);
-        let b = point1.y - k * point1.x;
-        let contentB = b - (k > 0 ? one : -1 * one) * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
+        const k = (point1.y - point2.y) / (point1.x - point2.x);
+        const b = point1.y - k * point1.x;
+        const contentB = b - (k > 0 ? one : -1 * one) * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
         return (y - contentB) / k;
     }
 }
@@ -109,13 +109,13 @@ function getXFromConentLineFunc(point1: Point, point2: Point, borderWidth: numbe
  */
 function getYFromConentLineFunc(point1: Point, point2: Point, borderWidth: number, direct: boolean = false): (y: number) => number {
     return (x: number) => {
-        let one = (direct ? +1 : -1);
+        const one = (direct ? +1 : -1);
         if (point1.y === point2.y) {
             return point1.y + one * borderWidth;
         }
-        let k = (point1.y - point2.y) / (point1.x - point2.x);
-        let b = point1.y - k * point1.x;
-        let contentB = b + one * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
+        const k = (point1.y - point2.y) / (point1.x - point2.x);
+        const b = point1.y - k * point1.x;
+        const contentB = b + one * Math.sqrt(Math.pow(borderWidth * k, 2) + Math.pow(borderWidth, 2));
         return k * x + contentB;
     }
 }
@@ -150,12 +150,11 @@ export function getRectGridPoint({ lt_x, lt_y, rb_x, rb_y }: RectGridPoint, bord
  * @returns 
  */
 export function getPolyGridPoint(path: PolyGridPoint["path"], borderWidth: number): { outside: PolyGridPoint["path"], inside: PolyGridPoint["path"] } {
-    let result = [];
     const adjust = Math.floor(borderWidth / 2);
-    let lt_x = getPolyContainerPoint(path, 'lt').x;
-    let lt_y = getPolyContainerPoint(path, 'lt').y;
-    let rb_x = getPolyContainerPoint(path, 'rb').x;
-    let rb_y = getPolyContainerPoint(path, 'rb').y;
+    const lt_x = getPolyContainerPoint(path, 'lt').x;
+    const lt_y = getPolyContainerPoint(path, 'lt').y;
+    const rb_x = getPolyContainerPoint(path, 'rb').x;
+    const rb_y = getPolyContainerPoint(path, 'rb').y;
     let point0, point1, point2, point3;
     if (getPolyType(path) === 'horizon') {
         return {
@@ -172,8 +171,8 @@ export function getPolyGridPoint(path: PolyGridPoint["path"], borderWidth: numbe
 
     function getPointFromHorizonPoly(type: "out" | "in"): PolyGridPoint["path"] {
         const one = type == "out" ? -1 : 1;
-        let getConentLeftLineX = getXFromConentLineFunc(path[0], path[3], adjust, type == "out" ? false : true);
-        let getConentRightLineX = getXFromConentLineFunc(path[1], path[2], adjust, type == "out" ? true : false);
+        const getConentLeftLineX = getXFromConentLineFunc(path[0], path[3], adjust, type == "out" ? false : true);
+        const getConentRightLineX = getXFromConentLineFunc(path[1], path[2], adjust, type == "out" ? true : false);
 
         point0 = { x: getConentLeftLineX(lt_y + one * adjust), y: lt_y + one * adjust };
         point1 = { x: getConentRightLineX(lt_y + one * adjust), y: lt_y + one * adjust };
@@ -185,8 +184,8 @@ export function getPolyGridPoint(path: PolyGridPoint["path"], borderWidth: numbe
 
     function getPointFromVerticalPoly(type: "out" | "in"): PolyGridPoint["path"] {
         const one = type == "out" ? -1 : 1;
-        let getConentTopLineY = getYFromConentLineFunc(path[0], path[1], adjust, type == "out" ? false : true);
-        let getConentBottomLineY = getYFromConentLineFunc(path[3], path[2], adjust, type == "out" ? true : false);
+        const getConentTopLineY = getYFromConentLineFunc(path[0], path[1], adjust, type == "out" ? false : true);
+        const getConentBottomLineY = getYFromConentLineFunc(path[3], path[2], adjust, type == "out" ? true : false);
 
         point0 = { y: getConentTopLineY(lt_x + one * adjust), x: lt_x + one * adjust };
         point1 = { y: getConentTopLineY(rb_x - one * adjust), x: rb_x - one * adjust };
@@ -200,13 +199,13 @@ export function getPolyGridPoint(path: PolyGridPoint["path"], borderWidth: numbe
 export function updateSubGridsBySplit(grid: GridConfig, newSubGrids: [GridConfig, GridConfig]): [GridConfig, GridConfig] {
     if (isGridSplited(grid)) {
         return newSubGrids.map((subGrid, index) => {
-            let oldSubGrid = grid.splitResult![index];
+            const oldSubGrid = grid.splitResult![index];
             if (isGridSplited(oldSubGrid)) {
-                let newSubGrid = {
+                const newSubGrid = {
                     ...oldSubGrid,
                     ...subGrid,
                 }
-                let { grids, line } = getGridsBySplit(newSubGrid, oldSubGrid.splitLine!, oldSubGrid.splitSpaceWidth!) || {};
+                const { grids, line } = getGridsBySplit(newSubGrid, oldSubGrid.splitLine!, oldSubGrid.splitSpaceWidth!) || {};
                 if (grids && line) {
                     return {
                         ...newSubGrid,
@@ -225,16 +224,16 @@ export function updateSubGridsBySplit(grid: GridConfig, newSubGrids: [GridConfig
 }
 
 export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], borderWidth: number): { grids: [GridConfig, GridConfig], line: [Point, Point] } | null {
-    let lt_x = grid.lt_x;
-    let lt_y = grid.lt_y;
-    let rb_x = grid.rb_x;
-    let rb_y = grid.rb_y;
-    let getLineCrossY = getYFromConentLineFunc(line[0], line[1], 0);
-    let leftCrossY = getLineCrossY(lt_x);
-    let rightCrossY = getLineCrossY(rb_x);
-    let getLineCrossX = getXFromConentLineFunc(line[0], line[1], 0);
-    let topCrossX = getLineCrossX(lt_y);
-    let bottomCrossX = getLineCrossX(rb_y);
+    const lt_x = grid.lt_x;
+    const lt_y = grid.lt_y;
+    const rb_x = grid.rb_x;
+    const rb_y = grid.rb_y;
+    const getLineCrossY = getYFromConentLineFunc(line[0], line[1], 0);
+    const leftCrossY = getLineCrossY(lt_x);
+    const rightCrossY = getLineCrossY(rb_x);
+    const getLineCrossX = getXFromConentLineFunc(line[0], line[1], 0);
+    const topCrossX = getLineCrossX(lt_y);
+    const bottomCrossX = getLineCrossX(rb_y);
     // 判断是否上下分割
     if ((leftCrossY > lt_y && leftCrossY < rb_y) && (rightCrossY > lt_y && rightCrossY < rb_y)) {
         if (leftCrossY == rightCrossY) {
@@ -249,12 +248,12 @@ export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], 
                 ]
             }
         } else {
-            let getLineCrossY_ceil = getYFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), false);
-            let getLineCrossY_floor = getYFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), true);
-            let leftCrossY_ceil = getLineCrossY_ceil(lt_x);
-            let rightCrossY_ceil = getLineCrossY_ceil(rb_x);
-            let leftCrossY_floor = getLineCrossY_floor(lt_x);
-            let rightCrossY_floor = getLineCrossY_floor(rb_x);
+            const getLineCrossY_ceil = getYFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), false);
+            const getLineCrossY_floor = getYFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), true);
+            const leftCrossY_ceil = getLineCrossY_ceil(lt_x);
+            const rightCrossY_ceil = getLineCrossY_ceil(rb_x);
+            const leftCrossY_floor = getLineCrossY_floor(lt_x);
+            const rightCrossY_floor = getLineCrossY_floor(rb_x);
             return {
                 grids: updateSubGridsBySplit(grid, [
                     { type: 'poly', path: [{ x: lt_x, y: lt_y }, { x: rb_x, y: lt_y }, { x: rb_x, y: rightCrossY_ceil }, { x: lt_x, y: leftCrossY_ceil }], id: grid.id + "_0" },
@@ -279,12 +278,12 @@ export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], 
                 ]
             }
         } else {
-            let getLineCrossX_left = getXFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), false);
-            let getLineCrossX_right = getXFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), true);
-            let topCrossX_left = getLineCrossX_left(lt_y);
-            let bottomCrossX_left = getLineCrossX_left(rb_y);
-            let topCrossX_right = getLineCrossX_right(lt_y);
-            let bottomCrossX_right = getLineCrossX_right(rb_y);
+            const getLineCrossX_left = getXFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), false);
+            const getLineCrossX_right = getXFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), true);
+            const topCrossX_left = getLineCrossX_left(lt_y);
+            const bottomCrossX_left = getLineCrossX_left(rb_y);
+            const topCrossX_right = getLineCrossX_right(lt_y);
+            const bottomCrossX_right = getLineCrossX_right(rb_y);
             return {
                 grids: updateSubGridsBySplit(grid, [
                     { type: 'poly', path: [{ x: lt_x, y: lt_y }, { x: topCrossX_left, y: lt_y }, { x: bottomCrossX_left, y: rb_y }, { x: lt_x, y: rb_y }], id: grid.id + "_0" },
@@ -302,24 +301,24 @@ export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], 
 }
 
 export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], borderWidth: number): { grids: [GridConfig, GridConfig], line: [Point, Point] } | null {
-    let path = grid.path;
-    let lt = getPolyContainerPoint(path, "lt");
-    let rb = getPolyContainerPoint(path, "rb");
-    let lt_x = lt.x;
-    let lt_y = lt.y;
-    let rb_x = rb.x;
-    let rb_y = rb.y;
-    let point0 = path[0];
-    let point1 = path[1];
-    let point2 = path[2];
-    let point3 = path[3];
-    let getLineCrossY = getYFromConentLineFunc(line[0], line[1], 0);
-    let getLineCrossX = getXFromConentLineFunc(line[0], line[1], 0);
+    const path = grid.path;
+    const lt = getPolyContainerPoint(path, "lt");
+    const rb = getPolyContainerPoint(path, "rb");
+    const lt_x = lt.x;
+    const lt_y = lt.y;
+    const rb_x = rb.x;
+    const rb_y = rb.y;
+    const point0 = path[0];
+    const point1 = path[1];
+    const point2 = path[2];
+    const point3 = path[3];
+    const getLineCrossY = getYFromConentLineFunc(line[0], line[1], 0);
+    const getLineCrossX = getXFromConentLineFunc(line[0], line[1], 0);
     const adjust = Math.floor(borderWidth / 2)
     if (getPolyType(grid.path) === 'horizon') {
         if ((line[0].y == line[1].y) && (line[0].y > lt_y) && (line[0].y < rb_y)) {
-            let getLeftLineCrossX = getXFromConentLineFunc(point0, point3, 0);
-            let getRightLineCrossX = getXFromConentLineFunc(point1, point2, 0);
+            const getLeftLineCrossX = getXFromConentLineFunc(point0, point3, 0);
+            const getRightLineCrossX = getXFromConentLineFunc(point1, point2, 0);
             return {
                 grids: updateSubGridsBySplit(grid, [
                     { type: 'poly', path: [point0, point1, { x: getRightLineCrossX(line[0].y - adjust), y: line[0].y - adjust }, { x: getLeftLineCrossX(line[0].y - adjust), y: line[0].y - adjust }], id: grid.id + "_0" },
@@ -331,8 +330,8 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
                 ]
             }
         }
-        let topCrossX = getLineCrossX(lt_y);
-        let bottomCrossX = getLineCrossX(rb_y);
+        const topCrossX = getLineCrossX(lt_y);
+        const bottomCrossX = getLineCrossX(rb_y);
         if ((topCrossX > point0.x && topCrossX < point1.x) && (bottomCrossX > point3.x && bottomCrossX < point2.x)) {
             if (topCrossX == bottomCrossX) {
                 return {
@@ -346,12 +345,12 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
                     ]
                 }
             } else {
-                let getLineCrossX_left = getXFromConentLineFunc(line[0], line[1], adjust, false);
-                let getLineCrossX_right = getXFromConentLineFunc(line[0], line[1], adjust, true);
-                let topCrossX_left = getLineCrossX_left(lt_y);
-                let bottomCrossX_left = getLineCrossX_left(rb_y);
-                let topCrossX_right = getLineCrossX_right(lt_y);
-                let bottomCrossX_right = getLineCrossX_right(rb_y);
+                const getLineCrossX_left = getXFromConentLineFunc(line[0], line[1], adjust, false);
+                const getLineCrossX_right = getXFromConentLineFunc(line[0], line[1], adjust, true);
+                const topCrossX_left = getLineCrossX_left(lt_y);
+                const bottomCrossX_left = getLineCrossX_left(rb_y);
+                const topCrossX_right = getLineCrossX_right(lt_y);
+                const bottomCrossX_right = getLineCrossX_right(rb_y);
                 return {
                     grids: updateSubGridsBySplit(grid, [
                         { type: 'poly', path: [point0, { x: topCrossX_left, y: lt_y }, { x: bottomCrossX_left, y: rb_y }, point3], id: grid.id + "_0" },
@@ -366,8 +365,8 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
         }
     } else if (getPolyType(grid.path) === 'vertical') {
         if ((line[0].x == line[1].x) && (line[0].x > lt_x) && (line[0].x < rb_x)) {
-            let getTopLineCrossY = getYFromConentLineFunc(point0, point1, 0);
-            let getBottomLineCrossY = getYFromConentLineFunc(point2, point3, 0);
+            const getTopLineCrossY = getYFromConentLineFunc(point0, point1, 0);
+            const getBottomLineCrossY = getYFromConentLineFunc(point2, point3, 0);
             return {
                 grids: updateSubGridsBySplit(grid, [
                     { type: 'poly', path: [point0, { x: line[0].x - adjust, y: getTopLineCrossY(line[0].x - adjust) }, { x: line[0].x - adjust, y: getBottomLineCrossY(line[0].x - adjust) }, point3], id: grid.id + "_0" },
@@ -379,8 +378,8 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
                 ]
             }
         }
-        let leftCrossY = getLineCrossY(lt_x);
-        let rightCrossY = getLineCrossY(rb_x);
+        const leftCrossY = getLineCrossY(lt_x);
+        const rightCrossY = getLineCrossY(rb_x);
         if ((leftCrossY > point0.y && leftCrossY < point3.y) && (rightCrossY > point1.y && rightCrossY < point2.y)) {
             if (leftCrossY == rightCrossY) {
                 return {
@@ -394,12 +393,12 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
                     ]
                 }
             } else {
-                let getLineCrossY_floor = getYFromConentLineFunc(line[0], line[1], adjust, true);
-                let getLineCrossY_ceil = getYFromConentLineFunc(line[0], line[1], adjust, false);
-                let leftCrossY_ceil = getLineCrossY_ceil(lt_x);
-                let rightCrossY_ceil = getLineCrossY_ceil(rb_x);
-                let leftCrossY_floor = getLineCrossY_floor(lt_x);
-                let rightCrossY_floor = getLineCrossY_floor(rb_x);
+                const getLineCrossY_floor = getYFromConentLineFunc(line[0], line[1], adjust, true);
+                const getLineCrossY_ceil = getYFromConentLineFunc(line[0], line[1], adjust, false);
+                const leftCrossY_ceil = getLineCrossY_ceil(lt_x);
+                const rightCrossY_ceil = getLineCrossY_ceil(rb_x);
+                const leftCrossY_floor = getLineCrossY_floor(lt_x);
+                const rightCrossY_floor = getLineCrossY_floor(rb_x);
                 return {
                     grids: updateSubGridsBySplit(grid, [
                         { type: 'poly', path: [point0, point1, { x: rb_x, y: rightCrossY_ceil }, { x: lt_x, y: leftCrossY_ceil }], id: grid.id + "_0" },
@@ -434,8 +433,8 @@ export function getGridsBySplit(grid: GridConfig, line: [Point, Point], borderWi
 
 export function getGridFromComicConfig(comicConfig: ComicConfig, targetId: string | number): GridConfig | null {
     for (let i = 0; i < comicConfig.length; i++) {
-        let grid = comicConfig[i];
-        let result_ = deepfind(grid);
+        const grid = comicConfig[i];
+        const result_ = deepfind(grid);
         if (result_) return result_;
     }
     return null;
@@ -446,8 +445,8 @@ export function getGridFromComicConfig(comicConfig: ComicConfig, targetId: strin
         }
         if (isGridSplited(grid)) {
             for (let i = 0; i < grid.splitResult!.length; i++) {
-                let grid_ = grid.splitResult![i];
-                let result_ = deepfind(grid_);
+                const grid_ = grid.splitResult![i];
+                const result_ = deepfind(grid_);
                 if (result_) return result_;
             }
         }

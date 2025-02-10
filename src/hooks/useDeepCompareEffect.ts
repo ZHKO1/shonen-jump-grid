@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash-es'
-import { DependencyList, EffectCallback, useEffect, useRef } from "react";
+import { DependencyList, EffectCallback } from "react";
 import { useCustomCompareEffect } from "./useCustomCompareEffect";
 
 export function useDeepCompareEffect(

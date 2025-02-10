@@ -45,7 +45,7 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
     options.initialValue ?? { x: 0, y: 0 },
   )
 
-  let { x = 0, y = 0 } = options.initialValue || {};
+  const { x = 0, y = 0 } = options.initialValue || {};
 
   useEffect(() => {
     setPositon({ x, y })

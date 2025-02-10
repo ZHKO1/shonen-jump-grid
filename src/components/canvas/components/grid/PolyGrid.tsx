@@ -14,20 +14,20 @@ export default function PolyGrid({ grid, border = false }: { grid: PolyGridConfi
     const isFocused = getFocusId() === grid.id;
 
     const { outside, inside } = getPolyGridPoint(grid.path, borderWidth);
-    let lt_outside = getPolyContainerPoint(outside, 'lt');
-    let rb_outside = getPolyContainerPoint(outside, 'rb');
+    const lt_outside = getPolyContainerPoint(outside, 'lt');
+    const rb_outside = getPolyContainerPoint(outside, 'rb');
     if (!isDef(lt_outside) || !isDef(rb_outside)) {
         return null;
     }
-    let grids = useSplit(grid, isFocused, borderWidth * 2);
+    const grids = useSplit(grid, isFocused, borderWidth * 2);
 
-    let left = lt_outside.x;
-    let top = lt_outside.y;
-    let width = rb_outside.x - lt_outside.x;
-    let height = rb_outside.y - lt_outside.y;
-    let sortPath = getPolyPointBySort(outside);
-    let clipPath = `polygon(${sortPath.map(p => `${p.x - left}px ${p.y - top}px`).join(',')})`;
-    let contentStyle = {
+    const left = lt_outside.x;
+    const top = lt_outside.y;
+    const width = rb_outside.x - lt_outside.x;
+    const height = rb_outside.y - lt_outside.y;
+    const sortPath = getPolyPointBySort(outside);
+    const clipPath = `polygon(${sortPath.map(p => `${p.x - left}px ${p.y - top}px`).join(',')})`;
+    const contentStyle = {
         width: `100%`,
         height: `100%`,
         clipPath: `polygon(${inside.map(p => `${p.x - left}px ${p.y - top}px`).join(',')})`,

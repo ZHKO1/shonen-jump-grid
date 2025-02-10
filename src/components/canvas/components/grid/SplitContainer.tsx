@@ -40,18 +40,18 @@ export default function SplitContainer({ grid, border = false }: { grid: GridCon
     const { getFocusId, setFocusId, clean } = useFocusStore();
     const isFocused = getFocusId() === grid.id;
 
-    let splitResult = grid.splitResult!;
-    let splitLine = grid.splitLine!;
-    let [isDrawing, setIsDrawing] = useState(false);
-    let [startPoint, setStartPoint] = useState(splitLine[0]);
-    let [endPoint, setEndPoint] = useState(splitLine[1]);
+    const splitResult = grid.splitResult!;
+    const splitLine = grid.splitLine!;
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [startPoint, setStartPoint] = useState(splitLine[0]);
+    const [endPoint, setEndPoint] = useState(splitLine[1]);
     useEffect(() => {
         if (!isDrawing) {  // 仅在非绘制状态时同步外部变化
             setStartPoint(splitLine[0]);
             setEndPoint(splitLine[1]);
         }
     }, [splitLine, isDrawing]);
-    let [middlePoint, setMiddlePoint] = useState({
+    const [middlePoint, setMiddlePoint] = useState({
         x: (startPoint.x + endPoint.x) / 2,
         y: (startPoint.y + endPoint.y) / 2
     });
@@ -62,7 +62,7 @@ export default function SplitContainer({ grid, border = false }: { grid: GridCon
         });
     }, [startPoint, endPoint]);
 
-    let { grids, line } = isDrawing && (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth * 2) || { grids: splitResult, line: grid.splitLine };
+    const { grids, line } = isDrawing && (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth * 2) || { grids: splitResult, line: grid.splitLine };
 
     const handleClickLine: MouseEventHandler<Element> = (e) => {
         try {
@@ -82,15 +82,15 @@ export default function SplitContainer({ grid, border = false }: { grid: GridCon
         return (point: Point, newIsDrawing: boolean) => {
             switch (type) {
                 case "start":
-                    let newStartPoint = getAdjustedPoint(point, endPoint!, { direction: "start" })
+                    const newStartPoint = getAdjustedPoint(point, endPoint!, { direction: "start" })
                     setStartPoint(newStartPoint);
                     break;
                 case "end":
-                    let newEndPoint = getAdjustedPoint(startPoint!, point, { direction: "end" })
+                    const newEndPoint = getAdjustedPoint(startPoint!, point, { direction: "end" })
                     setEndPoint(newEndPoint);
                     break;
                 case "middle":
-                    let offset = { x: point.x - middlePoint.x, y: point.y - middlePoint.y };
+                    const offset = { x: point.x - middlePoint.x, y: point.y - middlePoint.y };
                     setStartPoint({ x: startPoint.x + offset.x, y: startPoint.y + offset.y });
                     setEndPoint({ x: endPoint.x + offset.x, y: endPoint.y + offset.y });
                     setMiddlePoint(point);
