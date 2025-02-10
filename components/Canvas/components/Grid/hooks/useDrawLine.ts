@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useMouse } from "./useMouse";
-import type { Point } from '../grid';
+import type { Point } from '../types';
 import { useLatest } from "@/components/hooks/useLatest";
 import { getAdjustedPoint } from "../utils";
 

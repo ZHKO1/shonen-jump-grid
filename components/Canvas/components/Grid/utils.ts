@@ -1,4 +1,4 @@
-import { ComicConfig, GridConfig, Point, PolyGridConfig, PolyGridPoint, RectGridConfig, RectGridPoint } from "../grid";
+import { ComicConfig, GridConfig, Point, PolyGridConfig, PolyGridPoint, RectGridConfig, RectGridPoint } from "./types";
 
 type Pos = "lt" | "rt" | "lb" | "rb";
 type PolyType = "horizon" | "vertical";

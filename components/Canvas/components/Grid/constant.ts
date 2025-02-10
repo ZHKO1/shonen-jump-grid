@@ -1,0 +1,1 @@
+export const borderWidth = 6;

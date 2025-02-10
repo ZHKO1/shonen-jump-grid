@@ -1,5 +1,6 @@
 "use client";
-import { Grid, GridConfig } from "./grid";
+import { Grid } from "./components/Grid";
+import { GridConfig } from "./components/Grid/types";
 import { ContainerContext } from "./context/container";
 import { useEffect, useRef } from "react";
 import useStepsStore from '../store/step';

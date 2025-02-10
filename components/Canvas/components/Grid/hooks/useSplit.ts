@@ -2,7 +2,7 @@ import useStepsStore from "@/components/store/step";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useDrawLine } from "./useDrawLine";
 import { getGridFromComicConfig, getGridsBySplit } from "../utils";
-import { GridConfig } from "../grid";
+import { GridConfig } from "../types";
 
 export function useSplit(grid: GridConfig, isGridFocused: boolean, spaceWidth: number) {
   const { addStep, getCurrentStep } = useStepsStore();

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { combine } from 'zustand/middleware'
-import { ComicConfig } from '../Canvas/grid';
+import { ComicConfig } from '../Canvas/components/Grid/types';
 
 type Step = {
   type: "init" | "split" | "adjust-space",
