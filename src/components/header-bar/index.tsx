@@ -1,5 +1,5 @@
 "use client"
-import useStepsStore from "../store/step";
+import useStepsStore from "../../store/step";
 
 export default function HeaderBar() {
   const { nextStep, prevStep } = useStepsStore();

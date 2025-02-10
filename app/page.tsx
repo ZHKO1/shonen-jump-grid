@@ -1,5 +1,5 @@
-import Canvas from "@/components/Canvas";
-import HeaderBar from "@/components/HeaderBar";
+import Canvas from "@/src/components/canvas";
+import HeaderBar from "@/src/components/header-bar";
 
 export default function Home() {
   return (

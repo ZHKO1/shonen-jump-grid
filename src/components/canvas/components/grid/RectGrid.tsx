@@ -1,6 +1,6 @@
 import { MouseEventHandler, useRef } from "react";
 import { RectGridConfig } from "./types";
-import useFocusStore from "@/components/store/focus";
+import useFocusStore from "@/src/store/focus";
 import { getRectGridPoint } from "./utils";
 import { borderWidth } from "./constant";
 import { Grid } from ".";

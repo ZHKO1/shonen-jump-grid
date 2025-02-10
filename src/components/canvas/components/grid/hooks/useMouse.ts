@@ -1,6 +1,6 @@
 // https://github.com/uidotdev/usehooks/blob/main/index.js useMouse
 
-import { ContainerContext } from "@/components/Canvas/context/container";
+import { ContainerContext } from "@/src/components/canvas/context/container";
 import { useLayoutEffect, useRef, useContext } from "react";
 
 export type MouseState = {

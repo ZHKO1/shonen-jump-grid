@@ -1,8 +1,8 @@
 import { MouseEventHandler, useRef } from "react";
 import { PolyGridConfig } from "./types";
-import useFocusStore from "@/components/store/focus";
+import useFocusStore from "@/src/store/focus";
 import { getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort } from "./utils";
-import { isDef } from "@/components/utils";
+import { isDef } from "@/src/utils";
 import { useSplit } from "./hooks/useSplit";
 import { borderWidth } from "./constant";
 import { Grid } from ".";

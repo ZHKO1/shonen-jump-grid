@@ -1,13 +1,11 @@
 "use client";
-import { Grid } from "./components/Grid";
-import { GridConfig } from "./components/Grid/types";
+import { Grid } from "./components/grid";
+import { GridConfig } from "./components/grid/types";
 import { ContainerContext } from "./context/container";
 import { useEffect, useRef } from "react";
-import useStepsStore from '../store/step';
+import useStepsStore from '../../store/step';
 import Image from 'next/image'
-import useFocusStore from "../store/focus";
-
-
+import useFocusStore from "../../store/focus";
 
 const defaultConfig: GridConfig[] = [
   {
