@@ -2,18 +2,18 @@
 import { isGridSplited } from './utils';
 import { GridConfig } from './types';
 import SplitContainer from './SplitContainer';
-import RectGrid from './RectGrid';
-import PolyGrid from './PolyGrid';
+import RectGrid, { RectGridProps } from './RectGrid';
+import PolyGrid, { PolyGridProps } from './PolyGrid';
 
-
-export function Grid({ grid, border }: { grid: GridConfig, border?: boolean }) {
-    if (isGridSplited(grid)) {
-        return <SplitContainer grid={grid} border={border} />;
+export type GridProps = { grid: GridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
+export function Grid(props: GridProps) {
+    if (isGridSplited(props.grid)) {
+        return <SplitContainer {...props}/>;
     }
-    if (grid.type === 'poly') {
-        return <PolyGrid grid={grid} border={border} />;
-    } else if (grid.type === 'rect') {
-        return <RectGrid grid={grid} border={border} />;
+    if (props.grid.type === 'poly') {
+        return <PolyGrid {...props as PolyGridProps}/>;
+    } else if (props.grid.type === 'rect') {
+        return <RectGrid {...props as RectGridProps}/>;
     } else {
         return null;
     }

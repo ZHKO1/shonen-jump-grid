@@ -34,7 +34,8 @@ function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, 
     )
 }
 
-export default function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: boolean }) {
+export type SplitContainerProps = { grid: GridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
+export default function SplitContainer({ grid, previewFocus = false, onlyShowBorder = false }: SplitContainerProps) {
     const { addStep, getCurrentStep } = useStepsStore();
     const currentStep = getCurrentStep();
     const { getFocusId, setFocusId, clean } = useFocusStore();
@@ -63,7 +64,7 @@ export default function SplitContainer({ grid, border = false }: { grid: GridCon
     }, [startPoint, endPoint]);
 
     const defaultSplitResult = { grids: splitResult, line: grid.splitLine };
-    const { grids, line } = isDrawing && (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth: borderWidth * 2, recursion: true }) || defaultSplitResult;
+    const { grids: splitGrids, line } = isDrawing && (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth: borderWidth * 2, recursion: true }) || defaultSplitResult;
     const { grids: borderGrids } = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth: borderWidth * 2, recursion: false }) || defaultSplitResult;
 
     const handleClickLine: MouseEventHandler<Element> = (e) => {
@@ -102,14 +103,14 @@ export default function SplitContainer({ grid, border = false }: { grid: GridCon
             }
             setIsDrawing(newIsDrawing)
             if (!newIsDrawing) {
-                if (currentStep && grids) {
+                if (currentStep && splitGrids) {
                     const comicConfig = currentStep.comicConfig;
                     const newComicConfig = JSON.parse(JSON.stringify(comicConfig));
 
                     const newGrid = getGridFromComicConfig(newComicConfig, grid.id);
                     if (newGrid) {
                         newGrid.splitLine = JSON.parse(JSON.stringify(line));
-                        newGrid.splitResult = JSON.parse(JSON.stringify(grids));
+                        newGrid.splitResult = JSON.parse(JSON.stringify(splitGrids));
                         newGrid.splitSpaceWidth = grid.splitSpaceWidth;
                         addStep({
                             type: "adjust-space",
@@ -150,10 +151,10 @@ export default function SplitContainer({ grid, border = false }: { grid: GridCon
             )
         }
         {
-            grids && (grids.map(grid_ => (<Grid grid={grid_} key={grid_.id} border={border || isFocused} />)))
+            splitGrids && (splitGrids.map(grid_ => (<Grid grid={grid_} key={grid_.id}/>)))
         }
         {
-            (border || isFocused) && borderGrids && (borderGrids.map(grid_ => (<Grid grid={grid_} key={grid_.id} border={true} />)))
+            (onlyShowBorder || isFocused) && borderGrids && (borderGrids.map(grid_ => (<Grid grid={grid_} key={grid_.id}  onlyShowBorder={true}/>)))
         }
         {
             isFocused && startPoint && endPoint && (

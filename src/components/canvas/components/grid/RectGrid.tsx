@@ -1,4 +1,4 @@
-import { MouseEventHandler, useRef } from "react";
+import { CSSProperties, MouseEventHandler, useRef } from "react";
 import { RectGridConfig } from "./types";
 import useFocusStore from "@/src/store/focus";
 import { getRectGridPoint } from "./utils";
@@ -6,14 +6,15 @@ import { borderWidth } from "./constant";
 import { Grid } from ".";
 import { useSplit } from "./hooks/useSplit";
 
-export default function RectGrid({ grid, border = false }: { grid: RectGridConfig, border?: boolean }) {
+export type RectGridProps = { grid: RectGridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
+export default function RectGrid({ grid, previewFocus = false, onlyShowBorder = false }: RectGridProps) {
     const gridRef = useRef<HTMLDivElement>(null);
     const { getFocusId, setFocusId } = useFocusStore();
     const isFocused = getFocusId() === grid.id;
     const { outside } = getRectGridPoint({
         ...grid
     }, borderWidth);
-    const grids = useSplit(grid, isFocused, borderWidth * 2);
+    const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
 
     const left = outside.lt_x;
     const top = outside.lt_y;
@@ -24,7 +25,7 @@ export default function RectGrid({ grid, border = false }: { grid: RectGridConfi
         top,
         width,
         height,
-    }
+    } as CSSProperties
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
         setFocusId(grid.id);
@@ -34,7 +35,7 @@ export default function RectGrid({ grid, border = false }: { grid: RectGridConfi
     return (
         <div>
             {
-                <div className={`custom-grid absolute ${grids ? "hidden" : ""} flex flex-wrap content-center justify-center`}
+                <div className={`custom-grid absolute ${(splitGrids || onlyShowBorder) ? "hidden" : ""} flex flex-wrap content-center justify-center`}
                     style={customGridStyle}
                     ref={gridRef}
                     onClick={handleClick}
@@ -42,10 +43,10 @@ export default function RectGrid({ grid, border = false }: { grid: RectGridConfi
                 </div>
             }
             {
-                grids && (grids.map((grid_, index) => (<Grid grid={{ ...grid_, id: (new Date()).getTime() + "_" + index }} key={(new Date()).getTime() + "_" + index} border={true} />)))
+                splitGrids && (splitGrids.map((grid_, index) => (<Grid grid={{ ...grid_, id: (new Date()).getTime() + "_" + index }} key={(new Date()).getTime() + "_" + index} previewFocus={true} />)))
             }
             {
-                <svg className={`absolute w-full h-full pointer-events-none ${grids ? "hidden" : ""} ${(isFocused && !grids || border) ? "animate-breathe_" : "text-gray-200"}`}
+                <svg className={`absolute w-full h-full pointer-events-none ${splitGrids ? "hidden" : ""} ${(isFocused && !splitGrids || previewFocus || onlyShowBorder) ? "animate-breathe_" : "text-gray-200"}`}
                     style={{ left, top }}
                 >
                     <polygon

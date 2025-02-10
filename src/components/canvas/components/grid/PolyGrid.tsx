@@ -1,4 +1,4 @@
-import { MouseEventHandler, useRef } from "react";
+import { CSSProperties, MouseEventHandler, useRef } from "react";
 import { PolyGridConfig } from "./types";
 import useFocusStore from "@/src/store/focus";
 import { getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort } from "./utils";
@@ -7,7 +7,8 @@ import { useSplit } from "./hooks/useSplit";
 import { borderWidth } from "./constant";
 import { Grid } from ".";
 
-export default function PolyGrid({ grid, border = false }: { grid: PolyGridConfig, border?: boolean }) {
+export type PolyGridProps = { grid: PolyGridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
+export default function PolyGrid({ grid, previewFocus = false, onlyShowBorder = false }: PolyGridProps) {
     const gridRef = useRef<HTMLDivElement>(null);
     const { getFocusId, setFocusId } = useFocusStore();
     const isFocused = getFocusId() === grid.id;
@@ -18,7 +19,7 @@ export default function PolyGrid({ grid, border = false }: { grid: PolyGridConfi
     if (!isDef(lt_outside) || !isDef(rb_outside)) {
         return null;
     }
-    const grids = useSplit(grid, isFocused, borderWidth * 2);
+    const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
 
     const left = lt_outside.x;
     const top = lt_outside.y;
@@ -32,7 +33,7 @@ export default function PolyGrid({ grid, border = false }: { grid: PolyGridConfi
         width,
         height,
         clipPath,
-    }
+    } as CSSProperties
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
         setFocusId(grid.id);
@@ -42,7 +43,7 @@ export default function PolyGrid({ grid, border = false }: { grid: PolyGridConfi
     return (
         <div>
             {
-                <div className={`custom-grid absolute`}
+                <div className={`custom-grid absolute ${(splitGrids || onlyShowBorder) ? "hidden" : ""}`}
                     style={customGridStyle}
                     ref={gridRef}
                     onClick={handleClick}
@@ -50,11 +51,11 @@ export default function PolyGrid({ grid, border = false }: { grid: PolyGridConfi
                 </div>
             }
             {
-                grids && (grids.map((grid_, index) => (<Grid grid={{ ...grid_, id: (new Date()).getTime() + "_" + index }} key={(new Date()).getTime() + "_" + index} border={true} />)))
+                splitGrids && (splitGrids.map((grid_, index) => (<Grid grid={{ ...grid_, id: (new Date()).getTime() + "_" + index }} key={(new Date()).getTime() + "_" + index} previewFocus={true} />)))
             }
             {
-                <svg className={`absolute w-full h-full pointer-events-none ${grids ? "hidden" : ""} ${(isFocused && !grids || border) ? "animate-breathe_" : "text-gray-200"}`}
-                style={{ left, top }}
+                <svg className={`absolute w-full h-full pointer-events-none ${splitGrids ? "hidden" : ""} ${(isFocused && !splitGrids || previewFocus || onlyShowBorder) ? "animate-breathe_" : "text-gray-200"}`}
+                    style={{ left, top }}
                 >
                     <polygon
                         points={grid.path.map(p => `${p.x - left},${p.y - top}`).join(' ')}
