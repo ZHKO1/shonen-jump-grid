@@ -100,13 +100,13 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
     handleEvent(e)
   }
 
-  const move = (e: PointerEvent) => {
+  const updatePosition = (e: PointerEvent) => {
     const element = getTargetElement(target)
     if (!element) {
-      return
+      return false
     }
     if (!pressedDelta) {
-      return
+      return false
     }
     const container = getTargetElement(containerElement)
     const targetRect = element.getBoundingClientRect()
@@ -128,12 +128,19 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
       x,
       y,
     })
+    return true;
+  }
+
+  const move = (e: PointerEvent) => {
+    if (!updatePosition(e)) {
+      return
+    }
     options.onMove?.(position, e)
     handleEvent(e)
   }
 
   const end = (e: PointerEvent) => {
-    if (!pressedDelta) {
+    if (!updatePosition(e)) {
       return
     }
     setPressedDelta(undefined)

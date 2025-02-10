@@ -1,7 +1,7 @@
 'use client';
 import { MouseEventHandler, use, useContext, useEffect, useRef, useState } from 'react';
 import { isDef } from '../utils';
-import { getGridsBySplit, getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort, getRectGridPoint, isGridSplited } from './utils';
+import { getAdjustedPoint, getGridFromComicConfig, getGridsBySplit, getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort, getRectGridPoint, isGridSplited } from './utils';
 import { useSplit } from './hooks/useSplit';
 import useFocusStore from '../store/focus';
 import { useDraggable } from '../hooks';
@@ -195,13 +195,20 @@ function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, 
 
 function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: boolean }) {
     const { addStep, getCurrentStep } = useStepsStore();
+    const currentStep = getCurrentStep();
     const { getFocusId, setFocusId, clean } = useFocusStore();
     const isFocused = getFocusId() === grid.id;
 
     let splitResult = grid.splitResult;
     let [isDrawing, setIsDrawing] = useState(false);
     let [startPoint, setStartPoint] = useState(grid.splitLine?.[0]);
-    let endPoint = grid.splitLine?.[1];
+    let [endPoint, setEndPoint] = useState(grid.splitLine?.[1]);
+    useEffect(() => {
+        if (!isDrawing) {  // 仅在非绘制状态时同步外部变化
+            setStartPoint(grid.splitLine?.[0]);
+            setEndPoint(grid.splitLine?.[1]);
+        }
+    }, [grid.splitLine, isDrawing]);
 
     let { grids, line } = isDrawing && (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth * 2) || { grids: splitResult, line: grid.splitLine };
 
@@ -223,15 +230,33 @@ function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: b
         return (point: Point, newIsDrawing: boolean) => {
             switch (type) {
                 case "start":
-                    setStartPoint(point);
+                    let newStartPoint = getAdjustedPoint(point, endPoint!, { direction: "start" })
+                    setStartPoint(newStartPoint);
                     break;
                 case "end":
-                    // setEndPoint(point);
+                    let newEndPoint = getAdjustedPoint(startPoint!, point, { direction: "end" })
+                    setEndPoint(newEndPoint);
+                    break;
+                default:
                     break;
             }
             setIsDrawing(newIsDrawing)
             if (!newIsDrawing) {
+                if (currentStep && grids) {
+                    const comicConfig = currentStep.comicConfig;
+                    const newComicConfig = JSON.parse(JSON.stringify(comicConfig));
 
+                    const newGrid = getGridFromComicConfig(newComicConfig, grid.id);
+                    if (newGrid) {
+                        newGrid.splitLine = JSON.parse(JSON.stringify(line));
+                        newGrid.splitResult = JSON.parse(JSON.stringify(grids));
+                        newGrid.splitSpaceWidth = grid.splitSpaceWidth;
+                        addStep({
+                            type: "adjust-space",
+                            comicConfig: newComicConfig,
+                        });
+                    }
+                }
             }
         }
     }
@@ -272,7 +297,7 @@ function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: b
                 <>
                     <SplitPoint point={startPoint} onChange={handleDragglePoint("start")} />
                     <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' onClick={handleClickLine} style={{ left: (startPoint.x + endPoint.x) / 2, top: (startPoint.y + endPoint.y) / 2 }}></div>
-                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' onClick={handleClickLine} style={{ left: endPoint.x, top: endPoint.y }}></div>
+                    <SplitPoint point={endPoint} onChange={handleDragglePoint("end")} />
                 </>
             )
         }

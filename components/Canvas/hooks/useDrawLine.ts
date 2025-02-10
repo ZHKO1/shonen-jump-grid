@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useMouse } from "./useMouse";
 import type { Point } from '../grid';
 import { useLatest } from "@/components/hooks/useLatest";
+import { getAdjustedPoint } from "../utils";
 
 type DrawState = {
   isDrawing: boolean;
@@ -18,20 +19,6 @@ export function useDrawLine(isFocused: boolean) {
     end: null,
   });
   const latestDrawState = useLatest(drawState);
-
-  const getAdjustedEndPoint = (start: Point, end: Point): Point => {
-    const deltaX = end.x - start.x;
-    const deltaY = end.y - start.y;
-
-    if (deltaX === 0) return { ...end };
-
-    const slope = deltaY / deltaX;
-
-    if (Math.abs(slope) < 0.1) return { x: end.x, y: start.y };
-    if (Math.abs(slope) > 12) return { x: start.x, y: end.y };
-
-    return { ...end };
-  };
 
   const checkTimeElapsed = () => {
     if (mouseDownTimeRef.current) {
@@ -73,7 +60,7 @@ export function useDrawLine(isFocused: boolean) {
 
       setDrawState(prev => ({
         ...prev,
-        end: getAdjustedEndPoint(prev.start!, newEnd)
+        end: getAdjustedPoint(prev.start!, newEnd, { direction: "end" })
       }));
     };
 
@@ -97,7 +84,11 @@ export function useDrawLine(isFocused: boolean) {
         start.y === newEnd.y) {
         setDrawState({ isDrawing: false, start: null, end: null });
       } else {
-        setDrawState(prev => ({ ...prev, end: getAdjustedEndPoint(prev.start!, newEnd), isDrawing: false }));
+        setDrawState(prev => ({
+          ...prev,
+          end: getAdjustedPoint(prev.start!, newEnd, { direction: "end" }),
+          isDrawing: false
+        }));
       }
       mouseDownTimeRef.current = 0;
     };

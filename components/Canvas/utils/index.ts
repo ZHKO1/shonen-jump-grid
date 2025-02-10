@@ -461,3 +461,32 @@ export function isGridSplited(grid: GridConfig) {
     }
     return false;
 }
+
+
+export const getAdjustedPoint = (
+    start: Point,
+    end: Point,
+    options: { direction: 'start' | 'end' }
+): Point => {
+    const deltaX = end.x - start.x;
+    const deltaY = end.y - start.y;
+
+    // 垂直线直接返回
+    if (deltaX === 0) return options.direction === 'end' ? end : start;
+
+    const slope = deltaY / deltaX;
+    const absSlope = Math.abs(slope);
+
+    // 调整终点（保持起点不变）
+    if (options.direction === 'end') {
+        if (absSlope < 0.1) return { x: end.x, y: start.y };  // 接近水平
+        if (absSlope > 12) return { x: start.x, y: end.y };   // 接近垂直
+        return end;
+    }
+    // 调整起点（保持终点不变）
+    else {
+        if (absSlope < 0.1) return { x: start.x, y: end.y };  // 接近水平
+        if (absSlope > 12) return { x: end.x, y: start.y };   // 接近垂直
+        return start;
+    }
+};
