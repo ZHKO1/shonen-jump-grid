@@ -8,7 +8,6 @@ import { useSplit } from "./hooks/useSplit";
 
 export default function RectGrid({ grid, border = false }: { grid: RectGridConfig, border?: boolean }) {
     const gridRef = useRef<HTMLDivElement>(null);
-    // const [isGridFocused, setGridFocus] = useFocusGrid(gridRef, isDefaultFocused);
     const { getFocusId, setFocusId } = useFocusStore();
     const isFocused = getFocusId() === grid.id;
     const { outside } = getRectGridPoint({
@@ -20,9 +19,11 @@ export default function RectGrid({ grid, border = false }: { grid: RectGridConfi
     const top = outside.lt_y;
     const width = outside.rb_x - outside.lt_x;
     const height = outside.rb_y - outside.lt_y;
-    const contentStyle = {
-        width: `calc(100% - ${borderWidth * 2}px)`,
-        height: `calc(100% - ${borderWidth * 2}px)`,
+    const customGridStyle = {
+        left,
+        top,
+        width,
+        height,
     }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -33,33 +34,27 @@ export default function RectGrid({ grid, border = false }: { grid: RectGridConfi
     return (
         <div>
             {
-                <div className={`opacity-60 custom-grid absolute ${grids ? "hidden" : ""} ${(isFocused && !grids || border) ? "animate-breathe" : "bg-gray-200"} flex flex-wrap content-center justify-center`}
-                    style={{ left, top, width, height }}
+                <div className={`custom-grid absolute ${grids ? "hidden" : ""} flex flex-wrap content-center justify-center`}
+                    style={customGridStyle}
                     ref={gridRef}
                     onClick={handleClick}
                 >
-                    <div className="custom-grid-content bg-white" style={contentStyle}></div>
                 </div>
-
             }
             {
                 grids && (grids.map((grid_, index) => (<Grid grid={{ ...grid_, id: (new Date()).getTime() + "_" + index }} key={(new Date()).getTime() + "_" + index} border={true} />)))
             }
             {
-                /*
-                startPoint && endPoint && (
-                    <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-                        <line
-                            x1={startPoint.x}
-                            y1={startPoint.y}
-                            x2={endPoint.x}
-                            y2={endPoint.y}
-                            stroke="black"
-                            strokeWidth="2"
-                        />
-                    </svg>
-                )
-                */
+                <svg className={`absolute w-full h-full pointer-events-none ${grids ? "hidden" : ""} ${(isFocused && !grids || border) ? "animate-breathe_" : "text-gray-200"}`}
+                    style={{ left, top }}
+                >
+                    <polygon
+                        points={([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={borderWidth}
+                    />
+                </svg>
             }
         </div>
     )

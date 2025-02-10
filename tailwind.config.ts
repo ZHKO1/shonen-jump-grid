@@ -18,9 +18,14 @@ export default {
           '0%, 100%': { backgroundColor: 'red' },
           '50%': { backgroundColor: 'white' },
         },
+        focusBorderBreathe_: {
+          '0%, 100%': { color: 'red' },
+          '50%': { color: 'white' },
+        },
       },
       animation: {
         breathe: 'focusBorderBreathe 1.2s ease-in-out infinite',
+        breathe_: 'focusBorderBreathe_ 1.2s ease-in-out infinite',
       },
     },
   },

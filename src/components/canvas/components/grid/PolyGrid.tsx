@@ -9,11 +9,10 @@ import { Grid } from ".";
 
 export default function PolyGrid({ grid, border = false }: { grid: PolyGridConfig, border?: boolean }) {
     const gridRef = useRef<HTMLDivElement>(null);
-    // const [isGridFocused, setGridFocus] = useFocusGrid(gridRef);
     const { getFocusId, setFocusId } = useFocusStore();
     const isFocused = getFocusId() === grid.id;
 
-    const { outside, inside } = getPolyGridPoint(grid.path, borderWidth);
+    const { outside } = getPolyGridPoint(grid.path, borderWidth);
     const lt_outside = getPolyContainerPoint(outside, 'lt');
     const rb_outside = getPolyContainerPoint(outside, 'rb');
     if (!isDef(lt_outside) || !isDef(rb_outside)) {
@@ -27,10 +26,12 @@ export default function PolyGrid({ grid, border = false }: { grid: PolyGridConfi
     const height = rb_outside.y - lt_outside.y;
     const sortPath = getPolyPointBySort(outside);
     const clipPath = `polygon(${sortPath.map(p => `${p.x - left}px ${p.y - top}px`).join(',')})`;
-    const contentStyle = {
-        width: `100%`,
-        height: `100%`,
-        clipPath: `polygon(${inside.map(p => `${p.x - left}px ${p.y - top}px`).join(',')})`,
+    const customGridStyle = {
+        left,
+        top,
+        width,
+        height,
+        clipPath,
     }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -41,32 +42,27 @@ export default function PolyGrid({ grid, border = false }: { grid: PolyGridConfi
     return (
         <div>
             {
-                <div className={`opacity-60 custom-grid absolute ${(isFocused && !grids || border) ? "animate-breathe" : "bg-gray-200"}`}
-                    style={{ left, top, width, height, clipPath }}
+                <div className={`custom-grid absolute`}
+                    style={customGridStyle}
                     ref={gridRef}
                     onClick={handleClick}
                 >
-                    <div className="custom-grid-content bg-white" style={{ ...contentStyle }}></div>
                 </div>
             }
             {
                 grids && (grids.map((grid_, index) => (<Grid grid={{ ...grid_, id: (new Date()).getTime() + "_" + index }} key={(new Date()).getTime() + "_" + index} border={true} />)))
             }
             {
-                /*
-                startPoint && endPoint && (
-                    <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-                        <line
-                            x1={startPoint.x}
-                            y1={startPoint.y}
-                            x2={endPoint.x}
-                            y2={endPoint.y}
-                            stroke="black"
-                            strokeWidth="2"
-                        />
-                    </svg>
-                )
-                */
+                <svg className={`absolute w-full h-full pointer-events-none ${grids ? "hidden" : ""} ${(isFocused && !grids || border) ? "animate-breathe_" : "text-gray-200"}`}
+                style={{ left, top }}
+                >
+                    <polygon
+                        points={grid.path.map(p => `${p.x - left},${p.y - top}`).join(' ')}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={borderWidth}
+                    />
+                </svg>
             }
         </div>
 
