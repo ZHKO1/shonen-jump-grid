@@ -199,16 +199,27 @@ function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: b
     const { getFocusId, setFocusId, clean } = useFocusStore();
     const isFocused = getFocusId() === grid.id;
 
-    let splitResult = grid.splitResult;
+    let splitResult = grid.splitResult!;
+    let splitLine = grid.splitLine!;
     let [isDrawing, setIsDrawing] = useState(false);
-    let [startPoint, setStartPoint] = useState(grid.splitLine?.[0]);
-    let [endPoint, setEndPoint] = useState(grid.splitLine?.[1]);
+    let [startPoint, setStartPoint] = useState(splitLine[0]);
+    let [endPoint, setEndPoint] = useState(splitLine[1]);
     useEffect(() => {
         if (!isDrawing) {  // 仅在非绘制状态时同步外部变化
-            setStartPoint(grid.splitLine?.[0]);
-            setEndPoint(grid.splitLine?.[1]);
+            setStartPoint(splitLine[0]);
+            setEndPoint(splitLine[1]);
         }
-    }, [grid.splitLine, isDrawing]);
+    }, [splitLine, isDrawing]);
+    let [middlePoint, setMiddlePoint] = useState({
+        x: (startPoint.x + endPoint.x) / 2,
+        y: (startPoint.y + endPoint.y) / 2
+    });
+    useEffect(() => {
+        setMiddlePoint({
+            x: (startPoint.x + endPoint.x) / 2,
+            y: (startPoint.y + endPoint.y) / 2
+        });
+    }, [startPoint, endPoint]);
 
     let { grids, line } = isDrawing && (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth * 2) || { grids: splitResult, line: grid.splitLine };
 
@@ -236,6 +247,12 @@ function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: b
                 case "end":
                     let newEndPoint = getAdjustedPoint(startPoint!, point, { direction: "end" })
                     setEndPoint(newEndPoint);
+                    break;
+                case "middle":
+                    let offset = { x: point.x - middlePoint.x, y: point.y - middlePoint.y };
+                    setStartPoint({ x: startPoint.x + offset.x, y: startPoint.y + offset.y });
+                    setEndPoint({ x: endPoint.x + offset.x, y: endPoint.y + offset.y });
+                    setMiddlePoint(point);
                     break;
                 default:
                     break;
@@ -296,7 +313,7 @@ function SplitContainer({ grid, border = false }: { grid: GridConfig, border?: b
             isFocused && startPoint && endPoint && (
                 <>
                     <SplitPoint point={startPoint} onChange={handleDragglePoint("start")} />
-                    <div className='absolute size-[10px] rounded-full bg-black cursor-pointer -translate-x-1/2 -translate-y-1/2' onClick={handleClickLine} style={{ left: (startPoint.x + endPoint.x) / 2, top: (startPoint.y + endPoint.y) / 2 }}></div>
+                    <SplitPoint point={middlePoint} onChange={handleDragglePoint("middle")} />
                     <SplitPoint point={endPoint} onChange={handleDragglePoint("end")} />
                 </>
             )
