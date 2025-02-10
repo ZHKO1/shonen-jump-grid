@@ -8,7 +8,7 @@ export function useSplit(grid: GridConfig, isGridFocused: boolean, spaceWidth: n
   const { addStep, getCurrentStep } = useStepsStore();
   const currentStep = getCurrentStep();
   const [startPoint, endPoint, isDrawing] = useDrawLine(isGridFocused);
-  const { grids, line } = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], spaceWidth) || {};
+  const { grids, line } = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth }) || {};
 
   useEffect(() => {
     if (!isDrawing && startPoint && endPoint) {

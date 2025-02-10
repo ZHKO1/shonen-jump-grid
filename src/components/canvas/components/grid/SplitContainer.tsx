@@ -62,7 +62,9 @@ export default function SplitContainer({ grid, border = false }: { grid: GridCon
         });
     }, [startPoint, endPoint]);
 
-    const { grids, line } = isDrawing && (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], borderWidth * 2) || { grids: splitResult, line: grid.splitLine };
+    const defaultSplitResult = { grids: splitResult, line: grid.splitLine };
+    const { grids, line } = isDrawing && (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth: borderWidth * 2, recursion: true }) || defaultSplitResult;
+    // const { grids: borderGrids } = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth: borderWidth * 2, recursion: false }) || defaultSplitResult;
 
     const handleClickLine: MouseEventHandler<Element> = (e) => {
         try {
@@ -148,7 +150,10 @@ export default function SplitContainer({ grid, border = false }: { grid: GridCon
             )
         }
         {
-            grids && (grids.map(grid_ => (<Grid grid={grid_} key={grid_.id} border={isFocused || border} />)))
+            grids && (grids.map(grid_ => (<Grid grid={grid_} key={grid_.id} />)))
+        }
+        {
+            // (border || isFocused) && borderGrids && (borderGrids.map(grid_ => (<Grid grid={grid_} key={grid_.id} border={true} />)))
         }
         {
             isFocused && startPoint && endPoint && (

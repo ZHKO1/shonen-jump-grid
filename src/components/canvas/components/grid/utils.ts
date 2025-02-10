@@ -2,6 +2,7 @@ import { ComicConfig, GridConfig, Point, PolyGridConfig, PolyGridPoint, RectGrid
 
 type Pos = "lt" | "rt" | "lb" | "rb";
 type PolyType = "horizon" | "vertical";
+type SplitOptions = { spaceWidth: number, recursion?: boolean }
 /**
  * 获取四边形所在容器的四个点的坐标
  * @param path 
@@ -127,18 +128,19 @@ function getYFromConentLineFunc(point1: Point, point2: Point, borderWidth: numbe
  * @returns 
  */
 export function getRectGridPoint({ lt_x, lt_y, rb_x, rb_y }: RectGridPoint, borderWidth: number): { outside: RectGridPoint, inside: RectGridPoint } {
+    const adjust = Math.floor(borderWidth / 2);
     return {
         outside: {
-            lt_x: lt_x - Math.floor(borderWidth / 2),
-            lt_y: lt_y - Math.floor(borderWidth / 2),
-            rb_x: rb_x + Math.floor(borderWidth / 2),
-            rb_y: rb_y + Math.floor(borderWidth / 2),
+            lt_x: lt_x - adjust,
+            lt_y: lt_y - adjust,
+            rb_x: rb_x + adjust,
+            rb_y: rb_y + adjust,
         },
         inside: {
-            lt_x: lt_x + Math.floor(borderWidth / 2),
-            lt_y: lt_y + Math.floor(borderWidth / 2),
-            rb_x: rb_x - Math.floor(borderWidth / 2),
-            rb_y: rb_y - Math.floor(borderWidth / 2),
+            lt_x: lt_x + adjust,
+            lt_y: lt_y + adjust,
+            rb_x: rb_x - adjust,
+            rb_y: rb_y - adjust,
         }
     };
 }
@@ -196,7 +198,19 @@ export function getPolyGridPoint(path: PolyGridPoint["path"], borderWidth: numbe
     }
 }
 
-export function updateSubGridsBySplit(grid: GridConfig, newSubGrids: [GridConfig, GridConfig]): [GridConfig, GridConfig] {
+/**
+ * 从RectGrid返回被分割的两个grid，以及分割线
+ * @param path 
+ * @param line 
+ * @param options
+ * @param options.spaceWidth
+ * @param options.recursion
+ * @returns [GridConfig, GridConfig]
+ */
+export function updateSubGridsBySplit(grid: GridConfig, newSubGrids: [GridConfig, GridConfig], recursion: boolean): [GridConfig, GridConfig] {
+    if (!recursion) {
+        return newSubGrids;
+    }
     if (isGridSplited(grid)) {
         return newSubGrids.map((subGrid, index) => {
             const oldSubGrid = grid.splitResult![index];
@@ -205,7 +219,10 @@ export function updateSubGridsBySplit(grid: GridConfig, newSubGrids: [GridConfig
                     ...oldSubGrid,
                     ...subGrid,
                 }
-                const { grids, line } = getGridsBySplit(newSubGrid, oldSubGrid.splitLine!, oldSubGrid.splitSpaceWidth!) || {};
+                const { grids, line } = getGridsBySplit(newSubGrid, oldSubGrid.splitLine!, {
+                    spaceWidth: oldSubGrid.splitSpaceWidth!,
+                    recursion: recursion,
+                }) || {};
                 if (grids && line) {
                     return {
                         ...newSubGrid,
@@ -223,7 +240,16 @@ export function updateSubGridsBySplit(grid: GridConfig, newSubGrids: [GridConfig
     }
 }
 
-export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], borderWidth: number): { grids: [GridConfig, GridConfig], line: [Point, Point] } | null {
+/**
+ * 从RectGrid返回被分割的两个grid，以及分割线
+ * @param path 
+ * @param line 
+ * @param options
+ * @param options.spaceWidth
+ * @param options.recursion
+ * @returns { grids: [GridConfig, GridConfig], line: [Point, Point] } | null
+ */
+export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], { spaceWidth, recursion = true }: SplitOptions): { grids: [GridConfig, GridConfig], line: [Point, Point] } | null {
     const lt_x = grid.lt_x;
     const lt_y = grid.lt_y;
     const rb_x = grid.rb_x;
@@ -234,22 +260,23 @@ export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], 
     const getLineCrossX = getXFromConentLineFunc(line[0], line[1], 0);
     const topCrossX = getLineCrossX(lt_y);
     const bottomCrossX = getLineCrossX(rb_y);
+    const adjust = Math.floor(spaceWidth / 2)
     // 判断是否上下分割
     if ((leftCrossY > lt_y && leftCrossY < rb_y) && (rightCrossY > lt_y && rightCrossY < rb_y)) {
         if (leftCrossY == rightCrossY) {
             return {
                 grids: updateSubGridsBySplit(grid, [
-                    { type: 'rect', lt_x, lt_y, rb_x, rb_y: leftCrossY - Math.floor(borderWidth / 2), id: grid.id + "_0" },
-                    { type: 'rect', lt_x, lt_y: leftCrossY + Math.floor(borderWidth / 2), rb_x, rb_y, id: grid.id + "_1" }
-                ]),
+                    { type: 'rect', lt_x, lt_y, rb_x, rb_y: leftCrossY - adjust, id: grid.id + "_0" },
+                    { type: 'rect', lt_x, lt_y: leftCrossY + adjust, rb_x, rb_y, id: grid.id + "_1" }
+                ], recursion),
                 line: [
                     { x: lt_x, y: leftCrossY },
                     { x: rb_x, y: rightCrossY },
                 ]
             }
         } else {
-            const getLineCrossY_ceil = getYFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), false);
-            const getLineCrossY_floor = getYFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), true);
+            const getLineCrossY_ceil = getYFromConentLineFunc(line[0], line[1], adjust, false);
+            const getLineCrossY_floor = getYFromConentLineFunc(line[0], line[1], adjust, true);
             const leftCrossY_ceil = getLineCrossY_ceil(lt_x);
             const rightCrossY_ceil = getLineCrossY_ceil(rb_x);
             const leftCrossY_floor = getLineCrossY_floor(lt_x);
@@ -258,7 +285,7 @@ export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], 
                 grids: updateSubGridsBySplit(grid, [
                     { type: 'poly', path: [{ x: lt_x, y: lt_y }, { x: rb_x, y: lt_y }, { x: rb_x, y: rightCrossY_ceil }, { x: lt_x, y: leftCrossY_ceil }], id: grid.id + "_0" },
                     { type: 'poly', path: [{ x: lt_x, y: leftCrossY_floor }, { x: rb_x, y: rightCrossY_floor }, { x: rb_x, y: rb_y }, { x: lt_x, y: rb_y }], id: grid.id + "_1" },
-                ]),
+                ], recursion),
                 line: [
                     { x: lt_x, y: leftCrossY },
                     { x: rb_x, y: rightCrossY },
@@ -269,17 +296,17 @@ export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], 
         if (topCrossX == bottomCrossX) {
             return {
                 grids: updateSubGridsBySplit(grid, [
-                    { type: 'rect', lt_x, lt_y, rb_x: topCrossX - Math.floor(borderWidth / 2), rb_y, id: grid.id + "_0" },
-                    { type: 'rect', lt_x: topCrossX + Math.floor(borderWidth / 2), lt_y, rb_x, rb_y, id: grid.id + "_1" }
-                ]),
+                    { type: 'rect', lt_x, lt_y, rb_x: topCrossX - adjust, rb_y, id: grid.id + "_0" },
+                    { type: 'rect', lt_x: topCrossX + adjust, lt_y, rb_x, rb_y, id: grid.id + "_1" }
+                ], recursion),
                 line: [
                     { x: topCrossX, y: lt_y },
                     { x: bottomCrossX, y: rb_y },
                 ]
             }
         } else {
-            const getLineCrossX_left = getXFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), false);
-            const getLineCrossX_right = getXFromConentLineFunc(line[0], line[1], Math.floor(borderWidth / 2), true);
+            const getLineCrossX_left = getXFromConentLineFunc(line[0], line[1], adjust, false);
+            const getLineCrossX_right = getXFromConentLineFunc(line[0], line[1], adjust, true);
             const topCrossX_left = getLineCrossX_left(lt_y);
             const bottomCrossX_left = getLineCrossX_left(rb_y);
             const topCrossX_right = getLineCrossX_right(lt_y);
@@ -288,7 +315,7 @@ export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], 
                 grids: updateSubGridsBySplit(grid, [
                     { type: 'poly', path: [{ x: lt_x, y: lt_y }, { x: topCrossX_left, y: lt_y }, { x: bottomCrossX_left, y: rb_y }, { x: lt_x, y: rb_y }], id: grid.id + "_0" },
                     { type: 'poly', path: [{ x: topCrossX_right, y: lt_y }, { x: rb_x, y: lt_y }, { x: rb_x, y: rb_y }, { x: bottomCrossX_right, y: rb_y }], id: grid.id + "_1" },
-                ]),
+                ], recursion),
                 line: [
                     { x: topCrossX, y: lt_y },
                     { x: bottomCrossX, y: rb_y },
@@ -300,7 +327,16 @@ export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], 
     return null;
 }
 
-export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], borderWidth: number): { grids: [GridConfig, GridConfig], line: [Point, Point] } | null {
+/**
+ * 从PolyGrid返回被分割的两个grid，以及分割线
+ * @param path 
+ * @param line 
+ * @param options
+ * @param options.spaceWidth
+ * @param options.recursion
+ * @returns { grids: [GridConfig, GridConfig], line: [Point, Point] } | null
+ */
+export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], { spaceWidth, recursion = true }: SplitOptions): { grids: [GridConfig, GridConfig], line: [Point, Point] } | null {
     const path = grid.path;
     const lt = getPolyContainerPoint(path, "lt");
     const rb = getPolyContainerPoint(path, "rb");
@@ -314,7 +350,7 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
     const point3 = path[3];
     const getLineCrossY = getYFromConentLineFunc(line[0], line[1], 0);
     const getLineCrossX = getXFromConentLineFunc(line[0], line[1], 0);
-    const adjust = Math.floor(borderWidth / 2)
+    const adjust = Math.floor(spaceWidth / 2)
     if (getPolyType(grid.path) === 'horizon') {
         if ((line[0].y == line[1].y) && (line[0].y > lt_y) && (line[0].y < rb_y)) {
             const getLeftLineCrossX = getXFromConentLineFunc(point0, point3, 0);
@@ -323,7 +359,7 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
                 grids: updateSubGridsBySplit(grid, [
                     { type: 'poly', path: [point0, point1, { x: getRightLineCrossX(line[0].y - adjust), y: line[0].y - adjust }, { x: getLeftLineCrossX(line[0].y - adjust), y: line[0].y - adjust }], id: grid.id + "_0" },
                     { type: 'poly', path: [{ x: getLeftLineCrossX(line[0].y + adjust), y: line[0].y + adjust }, { x: getRightLineCrossX(line[0].y + adjust), y: line[0].y + adjust }, point2, point3], id: grid.id + "_1" },
-                ]),
+                ], recursion),
                 line: [
                     { x: getLeftLineCrossX(line[0].y), y: line[0].y },
                     { x: getRightLineCrossX(line[0].y), y: line[0].y },
@@ -338,7 +374,7 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
                     grids: updateSubGridsBySplit(grid, [
                         { type: 'poly', path: [point0, { x: topCrossX - adjust, y: lt_y }, { x: topCrossX - adjust, y: rb_y }, point3], id: grid.id + "_0" },
                         { type: 'poly', path: [{ x: topCrossX + adjust, y: lt_y }, point1, point2, { x: topCrossX + adjust, y: rb_y }], id: grid.id + "_1" },
-                    ]),
+                    ], recursion),
                     line: [
                         { x: topCrossX, y: lt_y },
                         { x: bottomCrossX, y: rb_y },
@@ -355,7 +391,7 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
                     grids: updateSubGridsBySplit(grid, [
                         { type: 'poly', path: [point0, { x: topCrossX_left, y: lt_y }, { x: bottomCrossX_left, y: rb_y }, point3], id: grid.id + "_0" },
                         { type: 'poly', path: [{ x: topCrossX_right, y: lt_y }, point1, point2, { x: bottomCrossX_right, y: rb_y }], id: grid.id + "_1" },
-                    ]),
+                    ], recursion),
                     line: [
                         { x: topCrossX, y: lt_y },
                         { x: bottomCrossX, y: rb_y },
@@ -371,7 +407,7 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
                 grids: updateSubGridsBySplit(grid, [
                     { type: 'poly', path: [point0, { x: line[0].x - adjust, y: getTopLineCrossY(line[0].x - adjust) }, { x: line[0].x - adjust, y: getBottomLineCrossY(line[0].x - adjust) }, point3], id: grid.id + "_0" },
                     { type: 'poly', path: [{ x: line[0].x + adjust, y: getTopLineCrossY(line[0].x + adjust) }, point1, point2, { x: line[0].x + adjust, y: getBottomLineCrossY(line[0].x + adjust) }], id: grid.id + "_1" },
-                ]),
+                ], recursion),
                 line: [
                     { x: line[0].x, y: getTopLineCrossY(line[0].x) },
                     { x: line[1].x, y: getBottomLineCrossY(line[0].x) },
@@ -386,7 +422,7 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
                     grids: updateSubGridsBySplit(grid, [
                         { type: 'poly', path: [point0, point1, { x: rb_x, y: leftCrossY - adjust }, { x: lt_x, y: leftCrossY - adjust }], id: grid.id + "_0" },
                         { type: 'poly', path: [{ x: lt_x, y: leftCrossY + adjust }, { x: rb_x, y: leftCrossY + adjust }, point2, point3], id: grid.id + "_1" },
-                    ]),
+                    ], recursion),
                     line: [
                         { x: lt_x, y: leftCrossY },
                         { x: rb_x, y: rightCrossY },
@@ -403,7 +439,7 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
                     grids: updateSubGridsBySplit(grid, [
                         { type: 'poly', path: [point0, point1, { x: rb_x, y: rightCrossY_ceil }, { x: lt_x, y: leftCrossY_ceil }], id: grid.id + "_0" },
                         { type: 'poly', path: [{ x: lt_x, y: leftCrossY_floor }, { x: rb_x, y: rightCrossY_floor }, point2, point3], id: grid.id + "_1" },
-                    ]),
+                    ], recursion),
                     line: [
                         { x: lt_x, y: leftCrossY },
                         { x: rb_x, y: rightCrossY },
@@ -417,20 +453,29 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
 }
 
 /**
- * 返回被分割的两个grid
+ * 从grid返回被分割的两个grid，以及分割线
  * @param path 
- * @param borderWidth 
- * @returns 
+ * @param line 
+ * @param options
+ * @param options.spaceWidth
+ * @param options.recursion
+ * @returns { grids: [GridConfig, GridConfig], line: [Point, Point] } | null
  */
-export function getGridsBySplit(grid: GridConfig, line: [Point, Point], borderWidth: number): { grids: [GridConfig, GridConfig], line: [Point, Point] } | null {
+export function getGridsBySplit(grid: GridConfig, line: [Point, Point], options: SplitOptions): { grids: [GridConfig, GridConfig], line: [Point, Point] } | null {
     if (grid.type === 'rect') {
-        return getGridsBySplitRect(grid, line, borderWidth);
+        return getGridsBySplitRect(grid, line, options);
     } else if (grid.type === 'poly') {
-        return getGridsBySplitPoly(grid, line, borderWidth);
+        return getGridsBySplitPoly(grid, line, options);
     }
     return null;
 }
 
+/**
+ * 从配置里获取指定的grid
+ * @param comicConfig 
+ * @param targetId
+ * @returns GridConfig | null
+ */
 export function getGridFromComicConfig(comicConfig: ComicConfig, targetId: string | number): GridConfig | null {
     for (let i = 0; i < comicConfig.length; i++) {
         const grid = comicConfig[i];
@@ -454,6 +499,11 @@ export function getGridFromComicConfig(comicConfig: ComicConfig, targetId: strin
     }
 }
 
+/**
+ * 判断该grid是否被分割
+ * @param path 
+ * @returns boolean
+ */
 export function isGridSplited(grid: GridConfig) {
     if (grid.splitLine && grid.splitResult && grid.splitResult.length > 0 && grid.splitSpaceWidth) {
         return true;
@@ -461,7 +511,13 @@ export function isGridSplited(grid: GridConfig) {
     return false;
 }
 
-
+/**
+ * 根据两个点，微调某个点，保持水平或垂直
+ * @param start 
+ * @param end 
+ * @param options.direction 'start' | 'end'
+ * @returns Point
+ */
 export const getAdjustedPoint = (
     start: Point,
     end: Point,
