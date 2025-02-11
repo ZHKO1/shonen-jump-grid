@@ -16,13 +16,13 @@ function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, 
         containerElement: gridRef,
         preventDefault: true,
         stopPropagation: true,
-        onMove(position, event) {
+        onMove(position/*, event*/) {
             onChange({
                 x: position.x + 5,
                 y: position.y + 5,
             }, true);
         },
-        onEnd(position, event) {
+        onEnd(position/*, event*/) {
             onChange({
                 x: position.x + 5,
                 y: position.y + 5,

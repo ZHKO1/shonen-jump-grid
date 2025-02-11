@@ -1,5 +1,5 @@
 import { BasicTarget, getTargetElement } from "../utils";
-import { defaultDocument, defaultWindow, off, on } from "../utils/browser";
+import { defaultDocument, /*defaultWindow,*/ off, on } from "../utils/browser";
 import { useDeepCompareEffect } from "./useDeepCompareEffect";
 import { useLatest } from "./useLatest";
 

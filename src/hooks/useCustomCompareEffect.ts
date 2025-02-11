@@ -19,5 +19,6 @@ export function useCustomCompareEffect<TDeps extends DependencyList>(
     }
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(effect, depsRef.current);
 }

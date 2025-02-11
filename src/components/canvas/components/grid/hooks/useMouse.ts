@@ -1,7 +1,7 @@
 // https://github.com/uidotdev/usehooks/blob/main/index.js useMouse
-
+import { useRef, useContext, useCallback } from "react";
 import { ContainerContext } from "@/src/components/canvas/context/container";
-import { useLayoutEffect, useRef, useContext } from "react";
+import { useEventListener } from "@/src/hooks";
 
 export type MouseState = {
   x: number,
@@ -26,35 +26,29 @@ export function useMouse() {
 
   const ref = gridRef;
 
-  useLayoutEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      const newState = {
-        x: event.pageX,
-        y: event.pageY,
-      } as MouseState;
+  const handleMouseMove = useCallback((event: MouseEvent) => {
+    const newState = {
+      x: event.pageX,
+      y: event.pageY,
+    } as MouseState;
 
-      if (ref.current?.nodeType === Node.ELEMENT_NODE) {
-        const { left, top } = ref.current.getBoundingClientRect();
-        const elementPositionX = left + window.scrollX;
-        const elementPositionY = top + window.scrollY;
-        const elementX = event.pageX - elementPositionX;
-        const elementY = event.pageY - elementPositionY;
+    if (ref.current?.nodeType === Node.ELEMENT_NODE) {
+      const { left, top } = ref.current.getBoundingClientRect();
+      const elementPositionX = left + window.scrollX;
+      const elementPositionY = top + window.scrollY;
+      const elementX = event.pageX - elementPositionX;
+      const elementY = event.pageY - elementPositionY;
 
-        newState.elementX = elementX;
-        newState.elementY = elementY;
-        newState.elementPositionX = elementPositionX;
-        newState.elementPositionY = elementPositionY;
-      }
+      newState.elementX = elementX;
+      newState.elementY = elementY;
+      newState.elementPositionX = elementPositionX;
+      newState.elementPositionY = elementPositionY;
+    }
 
-      stateRef.current = newState;
-    };
-
-    ref.current && document.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      ref.current && document.removeEventListener("mousemove", handleMouseMove);
-    };
+    stateRef.current = newState;
   }, [ref.current]);
+
+  useEventListener("mousemove", handleMouseMove);
 
   return stateRef;
 }

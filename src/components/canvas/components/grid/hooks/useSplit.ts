@@ -28,6 +28,7 @@ export function useSplit(grid: GridConfig, isGridFocused: boolean, spaceWidth: n
         }
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDrawing]);
 
   return grids;

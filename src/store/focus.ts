@@ -9,12 +9,12 @@ const useFocusStore = create(
     (set, get) => {
       return {
         setFocusId: (id: string | number) => {
-          set((state) => ({
+          set(() => ({
             focusId: id,
           }))
         },
         clean: () => {
-          set((state) => ({
+          set(() => ({
             focusId: "",
           }))
         },

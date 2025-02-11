@@ -5,6 +5,7 @@ import { ContainerContext } from "./context/container";
 import { useEffect, useRef } from "react";
 import useStepsStore from '../../store/step';
 import useFocusStore from "../../store/focus";
+import { useEventListener } from "@/src/hooks";
 
 const defaultConfig: GridConfig[] = [
   {
@@ -236,19 +237,16 @@ export default function Canvas() {
   const { addStep, getCurrentStep } = useStepsStore();
   const step = getCurrentStep();
 
-  const handleDocumentClick = (e: MouseEvent) => {
+  const handleDocumentClick = () => {
     clean();
   }
 
   useEffect(() => {
     addStep({ type: "init", comicConfig: defaultConfig });
-
-    document.addEventListener("click", handleDocumentClick);
-
-    return () => {
-      document.removeEventListener("click", handleDocumentClick);
-    };
   }, []);
+
+  useEventListener("click", handleDocumentClick);
+
   return (
     <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-black">
       <div ref={containerRef} className="canvas-content w-[720px] h-[1080px] bg-gray-100 relative overflow-hidden before:absolute before:border-2 before:top-0 before:left-0 before:right-0 before:bottom-0 before:border-gray-400 before:pointer-events-none">

@@ -1,10 +1,10 @@
 import { CSSProperties, MouseEventHandler, useRef } from "react";
-import { PolyGridConfig } from "./types";
 import useFocusStore from "@/src/store/focus";
-import { getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort } from "./utils";
 import { isDef } from "@/src/utils";
 import { useSplit } from "./hooks/useSplit";
+import { getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort } from "./utils";
 import { borderWidth } from "./constant";
+import { PolyGridConfig } from "./types";
 import { Grid } from ".";
 
 export type PolyGridProps = { grid: PolyGridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
@@ -16,9 +16,6 @@ export default function PolyGrid({ grid, previewFocus = false, onlyShowBorder = 
     const { outside } = getPolyGridPoint(grid.path, borderWidth);
     const lt_outside = getPolyContainerPoint(outside, 'lt');
     const rb_outside = getPolyContainerPoint(outside, 'rb');
-    if (!isDef(lt_outside) || !isDef(rb_outside)) {
-        return null;
-    }
     const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
 
     const left = lt_outside.x;
@@ -38,6 +35,10 @@ export default function PolyGrid({ grid, previewFocus = false, onlyShowBorder = 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
         setFocusId(grid.id);
         e.nativeEvent.stopImmediatePropagation();
+    }
+
+    if (!isDef(lt_outside) || !isDef(rb_outside)) {
+        return null;
     }
 
     return (
