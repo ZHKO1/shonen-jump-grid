@@ -3,8 +3,8 @@ import HeaderBar from "@/src/components/header-bar";
 
 export default function Home() {
   return (
-    <div className="h-screen p-3 flex flex-col">
-      <header className="h-16 bg-gray-100">
+    <div className="p-3">
+      <header className="h-12 bg-gray-100">
         <HeaderBar />
       </header>
       <main className="flex w-full bg-yellow-100">
