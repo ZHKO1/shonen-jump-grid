@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMouse } from "./useMouse";
 import type { Point } from '../types';
-import { useLatest } from "@/src/hooks/useLatest";
+import { useLatest } from "@/hooks/useLatest";
 import { getAdjustedPoint } from "../utils";
 
 type DrawState = {

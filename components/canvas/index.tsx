@@ -5,7 +5,7 @@ import { ContainerContext } from "./context/container";
 import { useEffect, useRef } from "react";
 import useStepsStore from '../../store/step';
 import useFocusStore from "../../store/focus";
-import { useEventListener } from "@/src/hooks";
+import { useEventListener } from "@/hooks";
 
 const defaultConfig: GridConfig[] = [
   {

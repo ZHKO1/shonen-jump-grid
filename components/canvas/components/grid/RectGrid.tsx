@@ -1,35 +1,30 @@
 import { CSSProperties, MouseEventHandler, useRef } from "react";
-import useFocusStore from "@/src/store/focus";
-import { isDef } from "@/src/utils";
-import { useSplit } from "./hooks/useSplit";
-import { getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort } from "./utils";
+import { RectGridConfig } from "./types";
+import useFocusStore from "@/store/focus";
+import { getRectGridPoint } from "./utils";
 import { borderWidth } from "./constant";
-import { PolyGridConfig } from "./types";
 import { Grid } from ".";
+import { useSplit } from "./hooks/useSplit";
 
-export type PolyGridProps = { grid: PolyGridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
-export default function PolyGrid({ grid, previewFocus = false, onlyShowBorder = false }: PolyGridProps) {
+export type RectGridProps = { grid: RectGridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
+export default function RectGrid({ grid, previewFocus = false, onlyShowBorder = false }: RectGridProps) {
     const gridRef = useRef<HTMLDivElement>(null);
     const { getFocusId, setFocusId } = useFocusStore();
     const isFocused = getFocusId() === grid.id;
-
-    const { outside } = getPolyGridPoint(grid.path, borderWidth);
-    const lt_outside = getPolyContainerPoint(outside, 'lt');
-    const rb_outside = getPolyContainerPoint(outside, 'rb');
+    const { outside } = getRectGridPoint({
+        ...grid
+    }, borderWidth);
     const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
 
-    const left = lt_outside.x;
-    const top = lt_outside.y;
-    const width = rb_outside.x - lt_outside.x;
-    const height = rb_outside.y - lt_outside.y;
-    const sortPath = getPolyPointBySort(outside);
-    const clipPath = `polygon(${sortPath.map(p => `${p.x - left}px ${p.y - top}px`).join(',')})`;
+    const left = outside.lt_x;
+    const top = outside.lt_y;
+    const width = outside.rb_x - outside.lt_x;
+    const height = outside.rb_y - outside.lt_y;
     const customGridStyle = {
         left,
         top,
         width,
         height,
-        clipPath,
     } as CSSProperties
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -37,14 +32,10 @@ export default function PolyGrid({ grid, previewFocus = false, onlyShowBorder = 
         e.nativeEvent.stopImmediatePropagation();
     }
 
-    if (!isDef(lt_outside) || !isDef(rb_outside)) {
-        return null;
-    }
-
     return (
         <div>
             {
-                <div className={`custom-grid absolute ${(splitGrids || onlyShowBorder) ? "hidden" : ""}`}
+                <div className={`custom-grid absolute ${(splitGrids || onlyShowBorder) ? "hidden" : ""} flex flex-wrap content-center justify-center`}
                     style={customGridStyle}
                     ref={gridRef}
                     onClick={handleClick}
@@ -59,7 +50,7 @@ export default function PolyGrid({ grid, previewFocus = false, onlyShowBorder = 
                     style={{ left, top }}
                 >
                     <polygon
-                        points={grid.path.map(p => `${p.x - left},${p.y - top}`).join(' ')}
+                        points={([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')}
                         fill="none"
                         stroke="currentColor"
                         strokeWidth={borderWidth}
@@ -67,6 +58,5 @@ export default function PolyGrid({ grid, previewFocus = false, onlyShowBorder = 
                 </svg>
             }
         </div>
-
     )
 }

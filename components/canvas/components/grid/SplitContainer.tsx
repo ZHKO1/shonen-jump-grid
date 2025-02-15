@@ -1,11 +1,11 @@
 import { MouseEventHandler, useContext, useEffect, useRef, useState } from "react";
 import { GridConfig, Point } from "./types";
 import { ContainerContext } from "../../context/container";
-import { useDraggable } from "@/src/hooks";
-import useStepsStore from "@/src/store/step";
+import { useDraggable } from "@/hooks";
+import useStepsStore from "@/store/step";
 import { getAdjustedPoint, getGridFromComicConfig, getGridsBySplit } from "./utils";
 import { borderWidth } from "./constant";
-import useFocusStore from "@/src/store/focus";
+import useFocusStore from "@/store/focus";
 import { Grid } from ".";
 
 function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, isDrawing: boolean) => void }) {

@@ -1,5 +1,5 @@
 import { Dispatch, RefObject, SetStateAction, useEffect, useState } from "react";
-import { BasicTarget, getTargetElement, Position } from "../utils";
+import { BasicTarget, getTargetElement, Position } from "../lib";
 import { useEventListener } from "./useEventListener";
 
 interface useDraggableOptions {
