@@ -113,7 +113,7 @@ export default function SplitContainer({ grid, previewFocus = false, onlyShowBor
                         newGrid.splitResult = JSON.parse(JSON.stringify(splitGrids));
                         newGrid.splitSpaceWidth = grid.splitSpaceWidth;
                         addStep({
-                            type: "adjust-space",
+                            type: "adjust",
                             comicConfig: newComicConfig,
                         });
                     }

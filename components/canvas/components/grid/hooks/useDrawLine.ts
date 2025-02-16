@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useMouse } from "./useMouse";
 import type { Point } from '../types';
 import { useLatest } from "@/hooks/useLatest";
 import { getAdjustedPoint } from "../utils";
+import { ContainerContext } from "@/components/canvas/context/container";
+
 
 type DrawState = {
   isDrawing: boolean;
@@ -11,6 +13,7 @@ type DrawState = {
 };
 
 export function useDrawLine(isFocused: boolean) {
+  const { current: grid } = useContext(ContainerContext).container;
   const mouseStateRef = useMouse();
   const mouseDownTimeRef = useRef<number>(0);
   const [drawState, setDrawState] = useState<DrawState>({
@@ -93,14 +96,14 @@ export function useDrawLine(isFocused: boolean) {
       mouseDownTimeRef.current = 0;
     };
 
-    document.addEventListener("mousedown", handleMouseDown);
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    grid && grid.addEventListener("mousedown", handleMouseDown);
+    grid && grid.addEventListener("mousemove", handleMouseMove);
+    grid && grid.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener("mousedown", handleMouseDown);
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      grid && grid.removeEventListener("mousedown", handleMouseDown);
+      grid && grid.removeEventListener("mousemove", handleMouseMove);
+      grid && grid.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isFocused]);
 

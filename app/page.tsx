@@ -1,5 +1,6 @@
 import Canvas from "@/components/canvas";
 import HeaderBar from "@/components/header-bar";
+import AttrCard from "@/components/attr-card";
 
 export default function Home() {
   return (
@@ -7,12 +8,13 @@ export default function Home() {
       <header>
         <HeaderBar />
       </header>
-      <main className="flex w-full bg-blue-100 p-3">
-        <section className="w-[200px] mr-3 bg-green-100 hidden"></section>
-        <section className="flex-1">
+      <main className="w-full bg-blue-100 p-3 relative">
+        <section className="">
           <Canvas />
         </section>
-        <section className="w-[200px] bg-red-100 hidden"></section>
+        <section className="absolute right-3 top-3">
+          <AttrCard />
+        </section>
       </main>
     </div>
   );

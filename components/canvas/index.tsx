@@ -245,7 +245,7 @@ export default function Canvas() {
     addStep({ type: "init", comicConfig: defaultConfig });
   }, []);
 
-  useEventListener("click", handleDocumentClick);
+  useEventListener("click", handleDocumentClick, containerRef);
 
   return (
     <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-black">
