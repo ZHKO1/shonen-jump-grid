@@ -4,6 +4,7 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Slider } from "@/components/ui/slider"
 import {
   Card,
   CardContent,
@@ -13,8 +14,9 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { getGridsBySplit, isGridSplited } from "../canvas/components/grid/utils";
-import { GridConfig, RectGridPoint } from "../canvas/components/grid/types"
+import { GridConfig, Point, RectGridPoint } from "../canvas/components/grid/types"
 import { useAdjustGrid } from "../canvas/components/grid/hooks/useAdjustGrid"
+import { borderWidth } from "../canvas/components/grid/constant"
 
 export default function GridAttr({ grid }: { grid: GridConfig }) {
   const { id, type, splitLine = [{ x: 0, y: 0 }, { x: 0, y: 0 }], splitSpaceWidth = 0 } = grid;
@@ -29,14 +31,16 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
     })
   }
 
-  const onSplitSpaceWidthChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  const onSplitSpaceWidthChange = (isCommit: boolean) => (number: number[]) => {
     if (isGridSplited(grid)) {
-      const splitSpaceWidth = Number(e.target.value);
+      const splitSpaceWidth = Number(number[0]);
       const result = getGridsBySplit(grid, grid.splitLine!, { spaceWidth: splitSpaceWidth, recursion: true });
       if (result && result.grids) {
         adjustGrid(id, {
           splitSpaceWidth,
           splitResult: result.grids,
+        }, {
+          preview: isCommit ? false : true
         })
       }
     }
@@ -50,36 +54,62 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
       </CardHeader>
       <CardContent>
         <form>
-          <div className="grid w-full items-center gap-2 text-xs">
-            <div>
-              <div className="line-clamp-1">
-                <span>Id:</span> {id}
+          <div className="grid w-full items-center gap-1 text-xs">
+            <div className="grid grid-cols-4 gap-1">
+              <div className="grid col-span-4 grid-cols-5 gap-1">
+                <Label className="col-span-2 text-xs">Id:</Label>
+                <Label className="col-span-3 text-xs">{id}</Label>
               </div>
-            </div>
-            <div className="flex flex-wrap">
               {
-                type === "rect" && (["lt_x", "lt_y", "rb_x", "rb_y"] as (keyof RectGridPoint)[]).map((key) => (
-                  <div key={key} className="w-1/2 flex items-center gap-2 my-1 pr-1">
-                    <span className="flex items-center">{key}:</span>
-                    <Input className="flex-1 h-4 text-xs rounded-sm" value={grid[key] as number} onChange={onRectChange(key)} />
-                  </div>
-                ))
+                type === "rect" && (
+                  <>
+                    <div className="grid col-span-4 grid-cols-5 gap-1">
+                      <Label className="col-span-2 text-xs">upper-left:</Label>
+                      <Label className="col-span-3 text-xs">({grid.lt_x.toFixed(1) + "," + grid.lt_y.toFixed(1)})</Label>
+                    </div>
+                    <div className="grid col-span-4 grid-cols-5 gap-1">
+                      <Label className="col-span-2 text-xs">lower-right:</Label>
+                      <Label className="col-span-3 text-xs">({grid.rb_x.toFixed(1) + "," + grid.rb_y.toFixed(1)})</Label>
+                    </div>
+                  </>
+                )
+              }
+              {
+                type === "poly" && (
+                  (grid.path as Point[]).map((point, index) => (
+                    <div key={"path" + index} className="grid col-span-4 grid-cols-5 gap-1">
+                      <Label className="col-span-2 text-xs">point{index}:</Label>
+                      <Label className="col-span-3 text-xs">({point.x.toFixed(1) + "," + point.y.toFixed(1)})</Label>
+                    </div>
+                  ))
+                )
+              }
+              {
+                isSplit && (
+                  <>
+                    <div className="grid col-span-4 grid-cols-5 gap-1">
+                      <Label className="col-span-2 text-xs">split line:</Label>
+                      <Label className="col-span-3 text-xs">({splitLineStart.x.toFixed(1)}, {splitLineStart.y.toFixed(1)})</Label>
+                    </div>
+                    <div className="grid col-span-4 grid-cols-5 gap-1">
+                      <Label className="col-span-2 text-xs"></Label>
+                      <Label className="col-span-3 text-xs">({splitLineEnd.x.toFixed(1)}, {splitLineEnd.y.toFixed(1)})</Label>
+                    </div>
+                    <div className="col-span-4 flex flex-col gap-2 my-1 pr-1">
+                      <Label className="text-xs">split space width: {splitSpaceWidth}</Label>
+                      <Slider
+                        value={[splitSpaceWidth]}
+                        min={borderWidth * 2}
+                        max={100}
+                        step={1}
+                        onValueChange={onSplitSpaceWidthChange(false)}
+                        onValueCommit={onSplitSpaceWidthChange(true)}
+                      />
+                    </div>
+                  </>
+                )
               }
             </div>
-            {
-              isSplit && (
-                <div>
-                  <div>
-                    <div>split line:</div>
-                    <div>({splitLineStart.x.toFixed(1)}, {splitLineStart.y.toFixed(1)}) ({splitLineEnd.x.toFixed(1)}, {splitLineEnd.y.toFixed(1)})</div>
-                  </div>
-                  <div className="flex items-center gap-2 my-1 pr-1">
-                    <span className="flex items-center">split space width:</span>
-                    <Input className="flex-1 h-4 text-xs rounded-sm" value={splitSpaceWidth} onChange={onSplitSpaceWidthChange} />
-                  </div>
-                </div>
-              )
-            }
           </div>
         </form>
       </CardContent>
@@ -87,6 +117,6 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
         {/* <Button variant="outline" >Cancel</Button>
         <Button variant="outline" >Deploy</Button> */}
       </CardFooter>
-    </Card>
+    </Card >
   )
 }

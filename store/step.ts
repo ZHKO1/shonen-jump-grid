@@ -12,20 +12,56 @@ const useStepsStore = create(
     {
       steps: [] as Step[],
       currentIndex: -1,
+      isCurrentTmp: false,
     },
     (set, get) => {
       return {
-        addStep: (step: Step) => {
-          set((state) => ({
-            steps: [...state.steps.slice(0, state.currentIndex + 1), step],
-            currentIndex: state.currentIndex + 1,
-          }))
+        addStep: (step: Step, isTmp?: boolean) => {
+          set((state) => {
+            if (isTmp) {
+              // 说明要添加的step是tmp
+              if (!state.isCurrentTmp) {
+                // 正常添加，修改isCurrentTmp
+                return {
+                  steps: [...state.steps.slice(0), step],
+                  currentIndex: state.currentIndex + 1,
+                  isCurrentTmp: true,
+                }
+              } else {
+                // 替换currentStep（tmp）
+                return {
+                  steps: [...state.steps.slice(0, state.currentIndex), step],
+                }
+              }
+            } else {
+              if (!state.isCurrentTmp) {
+                // 正常添加step
+                return {
+                  steps: [...state.steps.slice(0), step],
+                  currentIndex: state.currentIndex + 1,
+                }
+              } else {
+                // 替换currentStep（tmp），isCurrentTmp赋予false
+                return {
+                  steps: [...state.steps.slice(0, state.currentIndex), step],
+                  isCurrentTmp: false,
+                }
+              }
+            }
+          })
         },
         getCurrentStep: () => {
           const currentIndex = get().currentIndex;
           if (currentIndex < 0) return null;
           const step = get().steps[currentIndex];
           return step;
+        },
+        setCurrentStep: (step: Step, createTmp: boolean) => {
+          const currentIndex = get().currentIndex;
+          if (currentIndex < 0) return null;
+          set((state) => ({
+            steps: [...state.steps.slice(0, state.currentIndex), step],
+          }))
         },
         nextStep: () => {
           set((state) => ({
