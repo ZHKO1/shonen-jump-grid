@@ -7,6 +7,7 @@ import { getAdjustedPoint, getGridFromComicConfig, getGridsBySplit } from "./uti
 import { borderWidth } from "./constant";
 import useFocusStore from "@/store/focus";
 import { Grid } from ".";
+import { useAdjustGrid } from "./hooks/useAdjustGrid";
 
 function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, isDrawing: boolean) => void }) {
     const pointRef = useRef<HTMLDivElement>(null);
@@ -36,8 +37,7 @@ function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, 
 
 export type SplitContainerProps = { grid: GridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
 export default function SplitContainer({ grid, previewFocus = false, onlyShowBorder = false }: SplitContainerProps) {
-    const { addStep, getCurrentStep } = useStepsStore();
-    const currentStep = getCurrentStep();
+    const adjustGrid = useAdjustGrid();
     const { getFocusId, setFocusId, clean } = useFocusStore();
     const isFocused = getFocusId() === grid.id;
 
@@ -64,8 +64,8 @@ export default function SplitContainer({ grid, previewFocus = false, onlyShowBor
     }, [startPoint, endPoint]);
 
     const defaultSplitResult = { grids: splitResult, line: grid.splitLine };
-    const { grids: splitGrids, line } = isDrawing && (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth: borderWidth * 2, recursion: true }) || defaultSplitResult;
-    const { grids: borderGrids } = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth: borderWidth * 2, recursion: false }) || defaultSplitResult;
+    const { grids: splitGrids, line } = isDrawing && (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth: grid.splitSpaceWidth!, recursion: true }) || defaultSplitResult;
+    const { grids: borderGrids } = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth: grid.splitSpaceWidth!, recursion: false }) || defaultSplitResult;
 
     const handleClickLine: MouseEventHandler<Element> = (e) => {
         try {
@@ -103,20 +103,12 @@ export default function SplitContainer({ grid, previewFocus = false, onlyShowBor
             }
             setIsDrawing(newIsDrawing)
             if (!newIsDrawing) {
-                if (currentStep && splitGrids) {
-                    const comicConfig = currentStep.comicConfig;
-                    const newComicConfig = JSON.parse(JSON.stringify(comicConfig));
-
-                    const newGrid = getGridFromComicConfig(newComicConfig, grid.id);
-                    if (newGrid) {
-                        newGrid.splitLine = JSON.parse(JSON.stringify(line));
-                        newGrid.splitResult = JSON.parse(JSON.stringify(splitGrids));
-                        newGrid.splitSpaceWidth = grid.splitSpaceWidth;
-                        addStep({
-                            type: "adjust",
-                            comicConfig: newComicConfig,
-                        });
-                    }
+                if (splitGrids) {
+                    adjustGrid(grid.id, {
+                        splitLine: JSON.parse(JSON.stringify(line)),
+                        splitResult: JSON.parse(JSON.stringify(splitGrids)),
+                        splitSpaceWidth: grid.splitSpaceWidth,
+                    })
                 }
             }
         }
@@ -151,10 +143,10 @@ export default function SplitContainer({ grid, previewFocus = false, onlyShowBor
             )
         }
         {
-            splitGrids && (splitGrids.map(grid_ => (<Grid grid={grid_} key={grid_.id}/>)))
+            splitGrids && (splitGrids.map(grid_ => (<Grid grid={grid_} key={grid_.id} />)))
         }
         {
-            (onlyShowBorder || isFocused) && borderGrids && (borderGrids.map(grid_ => (<Grid grid={grid_} key={grid_.id}  onlyShowBorder={true}/>)))
+            (onlyShowBorder || isFocused) && borderGrids && (borderGrids.map(grid_ => (<Grid grid={grid_} key={grid_.id} onlyShowBorder={true} />)))
         }
         {
             isFocused && startPoint && endPoint && (

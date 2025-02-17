@@ -12,27 +12,36 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import useFocusStore from "@/store/focus";
-import useStepsStore from "@/store/step";
-import { getGridFromComicConfig } from "../canvas/components/grid/utils";
-import { GridConfig, RectGridConfig, RectGridPoint } from "../canvas/components/grid/types"
+import { getGridsBySplit, isGridSplited } from "../canvas/components/grid/utils";
+import { GridConfig, RectGridPoint } from "../canvas/components/grid/types"
+import { useAdjustGrid } from "../canvas/components/grid/hooks/useAdjustGrid"
 
 export default function GridAttr({ grid }: { grid: GridConfig }) {
-  const { id, type } = grid;
-  const { addStep, getCurrentStep } = useStepsStore();
-  const currentStep = getCurrentStep();
+  const { id, type, splitLine = [{ x: 0, y: 0 }, { x: 0, y: 0 }], splitSpaceWidth = 0 } = grid;
+  const adjustGrid = useAdjustGrid();
+  const isSplit = isGridSplited(grid);
+  const splitLineStart = splitLine[0];
+  const splitLineEnd = splitLine[1];
+
   const onRectChange = (key: keyof RectGridPoint): React.ChangeEventHandler<HTMLInputElement> => (e) => {
-    if (currentStep) {
-      const comicConfig = currentStep.comicConfig;
-      const newComicConfig = JSON.parse(JSON.stringify(comicConfig));
-      const newGrid = getGridFromComicConfig(newComicConfig, id) as RectGridConfig;
-      newGrid[key] = Number(e.target.value);
-      addStep({
-        type: "adjust",
-        comicConfig: newComicConfig,
-      });
+    adjustGrid(id, {
+      [key]: Number(e.target.value)
+    })
+  }
+
+  const onSplitSpaceWidthChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    if (isGridSplited(grid)) {
+      const splitSpaceWidth = Number(e.target.value);
+      const result = getGridsBySplit(grid, grid.splitLine!, { spaceWidth: splitSpaceWidth, recursion: true });
+      if (result && result.grids) {
+        adjustGrid(id, {
+          splitSpaceWidth,
+          splitResult: result.grids,
+        })
+      }
     }
   }
+
   return (
     <Card className="w-[250px]">
       <CardHeader>
@@ -44,27 +53,33 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
           <div className="grid w-full items-center gap-2 text-xs">
             <div>
               <div className="line-clamp-1">
-                <span className="font-medium">Id:</span> {id}
+                <span>Id:</span> {id}
               </div>
             </div>
             <div className="flex flex-wrap">
               {
                 type === "rect" && (["lt_x", "lt_y", "rb_x", "rb_y"] as (keyof RectGridPoint)[]).map((key) => (
                   <div key={key} className="w-1/2 flex items-center gap-2 my-1 pr-1">
-                    <span className="text-xs font-medium flex items-center">{key}:</span>
+                    <span className="flex items-center">{key}:</span>
                     <Input className="flex-1 h-4 text-xs rounded-sm" value={grid[key] as number} onChange={onRectChange(key)} />
                   </div>
                 ))
               }
-              {
-                ["splitLine", "splitSpaceWidth"].map(key => (
-                  <div key={key} className="flex items-center gap-2 my-1 pr-1">
-                    <span className="text-xs font-medium flex items-center">{key}:</span>
-                    <Input className="w-10 h-4 text-xs rounded-sm" />
-                  </div>
-                ))
-              }
             </div>
+            {
+              isSplit && (
+                <div>
+                  <div>
+                    <div>split line:</div>
+                    <div>({splitLineStart.x.toFixed(1)}, {splitLineStart.y.toFixed(1)}) ({splitLineEnd.x.toFixed(1)}, {splitLineEnd.y.toFixed(1)})</div>
+                  </div>
+                  <div className="flex items-center gap-2 my-1 pr-1">
+                    <span className="flex items-center">split space width:</span>
+                    <Input className="flex-1 h-4 text-xs rounded-sm" value={splitSpaceWidth} onChange={onSplitSpaceWidthChange} />
+                  </div>
+                </div>
+              )
+            }
           </div>
         </form>
       </CardContent>

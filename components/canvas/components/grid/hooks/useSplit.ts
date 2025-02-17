@@ -3,32 +3,24 @@ import { useEffect } from "react";
 import { useDrawLine } from "./useDrawLine";
 import { getGridFromComicConfig, getGridsBySplit } from "../utils";
 import { GridConfig } from "../types";
+import { useAdjustGrid } from "./useAdjustGrid";
 
 export function useSplit(grid: GridConfig, isGridFocused: boolean, spaceWidth: number) {
-  const { addStep, getCurrentStep } = useStepsStore();
-  const currentStep = getCurrentStep();
+  const adjustGrid = useAdjustGrid();
   const [startPoint, endPoint, isDrawing] = useDrawLine(isGridFocused);
   const { grids, line } = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth }) || {};
 
   useEffect(() => {
     if (!isDrawing && startPoint && endPoint) {
-      if (currentStep && grids) {
-        const comicConfig = currentStep.comicConfig;
-        const newComicConfig = JSON.parse(JSON.stringify(comicConfig));
-
-        const newGrid = getGridFromComicConfig(newComicConfig, grid.id);
-        if (newGrid) {
-          newGrid.splitLine = JSON.parse(JSON.stringify(line));
-          newGrid.splitResult = JSON.parse(JSON.stringify(grids));
-          newGrid.splitSpaceWidth = spaceWidth;
-          addStep({
-            type: "split",
-            comicConfig: newComicConfig,
-          });
-        }
+      if (grids) {
+        adjustGrid(grid.id, {
+          splitLine: JSON.parse(JSON.stringify(line)),
+          splitResult: JSON.parse(JSON.stringify(grids)),
+          splitSpaceWidth: spaceWidth,
+        })
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDrawing]);
 
   return grids;
