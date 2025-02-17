@@ -1,11 +1,14 @@
 "use client"
 import { Button } from "@/components/ui/button";
+import { Forward, LayoutDashboard, Reply } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import { Toggle } from "@/components/ui/toggle";
 import useStepsStore from "../../store/step";
-import { Archive, Forward, LayoutDashboard, Reply } from "lucide-react";
+import useAttrStore from "@/store/attr";
 
 export default function HeaderBar() {
   const { nextStep, prevStep } = useStepsStore();
+  const { setShow, getShow } = useAttrStore();
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -32,15 +35,10 @@ export default function HeaderBar() {
             </Tooltip>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" >
-                  <LayoutDashboard className="h-4 w-4" />
-                  <span className="sr-only">Detail</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Detail</TooltipContent>
-            </Tooltip>
+            <Toggle aria-label="Toggle italic" pressed={getShow()} onPressedChange={(pressed) => setShow(pressed)}>
+              <LayoutDashboard className="h-4 w-4" />
+              <span className="sr-only">Detail</span>
+            </Toggle>
           </div>
         </div>
       </div>
