@@ -124,8 +124,8 @@ export default function SplitContainer({ grid, previewFocus = false, onlyShowBor
                         y1={startPoint.y}
                         x2={endPoint.x}
                         y2={endPoint.y}
-                        stroke="white"
-                        strokeWidth="4"
+                        stroke="transparent"
+                        strokeWidth={grid.splitSpaceWidth}
                         pointerEvents="all"
                         onClick={handleClickLine}
                     />
