@@ -1,16 +1,17 @@
 import { CSSProperties, MouseEventHandler, useRef } from "react";
 import { RectGridConfig } from "./types";
-import useFocusStore from "@/store/focus";
+import useFocusStore from "@/store/config";
 import { getRectGridPoint } from "./utils";
 import { borderWidth } from "./constant";
 import { Grid } from ".";
 import { useSplit } from "./hooks/useSplit";
+import { AnimatePresence, motion } from "framer-motion";
 
 export type RectGridProps = { grid: RectGridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
 export default function RectGrid({ grid, previewFocus = false, onlyShowBorder = false }: RectGridProps) {
     const gridRef = useRef<HTMLDivElement>(null);
-    const { getFocusId, setFocusId } = useFocusStore();
-    const isFocused = getFocusId() === grid.id;
+    const { getGridFocusId, setGridFocusId } = useFocusStore();
+    const isFocused = getGridFocusId() === grid.id;
     const { outside } = getRectGridPoint({
         ...grid
     }, borderWidth);
@@ -28,25 +29,26 @@ export default function RectGrid({ grid, previewFocus = false, onlyShowBorder = 
     } as CSSProperties
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
-        setFocusId(grid.id);
+        setGridFocusId(grid.id);
         e.nativeEvent.stopImmediatePropagation();
     }
 
     return (
         <div>
             {
-                <div className={`custom-grid absolute ${(splitGrids || onlyShowBorder) ? "hidden" : ""} flex flex-wrap content-center justify-center`}
+                <motion.div className={`custom-grid absolute ${(splitGrids || onlyShowBorder) ? "hidden" : ""} flex flex-wrap content-center justify-center`}
                     style={customGridStyle}
                     ref={gridRef}
                     onClick={handleClick}
+                    layoutId={`grid-${grid.id}`}
                 >
-                </div>
+                </motion.div>
             }
             {
                 splitGrids && (splitGrids.map((grid_, index) => (<Grid grid={{ ...grid_, id: (new Date()).getTime() + "_" + index }} key={(new Date()).getTime() + "_" + index} previewFocus={true} />)))
             }
             {
-                <svg className={`absolute w-full h-full pointer-events-none ${splitGrids ? "hidden" : ""} ${(isFocused && !splitGrids || previewFocus || onlyShowBorder) ? "animate-breathe_" : "text-gray-200"}`}
+                <motion.svg className={`absolute w-full h-full pointer-events-none ${splitGrids ? "hidden" : ""} ${(isFocused && !splitGrids || previewFocus || onlyShowBorder) ? "animate-breathe_" : "text-gray-200"}`}
                     style={{ left, top }}
                 >
                     <polygon
@@ -55,7 +57,7 @@ export default function RectGrid({ grid, previewFocus = false, onlyShowBorder = 
                         stroke="currentColor"
                         strokeWidth={borderWidth}
                     />
-                </svg>
+                </motion.svg>
             }
         </div>
     )

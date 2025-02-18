@@ -1,19 +1,17 @@
 "use client"
 import * as React from "react"
 
-import useFocusStore from "@/store/focus";
 import useStepsStore from "@/store/step";
-import useAttrStore from "@/store/attr";
+import useConfigStore from "@/store/config";
 import { getGridFromComicConfig } from "../canvas/components/grid/utils";
 import GridAttr from "./GridAttr"
 import CanvasAttr from "./CanvasAttr"
 import { isDef } from "@/lib";
 
 export default function AttrCard() {
-  const { getFocusId } = useFocusStore();
   const { getCurrentStep } = useStepsStore();
-  const { getShow } = useAttrStore();
-  const focusId = getFocusId();
+  const { getIsAttrCardShowed, getGridFocusId } = useConfigStore();
+  const focusId = getGridFocusId();
 
   const currentStep = getCurrentStep();
   const comicConfig = currentStep?.comicConfig;
@@ -21,7 +19,7 @@ export default function AttrCard() {
   const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
 
   return (
-    <div className={getShow() ? "" : "hidden"}>
+    <div className={getIsAttrCardShowed() ? "" : "hidden"}>
       {
         (focusId !== "") && grid ? <GridAttr grid={grid} /> : <CanvasAttr />
       }

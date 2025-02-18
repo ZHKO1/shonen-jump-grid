@@ -1,11 +1,11 @@
 import { MouseEventHandler, useContext, useEffect, useRef, useState } from "react";
-import { GridConfig, Point } from "./types";
-import { ContainerContext } from "../../context/container";
 import { useDraggable } from "@/hooks";
 import useStepsStore from "@/store/step";
+import useFocusStore from "@/store/config";
+import { GridConfig, Point } from "./types";
+import { ContainerContext } from "../../context/container";
 import { getAdjustedPoint, getGridFromComicConfig, getGridsBySplit } from "./utils";
 import { borderWidth } from "./constant";
-import useFocusStore from "@/store/focus";
 import { Grid } from ".";
 import { useAdjustGrid } from "./hooks/useAdjustGrid";
 
@@ -38,8 +38,8 @@ function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, 
 export type SplitContainerProps = { grid: GridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
 export default function SplitContainer({ grid, previewFocus = false, onlyShowBorder = false }: SplitContainerProps) {
     const adjustGrid = useAdjustGrid();
-    const { getFocusId, setFocusId, clean } = useFocusStore();
-    const isFocused = getFocusId() === grid.id;
+    const { getGridFocusId, setGridFocusId, cleanGridFocus } = useFocusStore();
+    const isFocused = getGridFocusId() === grid.id;
 
     const splitResult = grid.splitResult!;
     const splitLine = grid.splitLine!;
@@ -72,9 +72,9 @@ export default function SplitContainer({ grid, previewFocus = false, onlyShowBor
             if (isFocused) {
                 return;
             }
-            clean();
+            cleanGridFocus();
             setTimeout(() => {
-                setFocusId(grid.id);
+                setGridFocusId(grid.id);
             });
         } finally {
             e.nativeEvent.stopImmediatePropagation();

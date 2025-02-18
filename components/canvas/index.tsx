@@ -1,11 +1,11 @@
 "use client";
+import { useEffect, useRef } from "react";
+import { useEventListener } from "@/hooks";
+import useStepsStore from '@/store/step';
+import useFocusStore from "@/store/config";
 import { Grid } from "./components/grid";
 import { GridConfig } from "./components/grid/types";
 import { ContainerContext } from "./context/container";
-import { useEffect, useRef } from "react";
-import useStepsStore from '../../store/step';
-import useFocusStore from "../../store/focus";
-import { useEventListener } from "@/hooks";
 
 const defaultConfig: GridConfig[] = [
   {
@@ -232,17 +232,17 @@ const defaultConfig3: GridConfig[] = [
 ]
 
 export default function Canvas() {
-  const { clean } = useFocusStore();
+  const { cleanGridFocus } = useFocusStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const { addStep, getCurrentStep } = useStepsStore();
   const step = getCurrentStep();
 
   const handleDocumentClick = () => {
-    clean();
+    cleanGridFocus();
   }
 
   useEffect(() => {
-    addStep({ type: "init", comicConfig: defaultConfig });
+    addStep({ type: "init", comicConfig: defaultConfig3 });
   }, []);
 
   useEventListener("click", handleDocumentClick, containerRef);

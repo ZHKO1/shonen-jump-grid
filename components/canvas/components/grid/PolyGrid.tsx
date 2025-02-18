@@ -1,5 +1,5 @@
 import { CSSProperties, MouseEventHandler, useRef } from "react";
-import useFocusStore from "@/store/focus";
+import useFocusStore from "@/store/config";
 import { isDef } from "@/lib";
 import { useSplit } from "./hooks/useSplit";
 import { getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort } from "./utils";
@@ -10,8 +10,8 @@ import { Grid } from ".";
 export type PolyGridProps = { grid: PolyGridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
 export default function PolyGrid({ grid, previewFocus = false, onlyShowBorder = false }: PolyGridProps) {
     const gridRef = useRef<HTMLDivElement>(null);
-    const { getFocusId, setFocusId } = useFocusStore();
-    const isFocused = getFocusId() === grid.id;
+    const { getGridFocusId, setGridFocusId } = useFocusStore();
+    const isFocused = getGridFocusId() === grid.id;
 
     const { outside } = getPolyGridPoint(grid.path, borderWidth);
     const lt_outside = getPolyContainerPoint(outside, 'lt');
@@ -33,7 +33,7 @@ export default function PolyGrid({ grid, previewFocus = false, onlyShowBorder = 
     } as CSSProperties
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
-        setFocusId(grid.id);
+        setGridFocusId(grid.id);
         e.nativeEvent.stopImmediatePropagation();
     }
 

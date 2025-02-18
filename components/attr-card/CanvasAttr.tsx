@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import useFocusStore from "@/store/focus";
+import useFocusStore from "@/store/config";
 import useStepsStore from "@/store/step";
 import { getGridFromComicConfig } from "../canvas/components/grid/utils";
 
