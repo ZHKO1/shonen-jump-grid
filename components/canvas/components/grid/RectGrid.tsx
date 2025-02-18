@@ -1,17 +1,20 @@
 import { CSSProperties, MouseEventHandler, useRef } from "react";
-import { RectGridConfig } from "./types";
+import { motion } from "framer-motion";
 import useFocusStore from "@/store/config";
+import { cn } from "@/lib/utils";
+import { RectGridConfig } from "./types";
 import { getRectGridPoint } from "./utils";
 import { borderWidth } from "./constant";
 import { Grid } from ".";
 import { useSplit } from "./hooks/useSplit";
-import { motion } from "framer-motion";
 
-export type RectGridProps = { grid: RectGridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
-export default function RectGrid({ grid, previewFocus = false, onlyShowBorder = false }: RectGridProps) {
+export type RectGridProps = { grid: RectGridConfig, showAsFocused?: boolean, borderOnly?: boolean };
+export default function RectGrid({ grid, showAsFocused = false, borderOnly = false }: RectGridProps) {
     const gridRef = useRef<HTMLDivElement>(null);
     const { getGridFocusId, setGridFocusId } = useFocusStore();
     const isFocused = getGridFocusId() === grid.id;
+    // 有时候motion.div会给自己加上opacity:0，原因不明，因此只在必要时（也就是焦点状态）才使用motion.div
+    const NewDiv = isFocused ? motion.div : "div";
     const { outside } = getRectGridPoint({
         ...grid
     }, borderWidth);
@@ -35,38 +38,61 @@ export default function RectGrid({ grid, previewFocus = false, onlyShowBorder = 
         e.nativeEvent.stopImmediatePropagation();
     }
 
+    const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;
+
+    const gridContainerStyle = {
+        ...customGridPosStyle,
+        ...customGridSizeStyle
+    };
+
+    const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
+
     return (
         <div>
-            {
-                <motion.div className={`custom-grid absolute ${(splitGrids || onlyShowBorder) ? "hidden" : ""} flex flex-wrap content-center justify-center`}
-                    style={{ ...customGridPosStyle, ...customGridSizeStyle }}
-                    ref={gridRef}
-                    onClick={handleClick}
-                    layoutId={`grid-content-${grid.id}`}
+            <NewDiv
+                className={cn(
+                    "bg-slate-400 absolute flex flex-wrap content-center justify-center",
+                    (splitGrids || borderOnly) && "hidden"
+                )}
+                style={gridContainerStyle}
+                ref={gridRef}
+                onClick={handleClick}
+                {
+                ...(isFocused ? { layoutId: `grid-content-${grid.id}` } : {})
+                }
+            />
+
+            {splitGrids?.map((grid_, index) => (
+                <Grid
+                    grid={{ ...grid_, id: getSplitGridId(index) }}
+                    key={getSplitGridId(index)}
+                    showAsFocused
+                />
+            ))}
+
+            <NewDiv
+                className="absolute pointer-events-none"
+                {
+                ...(isFocused ? { layoutId: `grid-border-${grid.id}` } : {})
+                }
+                style={customGridPosStyle}
+            >
+                <svg
+                    className={cn(
+                        "pointer-events-none",
+                        splitGrids && "hidden",
+                        shouldShowBorder ? "animate-breathe" : "text-gray-200"
+                    )}
+                    style={customGridSizeStyle}
                 >
-                </motion.div>
-            }
-            {
-                splitGrids && (splitGrids.map((grid_, index) => (<Grid grid={{ ...grid_, id: (new Date()).getTime() + "_" + index }} key={(new Date()).getTime() + "_" + index} previewFocus={true} />)))
-            }
-            {
-                <motion.div
-                    className="absolute pointer-events-none"
-                    layoutId={`grid-border-${grid.id}`}
-                    style={{ ...customGridPosStyle }}
-                >
-                    <svg className={`pointer-events-none ${splitGrids ? "hidden" : ""} ${(isFocused && !splitGrids || previewFocus || onlyShowBorder) ? "animate-breathe_" : "text-gray-200"}`}
-                        style={customGridSizeStyle}
-                    >
-                        <polygon
-                            points={([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')}
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth={borderWidth}
-                        />
-                    </svg>
-                </motion.div>
-            }
+                    <polygon
+                        points={([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={borderWidth}
+                    />
+                </svg>
+            </NewDiv>
         </div>
     )
 }

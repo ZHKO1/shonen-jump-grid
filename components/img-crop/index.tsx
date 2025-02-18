@@ -74,7 +74,7 @@ export default function ImgCrop() {
             >
               <CloseIcon />
             </motion.button>
-            <motion.div className={`custom-grid absolute flex flex-wrap content-center justify-center`}
+            <motion.div className={`absolute flex flex-wrap content-center justify-center bg-green-600`}
               style={customGridSizeStyle}
               layoutId={`grid-content-${grid.id}`}
             >

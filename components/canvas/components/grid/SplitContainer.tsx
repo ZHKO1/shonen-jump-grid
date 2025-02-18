@@ -1,6 +1,6 @@
 import { MouseEventHandler, useContext, useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { useDraggable } from "@/hooks";
-import useStepsStore from "@/store/step";
 import useFocusStore from "@/store/config";
 import { GridConfig, Point } from "./types";
 import { ContainerContext } from "../../context/container";
@@ -35,8 +35,8 @@ function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, 
     )
 }
 
-export type SplitContainerProps = { grid: GridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
-export default function SplitContainer({ grid, previewFocus = false, onlyShowBorder = false }: SplitContainerProps) {
+export type SplitContainerProps = { grid: GridConfig, showAsFocused?: boolean, borderOnly?: boolean };
+export default function SplitContainer({ grid, showAsFocused = false, borderOnly = false }: SplitContainerProps) {
     const adjustGrid = useAdjustGrid();
     const { getGridFocusId, setGridFocusId, cleanGridFocus } = useFocusStore();
     const isFocused = getGridFocusId() === grid.id;
@@ -117,8 +117,13 @@ export default function SplitContainer({ grid, previewFocus = false, onlyShowBor
     return (<div>
         {
             startPoint && endPoint && (
-                <svg className={`absolute top-0 left-0 w-full h-full ${(isFocused) ? "opacity-100" : "opacity-0"}`}
-                    style={{ pointerEvents: "none" }}>
+                <svg
+                    className={cn(
+                        "absolute top-0 left-0 w-full h-full",
+                        isFocused ? "opacity-100" : "opacity-0"
+                    )}
+                    style={{ pointerEvents: "none" }}
+                >
                     <line
                         x1={startPoint.x}
                         y1={startPoint.y}
@@ -146,7 +151,7 @@ export default function SplitContainer({ grid, previewFocus = false, onlyShowBor
             splitGrids && (splitGrids.map(grid_ => (<Grid grid={grid_} key={grid_.id} />)))
         }
         {
-            (onlyShowBorder || isFocused) && borderGrids && (borderGrids.map(grid_ => (<Grid grid={grid_} key={grid_.id} onlyShowBorder={true} />)))
+            isFocused && borderGrids && (borderGrids.map(grid_ => (<Grid grid={grid_} key={"border" + grid_.id} borderOnly showAsFocused/>)))
         }
         {
             isFocused && startPoint && endPoint && (

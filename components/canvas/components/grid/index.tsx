@@ -5,7 +5,7 @@ import SplitContainer from './SplitContainer';
 import RectGrid, { RectGridProps } from './RectGrid';
 import PolyGrid, { PolyGridProps } from './PolyGrid';
 
-export type GridProps = { grid: GridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
+export type GridProps = { grid: GridConfig, showAsFocused?: boolean, borderOnly?: boolean };
 export function Grid(props: GridProps) {
     if (isGridSplited(props.grid)) {
         return <SplitContainer {...props}/>;
