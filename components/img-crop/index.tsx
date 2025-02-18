@@ -1,11 +1,13 @@
 "use client";
 import Image from "next/image";
-import React, { useEffect, useId, useRef, useState } from "react";
+import React, { CSSProperties, useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useOutsideClick } from "@/hooks/use-outside-click";
+// import { useOutsideClick } from "@/hooks/use-outside-click";
 import useConfigStore from "@/store/config";
 import useStepsStore from "@/store/step";
-import { getGridFromComicConfig } from "../canvas/components/grid/utils";
+import { getGridFromComicConfig, getRectGridPoint } from "../canvas/components/grid/utils";
+import { RectGridConfig } from "../canvas/components/grid/types";
+import { borderWidth } from "../canvas/components/grid/constant";
 
 // { active, setActive, id }: { active: (typeof cards)[number], setActive: Function, id: string }
 export default function ImgCrop() {
@@ -15,9 +17,24 @@ export default function ImgCrop() {
   const currentStep = getCurrentStep();
   const comicConfig = currentStep?.comicConfig;
 
-  const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
+  const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId) as RectGridConfig;
   const IsImgCropShowed = getIsImgCropShowed();
   const isShowed = IsImgCropShowed && grid;
+  console.log("IsImgCropShowed", IsImgCropShowed);
+  console.log("isShowed", isShowed);
+
+
+  const { outside } = getRectGridPoint({
+    ...grid!
+  }, borderWidth);
+  const left = outside.lt_x;
+  const top = outside.lt_y;
+  const width = outside.rb_x - outside.lt_x;
+  const height = outside.rb_y - outside.lt_y;
+  const customGridSizeStyle = {
+    width,
+    height,
+  } as CSSProperties
 
   // const ref = useRef<HTMLDivElement>(null);
   // useOutsideClick(ref, () => setActive(null));
@@ -35,7 +52,7 @@ export default function ImgCrop() {
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {isShowed ? (
+        {isShowed && (
           <div className="fixed inset-0  grid place-items-center z-[100]">
             <motion.button
               key={`grid-${grid.id}`}
@@ -52,69 +69,34 @@ export default function ImgCrop() {
                   duration: 0.05,
                 },
               }}
-              className="flex absolute top-2 right-2 lg:hidden items-center justify-center bg-white rounded-full h-6 w-6"
+              className="flex absolute top-2 right-2 items-center justify-center bg-white rounded-full h-6 w-6"
               onClick={() => setIsImgCropShowed(false)}
             >
               <CloseIcon />
             </motion.button>
-            {/* <motion.div
-              layoutId={`card-${active.title}-${id}`}
-              ref={ref}
-              className="w-full max-w-[500px]  h-full md:h-fit md:max-h-[90%]  flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden bg-orange-500"
+            <motion.div className={`custom-grid absolute flex flex-wrap content-center justify-center`}
+              style={customGridSizeStyle}
+              layoutId={`grid-content-${grid.id}`}
             >
-              <motion.div layoutId={`image-${active.title}-${id}`}>
-                <img
-                  width={200}
-                  height={200}
-                  src={active.src}
-                  alt={active.title}
-                  className="w-full h-80 lg:h-80 sm:rounded-tr-lg sm:rounded-tl-lg object-cover object-top"
+            </motion.div>
+            <motion.div
+              className="absolute pointer-events-none"
+              layoutId={`grid-border-${grid.id}`}
+              style={customGridSizeStyle}
+            >
+              <svg className={`pointer-events-none text-gray-200`}
+                style={customGridSizeStyle}
+              >
+                <polygon
+                  points={([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={borderWidth}
                 />
-              </motion.div>
-
-              <div>
-                <div className="flex justify-between items-start p-4">
-                  <div className="">
-                    <motion.h3
-                      layoutId={`title-${active.title}-${id}`}
-                      className="font-bold text-neutral-700 dark:text-neutral-200"
-                    >
-                      {active.title}
-                    </motion.h3>
-                    <motion.p
-                      layoutId={`description-${active.description}-${id}`}
-                      className="text-neutral-600 dark:text-neutral-400"
-                    >
-                      {active.description}
-                    </motion.p>
-                  </div>
-
-                  <motion.a
-                    layoutId={`button-${active.title}-${id}`}
-                    href={active.ctaLink}
-                    target="_blank"
-                    className="px-4 py-3 text-sm rounded-full font-bold bg-green-500 text-white"
-                  >
-                    {active.ctaText}YOYO
-                  </motion.a>
-                </div>
-                <div className="pt-4 relative px-4">
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="text-neutral-600 text-xs md:text-sm lg:text-base h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto dark:text-neutral-400 [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
-                  >
-                    {typeof active.content === "function"
-                      ? active.content()
-                      : active.content}
-                  </motion.div>
-                </div>
-              </div>
-            </motion.div> */}
+              </svg>
+            </motion.div>
           </div>
-        ) : null}
+        )}
       </AnimatePresence>
     </>
   );

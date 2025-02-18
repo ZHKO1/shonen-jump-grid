@@ -5,7 +5,7 @@ import { getRectGridPoint } from "./utils";
 import { borderWidth } from "./constant";
 import { Grid } from ".";
 import { useSplit } from "./hooks/useSplit";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 
 export type RectGridProps = { grid: RectGridConfig, previewFocus?: boolean, onlyShowBorder?: boolean };
 export default function RectGrid({ grid, previewFocus = false, onlyShowBorder = false }: RectGridProps) {
@@ -21,9 +21,11 @@ export default function RectGrid({ grid, previewFocus = false, onlyShowBorder = 
     const top = outside.lt_y;
     const width = outside.rb_x - outside.lt_x;
     const height = outside.rb_y - outside.lt_y;
-    const customGridStyle = {
+    const customGridPosStyle = {
         left,
         top,
+    } as CSSProperties
+    const customGridSizeStyle = {
         width,
         height,
     } as CSSProperties
@@ -37,10 +39,10 @@ export default function RectGrid({ grid, previewFocus = false, onlyShowBorder = 
         <div>
             {
                 <motion.div className={`custom-grid absolute ${(splitGrids || onlyShowBorder) ? "hidden" : ""} flex flex-wrap content-center justify-center`}
-                    style={customGridStyle}
+                    style={{ ...customGridPosStyle, ...customGridSizeStyle }}
                     ref={gridRef}
                     onClick={handleClick}
-                    layoutId={`grid-${grid.id}`}
+                    layoutId={`grid-content-${grid.id}`}
                 >
                 </motion.div>
             }
@@ -48,16 +50,22 @@ export default function RectGrid({ grid, previewFocus = false, onlyShowBorder = 
                 splitGrids && (splitGrids.map((grid_, index) => (<Grid grid={{ ...grid_, id: (new Date()).getTime() + "_" + index }} key={(new Date()).getTime() + "_" + index} previewFocus={true} />)))
             }
             {
-                <motion.svg className={`absolute w-full h-full pointer-events-none ${splitGrids ? "hidden" : ""} ${(isFocused && !splitGrids || previewFocus || onlyShowBorder) ? "animate-breathe_" : "text-gray-200"}`}
-                    style={{ left, top }}
+                <motion.div
+                    className="absolute pointer-events-none"
+                    layoutId={`grid-border-${grid.id}`}
+                    style={{ ...customGridPosStyle }}
                 >
-                    <polygon
-                        points={([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={borderWidth}
-                    />
-                </motion.svg>
+                    <svg className={`pointer-events-none ${splitGrids ? "hidden" : ""} ${(isFocused && !splitGrids || previewFocus || onlyShowBorder) ? "animate-breathe_" : "text-gray-200"}`}
+                        style={customGridSizeStyle}
+                    >
+                        <polygon
+                            points={([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')}
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={borderWidth}
+                        />
+                    </svg>
+                </motion.div>
             }
         </div>
     )
