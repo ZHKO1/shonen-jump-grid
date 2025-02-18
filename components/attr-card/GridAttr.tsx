@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import useConfigStore from "@/store/config"
 import { getGridsBySplit, isGridSplited } from "../canvas/components/grid/utils";
 import { GridConfig, Point, RectGridPoint } from "../canvas/components/grid/types"
 import { useAdjustGrid } from "../canvas/components/grid/hooks/useAdjustGrid"
@@ -24,6 +25,7 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
   const isSplit = isGridSplited(grid);
   const splitLineStart = splitLine[0];
   const splitLineEnd = splitLine[1];
+  const { setIsImgCropShowed } = useConfigStore();
 
   const onRectChange = (key: keyof RectGridPoint): React.ChangeEventHandler<HTMLInputElement> => (e) => {
     adjustGrid(id, {
@@ -44,6 +46,11 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
         })
       }
     }
+  }
+
+  const handleImgConfig = (e: React.MouseEvent) => {
+    setIsImgCropShowed(true);
+    e.preventDefault();
   }
 
   return (
@@ -111,7 +118,7 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
                   <div className="grid col-span-4 grid-cols-5 gap-1">
                     <Label className="col-span-2 text-xs flex items-center">image:</Label>
                     <div className="grid grid-cols-2 col-span-3 text-xs gap-1">
-                      <Button variant="outline" size="sm" className="h-6" onClick={e => e.preventDefault()}>config</Button>
+                      <Button variant="outline" size="sm" className="h-6" onClick={handleImgConfig}>config</Button>
                     </div>
                   </div>
                 )

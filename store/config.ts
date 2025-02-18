@@ -5,7 +5,8 @@ const useConfigStore = create(
   combine(
     {
       gridFocusId: "" as string | number,
-      isAttrCardShowed: false,
+      isAttrCardShowed: true,
+      isImgCropShowed: false,
     },
     (set, get) => {
       return {
@@ -30,6 +31,15 @@ const useConfigStore = create(
         },
         getIsAttrCardShowed: () => {
           return get().isAttrCardShowed;
+        },
+
+        setIsImgCropShowed: (val: boolean) => {
+          set(() => ({
+            isImgCropShowed: val,
+          }))
+        },
+        getIsImgCropShowed: () => {
+          return get().isImgCropShowed;
         },
       }
     },
