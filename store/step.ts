@@ -23,7 +23,7 @@ const useStepsStore = create(
               if (!state.isCurrentTmp) {
                 // 正常添加，修改isCurrentTmp
                 return {
-                  steps: [...state.steps.slice(0), step],
+                  steps: [...state.steps.slice(0, state.currentIndex + 1), step],
                   currentIndex: state.currentIndex + 1,
                   isCurrentTmp: true,
                 }
@@ -37,7 +37,7 @@ const useStepsStore = create(
               if (!state.isCurrentTmp) {
                 // 正常添加step
                 return {
-                  steps: [...state.steps.slice(0), step],
+                  steps: [...state.steps.slice(0, state.currentIndex + 1), step],
                   currentIndex: state.currentIndex + 1,
                 }
               } else {
