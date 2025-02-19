@@ -46,6 +46,9 @@ export function useDrawLine(isFocused: boolean) {
         y: mouseStateRef.current.elementY
       };
       setDrawState({ isDrawing: true, start, end: null });
+
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);  
     };
 
     const handleMouseMove = () => {
@@ -94,16 +97,14 @@ export function useDrawLine(isFocused: boolean) {
         }));
       }
       mouseDownTimeRef.current = 0;
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);  
     };
 
     grid && grid.addEventListener("mousedown", handleMouseDown);
-    grid && grid.addEventListener("mousemove", handleMouseMove);
-    grid && grid.addEventListener("mouseup", handleMouseUp);
 
     return () => {
       grid && grid.removeEventListener("mousedown", handleMouseDown);
-      grid && grid.removeEventListener("mousemove", handleMouseMove);
-      grid && grid.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isFocused]);
 

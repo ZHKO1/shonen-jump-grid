@@ -7,6 +7,7 @@ import { GridBorder } from "./GridBorder";
 import { GridContent } from "./GridContent";
 import { Grid } from ".";
 import { useSplit } from "./hooks/useSplit";
+import { useEventListener } from "@/hooks";
 
 export interface RectGridProps {
     grid: RectGridConfig,
@@ -18,9 +19,9 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
     const gridRef = useRef<HTMLDivElement>(null);
     const { getGridFocusId, setGridFocusId } = useFocusStore();
     const isFocused = getGridFocusId() === grid.id;
-
     const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
     const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;
+    const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
 
     const {
         gridPosStyle,
@@ -35,10 +36,11 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
         setGridFocusId(grid.id);
-        e.nativeEvent.stopImmediatePropagation();
+        e.stopPropagation();
+        // e.nativeEvent.stopImmediatePropagation();
     }
 
-    const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
+    useEventListener("click", handleClick, gridRef);
 
     return (
         <div>

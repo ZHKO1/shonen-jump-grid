@@ -1,4 +1,4 @@
-import { CSSProperties, MouseEventHandler, useRef } from "react";
+import { CSSProperties, MouseEventHandler, useEffect, useRef } from "react";
 import useFocusStore from "@/store/config";
 import { isDef } from "@/lib";
 import { useSplit } from "./hooks/useSplit";
@@ -8,6 +8,7 @@ import { PolyGridConfig } from "./types";
 import { GridBorder } from "./GridBorder";
 import { GridContent } from "./GridContent";
 import { Grid } from ".";
+import { useEventListener } from "@/hooks";
 
 export interface PolyGridProps {
     grid: PolyGridConfig,
@@ -19,6 +20,8 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
     const { getGridFocusId, setGridFocusId } = useFocusStore();
     const isFocused = getGridFocusId() === grid.id;
     const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
+    const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;
+    const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
 
     const {
         gridPosStyle,
@@ -34,12 +37,11 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
         setGridFocusId(grid.id);
-        e.nativeEvent.stopImmediatePropagation();
+        // e.nativeEvent.stopImmediatePropagation();
+        e.stopPropagation();
     }
 
-    const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;
-
-    const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
+    useEventListener("click", handleClick, gridRef);
 
     return (
         <div>
@@ -52,7 +54,7 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
                     }}
                     clipPath={clipPath}
                     ref={gridRef}
-                    onClick={handleClick}
+                    // onClick={handleClick}
                 />)
             }
 
