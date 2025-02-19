@@ -2,7 +2,7 @@ import { isBrowser } from "./is";
 import type { Fn } from "./type";
 
 export function on<T extends Window | Document | HTMLElement | EventTarget>(
-  obj: T | null,
+  obj: T | null | undefined,
   ...args: Parameters<T['addEventListener']> | [string, Fn | null, ...any]
 ): void {
   if (obj && obj.addEventListener) {
@@ -11,7 +11,7 @@ export function on<T extends Window | Document | HTMLElement | EventTarget>(
 }
 
 export function off<T extends Window | Document | HTMLElement | EventTarget>(
-  obj: T | null,
+  obj: T | null | undefined,
   ...args: Parameters<T['removeEventListener']> | [string, Fn | null, ...any]
 ): void {
   if (obj && obj.removeEventListener) {

@@ -1,5 +1,5 @@
 import { Dispatch, RefObject, SetStateAction, useEffect, useState } from "react";
-import { BasicTarget, getTargetElement, Position } from "../lib";
+import { BasicTarget, defaultDocument, getTargetElement, off, on, Position } from "../lib";
 import { useEventListener } from "./useEventListener";
 
 interface useDraggableOptions {
@@ -38,7 +38,7 @@ function isScrollY(node: Element | null) {
 
 export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, options: useDraggableOptions = {})
   : readonly [number, number, boolean, Dispatch<SetStateAction<Position>>] => {
-  const { draggingElement, containerElement } = options;
+  const { draggingElement = defaultDocument, containerElement } = options;
   const draggingHandle = options.handle ?? target
 
   const [position, setPositon] = useState<Position>(

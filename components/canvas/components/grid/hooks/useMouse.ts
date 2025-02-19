@@ -2,6 +2,7 @@
 import { useRef, useContext, useCallback } from "react";
 import { ContainerContext } from "@/components/canvas/context/container";
 import { useEventListener } from "@/hooks";
+import { defaultDocument } from "@/lib";
 
 export type MouseState = {
   x: number,
@@ -48,7 +49,7 @@ export function useMouse() {
     stateRef.current = newState;
   }, [ref.current]);
 
-  useEventListener("mousemove", handleMouseMove);
+  useEventListener("mousemove", handleMouseMove, defaultDocument);
 
   return stateRef;
 }

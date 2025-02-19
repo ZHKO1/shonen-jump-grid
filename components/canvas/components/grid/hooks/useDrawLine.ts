@@ -4,6 +4,7 @@ import type { Point } from '../types';
 import { useLatest } from "@/hooks/useLatest";
 import { getAdjustedPoint } from "../utils";
 import { ContainerContext } from "@/components/canvas/context/container";
+import { defaultDocument, off, on } from "@/lib";
 
 
 type DrawState = {
@@ -47,8 +48,8 @@ export function useDrawLine(isFocused: boolean) {
       };
       setDrawState({ isDrawing: true, start, end: null });
 
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);  
+      on(defaultDocument, "mousemove", handleMouseMove);
+      on(defaultDocument, "mouseup", handleMouseUp);
     };
 
     const handleMouseMove = () => {
@@ -97,14 +98,14 @@ export function useDrawLine(isFocused: boolean) {
         }));
       }
       mouseDownTimeRef.current = 0;
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);  
+      off(defaultDocument, "mousemove", handleMouseMove);
+      off(defaultDocument, "mouseup", handleMouseUp);
     };
 
-    grid && grid.addEventListener("mousedown", handleMouseDown);
+    on(grid, "mousedown", handleMouseDown);
 
     return () => {
-      grid && grid.removeEventListener("mousedown", handleMouseDown);
+      off(grid, "mousedown", handleMouseDown);
     };
   }, [isFocused]);
 

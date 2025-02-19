@@ -8,7 +8,7 @@ export type Target = BasicTarget<HTMLElement | Element | Window | Document | Eve
 export function useEventListener<K extends keyof WindowEventMap>(
   eventName: K,
   handler: (event: WindowEventMap[K]) => void,
-  element?: Window,
+  element: Window,
   options?: boolean | AddEventListenerOptions
 ): void
 
@@ -47,20 +47,20 @@ export function useEventListener<K = Event>(
 export function useEventListener(
   eventName: string,
   handler: (...p: any) => void,
-  element?: Target,
+  element: Target,
   options?: boolean | AddEventListenerOptions
 ): void
 
 export function useEventListener(
   eventName: string,
   handler: (...p: any) => void,
-  element?: Target,
+  element: Target,
   options: boolean | AddEventListenerOptions = {}
 ): void {
   const savedHandler = useLatest(handler);
 
   useDeepCompareEffect(() => {
-    const targetElement = getTargetElement(element, defaultDocument);
+    const targetElement = getTargetElement(element);
     if (!(targetElement && targetElement.addEventListener)) {
       return;
     }
