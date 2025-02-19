@@ -201,15 +201,38 @@ export function getPolyGridPoint(path: PolyGridPoint["path"], borderWidth: numbe
 }
 
 /**
- * 从RectGrid返回被分割的两个grid，以及分割线
- * @param path 
- * @param line 
- * @param options
- * @param options.spaceWidth
- * @param options.recursion
+ * 如果grid是正长方形，那么修改type为Rect，否则原样返回
+ * @param grid 
+ * @returns GridConfig
+ */
+export function makePolyToRect(grid: GridConfig): GridConfig {
+    if (grid.type == "poly") {
+        const [p0, p1, p2, p3] = grid.path;
+        if ((p0.y == p1.y) && (p1.x == p2.x) && (p2.y == p3.y) && (p3.x == p0.x)) {
+            let newGrid = {
+                ...grid
+            } as Record<string, any>;
+            delete newGrid.path;
+            newGrid.type = "rect";
+            newGrid.lt_x = p0.x;
+            newGrid.lt_y = p0.y;
+            newGrid.rb_x = p2.x;
+            newGrid.rb_y = p2.y;
+            return newGrid as RectGridConfig;
+        }
+    }
+    return grid;
+}
+
+/**
+ * 更新了子Grid后，根据recursion配置选择是否递归处理旧子Grid的分割线
+ * @param grid 
+ * @param newSubGrids
+ * @param recursion
  * @returns [GridConfig, GridConfig]
  */
 export function updateSubGridsBySplit(grid: GridConfig, newSubGrids: [GridConfig, GridConfig], recursion: boolean): [GridConfig, GridConfig] {
+    newSubGrids = [makePolyToRect(newSubGrids[0]), makePolyToRect(newSubGrids[1])]
     if (!recursion) {
         return newSubGrids;
     }
@@ -555,7 +578,7 @@ interface GridStyle {
     clipPath?: string
 }
 
-export const getRectGridStyle = (grid: RectGridConfig): GridStyle => {
+const getRectGridStyle = (grid: RectGridConfig): GridStyle => {
     const { outside } = getRectGridPoint({
         ...grid
     }, borderWidth);
@@ -579,7 +602,7 @@ export const getRectGridStyle = (grid: RectGridConfig): GridStyle => {
     }
 }
 
-export const getPolyGridStyle = (grid: PolyGridConfig): GridStyle => {
+const getPolyGridStyle = (grid: PolyGridConfig): GridStyle => {
     const { outside } = getPolyGridPoint(grid.path, borderWidth);
     const lt_outside = getPolyContainerPoint(outside, 'lt');
     const rb_outside = getPolyContainerPoint(outside, 'rb');
@@ -608,11 +631,16 @@ export const getPolyGridStyle = (grid: PolyGridConfig): GridStyle => {
     }
 }
 
+/**
+ * 从grid配置获取对应样式（容器位置样式，容器形状样式，容器大小样式，边框svg样式）
+ * @param GridConfig
+ * @returns GridStyle
+ */
 export function getGridStyle(grid: GridConfig): GridStyle {
     if (grid.type === 'rect') {
         return getRectGridStyle(grid);
     } else if (grid.type === 'poly') {
         return getPolyGridStyle(grid);
     }
-    throw new Error("getGridStyle unknown type");
+    throw new Error("getGridStyle Unknown Type");
 }
