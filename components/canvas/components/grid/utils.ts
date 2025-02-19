@@ -1,4 +1,6 @@
+import { CSSProperties } from "react";
 import { ComicConfig, GridConfig, Point, PolyGridConfig, PolyGridPoint, RectGridConfig, RectGridPoint } from "./types";
+import { borderWidth } from "./constant";
 
 type Pos = "lt" | "rt" | "lb" | "rb";
 type PolyType = "horizon" | "vertical";
@@ -545,3 +547,72 @@ export const getAdjustedPoint = (
         return start;
     }
 };
+
+interface GridStyle {
+    gridPosStyle: CSSProperties,
+    gridSizeStyle: CSSProperties,
+    svgPoints: string,
+    clipPath?: string
+}
+
+export const getRectGridStyle = (grid: RectGridConfig): GridStyle => {
+    const { outside } = getRectGridPoint({
+        ...grid
+    }, borderWidth);
+    const left = outside.lt_x;
+    const top = outside.lt_y;
+    const width = outside.rb_x - outside.lt_x;
+    const height = outside.rb_y - outside.lt_y;
+    const gridPosStyle = {
+        left,
+        top,
+    } as CSSProperties
+    const gridSizeStyle = {
+        width,
+        height,
+    } as CSSProperties
+    const svgPoints = ([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')
+    return {
+        gridPosStyle,
+        gridSizeStyle,
+        svgPoints
+    }
+}
+
+export const getPolyGridStyle = (grid: PolyGridConfig): GridStyle => {
+    const { outside } = getPolyGridPoint(grid.path, borderWidth);
+    const lt_outside = getPolyContainerPoint(outside, 'lt');
+    const rb_outside = getPolyContainerPoint(outside, 'rb');
+    const left = lt_outside.x;
+    const top = lt_outside.y;
+    const width = rb_outside.x - lt_outside.x;
+    const height = rb_outside.y - lt_outside.y;
+    const sortPath = getPolyPointBySort(outside);
+    const clipPath = `polygon(${sortPath.map(p => `${p.x - left}px ${p.y - top}px`).join(',')})`;
+    const gridPosStyle = {
+        left,
+        top,
+    } as CSSProperties
+    const gridSizeStyle = {
+        width,
+        height,
+    } as CSSProperties
+
+    const svgPoints = grid.path.map(p => `${p.x - left},${p.y - top}`).join(' ');
+
+    return {
+        gridPosStyle,
+        gridSizeStyle,
+        svgPoints,
+        clipPath,
+    }
+}
+
+export function getGridStyle(grid: GridConfig): GridStyle {
+    if (grid.type === 'rect') {
+        return getRectGridStyle(grid);
+    } else if (grid.type === 'poly') {
+        return getPolyGridStyle(grid);
+    }
+    throw new Error("getGridStyle unknown type");
+}

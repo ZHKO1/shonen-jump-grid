@@ -2,7 +2,7 @@ import { CSSProperties, MouseEventHandler, useRef } from "react";
 import useFocusStore from "@/store/config";
 import { isDef } from "@/lib";
 import { useSplit } from "./hooks/useSplit";
-import { getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort } from "./utils";
+import { getGridStyle, getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort } from "./utils";
 import { borderWidth } from "./constant";
 import { PolyGridConfig } from "./types";
 import { GridBorder } from "./GridBorder";
@@ -18,31 +18,19 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
     const gridRef = useRef<HTMLDivElement>(null);
     const { getGridFocusId, setGridFocusId } = useFocusStore();
     const isFocused = getGridFocusId() === grid.id;
-
-    const { outside } = getPolyGridPoint(grid.path, borderWidth);
-    const lt_outside = getPolyContainerPoint(outside, 'lt');
-    const rb_outside = getPolyContainerPoint(outside, 'rb');
     const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
 
-    const left = lt_outside.x;
-    const top = lt_outside.y;
-    const width = rb_outside.x - lt_outside.x;
-    const height = rb_outside.y - lt_outside.y;
-    const sortPath = getPolyPointBySort(outside);
-    const clipPath = `polygon(${sortPath.map(p => `${p.x - left}px ${p.y - top}px`).join(',')})`;
-    const customGridPosStyle = {
-        left,
-        top,
-    } as CSSProperties
-    const customGridSizeStyle = {
-        width,
-        height,
-    } as CSSProperties
-    const customGridStyle = {
-        ...customGridPosStyle,
-        ...customGridSizeStyle,
-    };
-    const svgPoints = grid.path.map(p => `${p.x - left},${p.y - top}`).join(' ');
+    const {
+        gridPosStyle,
+        gridSizeStyle,
+        svgPoints,
+        clipPath,
+    } = getGridStyle(grid);
+
+    const gridStyle = {
+        ...gridPosStyle,
+        ...gridSizeStyle
+    }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
         setGridFocusId(grid.id);
@@ -53,10 +41,6 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
 
     const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
 
-    if (!isDef(lt_outside) || !isDef(rb_outside)) {
-        return null;
-    }
-
     return (
         <div>
             {
@@ -64,7 +48,7 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
                     disableMotion={!isFocused}
                     gridId={grid.id}
                     style={{
-                        ...customGridStyle
+                        ...gridStyle
                     }}
                     clipPath={clipPath}
                     ref={gridRef}
@@ -86,8 +70,8 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
                         disableMotion={!isFocused}
                         gridId={grid.id}
                         svgPoints={svgPoints}
-                        containerStyle={customGridPosStyle}
-                        svgStyle={customGridSizeStyle}
+                        containerStyle={gridPosStyle}
+                        svgStyle={gridSizeStyle}
                         focused={shouldShowBorder}
                     />
                 )

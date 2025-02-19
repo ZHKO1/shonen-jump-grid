@@ -1,15 +1,14 @@
 "use client";
+import React from "react";
 import Image from "next/image";
-import React, { CSSProperties, useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 // import { useOutsideClick } from "@/hooks/use-outside-click";
 import useConfigStore from "@/store/config";
 import useStepsStore from "@/store/step";
-import { getGridFromComicConfig, getRectGridPoint } from "../canvas/components/grid/utils";
-import { RectGridConfig } from "../canvas/components/grid/types";
-import { borderWidth } from "../canvas/components/grid/constant";
+import { getGridFromComicConfig, getGridStyle } from "../canvas/components/grid/utils";
+import { GridBorder } from "../canvas/components/grid/GridBorder";
+import { GridContent } from "../canvas/components/grid/GridContent";
 
-// { active, setActive, id }: { active: (typeof cards)[number], setActive: Function, id: string }
 export default function ImgCrop() {
   const { getCurrentStep } = useStepsStore();
   const { setIsImgCropShowed, getIsImgCropShowed, getGridFocusId } = useConfigStore();
@@ -17,21 +16,16 @@ export default function ImgCrop() {
   const currentStep = getCurrentStep();
   const comicConfig = currentStep?.comicConfig;
 
-  const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId) as RectGridConfig;
+  const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
   const IsImgCropShowed = getIsImgCropShowed();
   const isShowed = IsImgCropShowed && grid;
 
-  const { outside } = getRectGridPoint({
-    ...grid!
-  }, borderWidth);
-  const left = outside.lt_x;
-  const top = outside.lt_y;
-  const width = outside.rb_x - outside.lt_x;
-  const height = outside.rb_y - outside.lt_y;
-  const customGridSizeStyle = {
-    width,
-    height,
-  } as CSSProperties
+  const {
+    // gridPosStyle,
+    gridSizeStyle,
+    svgPoints = "",
+    clipPath,
+  } = grid && getGridStyle(grid) || {};
 
   // const ref = useRef<HTMLDivElement>(null);
   // useOutsideClick(ref, () => setActive(null));
@@ -71,27 +65,18 @@ export default function ImgCrop() {
             >
               <CloseIcon />
             </motion.button>
-            <motion.div className={`absolute flex flex-wrap content-center justify-center bg-green-600`}
-              style={customGridSizeStyle}
-              layoutId={`grid-content-${grid.id}`}
-            >
-            </motion.div>
-            <motion.div
-              className="absolute pointer-events-none"
-              layoutId={`grid-border-${grid.id}`}
-              style={customGridSizeStyle}
-            >
-              <svg className={`pointer-events-none text-gray-200`}
-                style={customGridSizeStyle}
-              >
-                <polygon
-                  points={([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={borderWidth}
-                />
-              </svg>
-            </motion.div>
+            <GridContent
+              className="bg-green-600"
+              gridId={grid.id}
+              style={gridSizeStyle}
+              clipPath={clipPath}
+            />
+            <GridBorder
+              gridId={grid.id}
+              svgPoints={svgPoints}
+              containerStyle={gridSizeStyle}
+              svgStyle={gridSizeStyle}
+            />
           </div>
         )}
       </AnimatePresence>

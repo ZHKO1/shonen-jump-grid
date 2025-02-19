@@ -1,7 +1,7 @@
 import { CSSProperties, MouseEventHandler, useRef } from "react";
 import useFocusStore from "@/store/config";
 import { RectGridConfig } from "./types";
-import { getRectGridPoint } from "./utils";
+import { getGridStyle, getRectGridPoint } from "./utils";
 import { borderWidth } from "./constant";
 import { GridBorder } from "./GridBorder";
 import { GridContent } from "./GridContent";
@@ -19,29 +19,19 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
     const { getGridFocusId, setGridFocusId } = useFocusStore();
     const isFocused = getGridFocusId() === grid.id;
 
-    const { outside } = getRectGridPoint({
-        ...grid
-    }, borderWidth);
     const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
     const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;
 
-    const left = outside.lt_x;
-    const top = outside.lt_y;
-    const width = outside.rb_x - outside.lt_x;
-    const height = outside.rb_y - outside.lt_y;
-    const customGridPosStyle = {
-        left,
-        top,
-    } as CSSProperties
-    const customGridSizeStyle = {
-        width,
-        height,
-    } as CSSProperties
-    const customGridStyle = {
-        ...customGridPosStyle,
-        ...customGridSizeStyle
-    };
-    const svgPoints = ([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')
+    const {
+        gridPosStyle,
+        gridSizeStyle,
+        svgPoints,
+    } = getGridStyle(grid);
+
+    const gridStyle = {
+        ...gridPosStyle,
+        ...gridSizeStyle
+    }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
         setGridFocusId(grid.id);
@@ -56,7 +46,7 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
                 !(splitGrids || borderOnly) && (<GridContent
                     disableMotion={!isFocused}
                     gridId={grid.id}
-                    style={customGridStyle}
+                    style={gridStyle}
                     ref={gridRef}
                     onClick={handleClick}
                 />)
@@ -76,8 +66,8 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
                         disableMotion={!isFocused}
                         gridId={grid.id}
                         svgPoints={svgPoints}
-                        containerStyle={customGridPosStyle}
-                        svgStyle={customGridSizeStyle}
+                        containerStyle={gridPosStyle}
+                        svgStyle={gridSizeStyle}
                         focused={shouldShowBorder}
                     />
                 )
