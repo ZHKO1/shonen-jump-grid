@@ -1,4 +1,5 @@
 import { CSSProperties, MouseEventHandler, useRef } from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import useFocusStore from "@/store/config";
 import { isDef } from "@/lib";
@@ -13,6 +14,7 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
     const gridRef = useRef<HTMLDivElement>(null);
     const { getGridFocusId, setGridFocusId } = useFocusStore();
     const isFocused = getGridFocusId() === grid.id;
+    const NewDiv = isFocused ? motion.div : "div";
 
     const { outside } = getPolyGridPoint(grid.path, borderWidth);
     const lt_outside = getPolyContainerPoint(outside, 'lt');
@@ -25,13 +27,22 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
     const height = rb_outside.y - lt_outside.y;
     const sortPath = getPolyPointBySort(outside);
     const clipPath = `polygon(${sortPath.map(p => `${p.x - left}px ${p.y - top}px`).join(',')})`;
-    const customGridStyle = {
+    const customGridPosStyle = {
         left,
         top,
+    } as CSSProperties
+    const customGridSizeStyle = {
         width,
         height,
-        clipPath,
     } as CSSProperties
+    const customGridClipPathStyle = {
+        clipPath,
+    } as CSSProperties    
+    const customGridStyle = {
+        ...customGridPosStyle,
+        ...customGridSizeStyle,
+        ...customGridClipPathStyle,
+    };
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
         setGridFocusId(grid.id);
@@ -49,7 +60,7 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
 
     return (
         <div>
-            <div
+            <NewDiv
                 className={cn(
                     "bg-slate-400 absolute",
                     shouldHideContent && "hidden"
@@ -57,6 +68,9 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
                 style={customGridStyle}
                 ref={gridRef}
                 onClick={handleClick}
+                {
+                ...(isFocused ? { layoutId: `grid-content-${grid.id}` } : {})
+                }
             />
 
             {splitGrids?.map((grid_, index) => (
@@ -67,21 +81,29 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
                 />
             ))}
 
-            <svg
-                className={cn(
-                    "absolute w-full h-full pointer-events-none",
-                    splitGrids && "hidden",
-                    shouldShowBorder ? "animate-breathe" : "text-gray-200"
-                )}
-                style={{ left, top }}
+            <NewDiv
+                className="absolute pointer-events-none"
+                {
+                ...(isFocused ? { layoutId: `grid-border-${grid.id}` } : {})
+                }
+                style={customGridPosStyle}
             >
-                <polygon
-                    points={grid.path.map(p => `${p.x - left},${p.y - top}`).join(' ')}
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={borderWidth}
-                />
-            </svg>
+                <svg
+                    className={cn(
+                        "absolute w-full h-full pointer-events-none",
+                        splitGrids && "hidden",
+                        shouldShowBorder ? "animate-breathe" : "text-gray-200"
+                    )}
+                    style={customGridSizeStyle}
+                >
+                    <polygon
+                        points={grid.path.map(p => `${p.x - left},${p.y - top}`).join(' ')}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={borderWidth}
+                    />
+                </svg>
+            </NewDiv>
         </div>
     )
 }

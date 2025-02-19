@@ -1,24 +1,102 @@
-import { CSSProperties, MouseEventHandler, useRef } from "react";
-import { motion } from "framer-motion";
+import { forwardRef, CSSProperties, MouseEventHandler, useRef } from "react";
+import { HTMLMotionProps, motion } from "framer-motion";
 import useFocusStore from "@/store/config";
 import { cn } from "@/lib/utils";
-import { RectGridConfig } from "./types";
+import { GridConfig, RectGridConfig } from "./types";
 import { getRectGridPoint } from "./utils";
 import { borderWidth } from "./constant";
 import { Grid } from ".";
 import { useSplit } from "./hooks/useSplit";
 
-export type RectGridProps = { grid: RectGridConfig, showAsFocused?: boolean, borderOnly?: boolean };
+export interface RectGridContentProps
+    extends HTMLMotionProps<"div"> {
+    gridId: GridConfig["id"],
+    disableMotion?: boolean,
+}
+
+export interface RectGridBorderProps
+    extends HTMLMotionProps<"div"> {
+    gridId: GridConfig["id"],
+    disableMotion?: boolean,
+    svgPoints: string,
+    focused?: boolean,
+    containerStyle?: CSSProperties,
+    svgStyle?: CSSProperties,
+}
+
+export interface RectGridProps {
+    grid: RectGridConfig,
+    showAsFocused?: boolean,
+    borderOnly?: boolean
+}
+
+export const RectGridContent = forwardRef<HTMLDivElement, RectGridContentProps>(
+    ({ className, gridId, disableMotion = false, ...props }, ref) => {
+        // 有时候motion.div会给自己加上opacity:0，原因不明，因此只在必要时（也就是焦点状态）才使用motion.div
+        const Comp = (disableMotion ? "div" : motion.div) as (typeof motion.div)
+        const extraProps = (disableMotion ? {} : { layoutId: `grid-content-${gridId}` })
+        return (
+            <Comp
+                className={cn(
+                    "bg-slate-400 absolute flex flex-wrap content-center justify-center",
+                    className
+                )}
+                ref={ref}
+                {
+                ...extraProps
+                }
+                {...props}
+            />
+        )
+    }
+);
+
+export const RectGridBorder = forwardRef<HTMLDivElement, RectGridBorderProps>(
+    ({ className, gridId, svgPoints, disableMotion = false, focused = false, containerStyle = {}, svgStyle = {}, ...props }, ref) => {
+        const Comp = (disableMotion ? "div" : motion.div) as (typeof motion.div)
+        const extraProps = (disableMotion ? {} : { layoutId: `grid-border-${gridId}` })
+        return (
+            <Comp
+                className={cn("absolute pointer-events-none", className)}
+                ref={ref}
+                {
+                ...extraProps
+                }
+                {...props}
+                style={{
+                    ...props.style,
+                    ...containerStyle
+                }}
+            >
+                <svg
+                    className={cn(
+                        "pointer-events-none",
+                        focused ? "animate-breathe" : "text-gray-200"
+                    )}
+                    style={svgStyle}
+                >
+                    <polygon
+                        points={svgPoints}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={borderWidth}
+                    />
+                </svg>
+            </Comp>
+        )
+    }
+);
+
 export default function RectGrid({ grid, showAsFocused = false, borderOnly = false }: RectGridProps) {
     const gridRef = useRef<HTMLDivElement>(null);
     const { getGridFocusId, setGridFocusId } = useFocusStore();
     const isFocused = getGridFocusId() === grid.id;
-    // 有时候motion.div会给自己加上opacity:0，原因不明，因此只在必要时（也就是焦点状态）才使用motion.div
-    const NewDiv = isFocused ? motion.div : "div";
+
     const { outside } = getRectGridPoint({
         ...grid
     }, borderWidth);
     const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
+    const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;
 
     const left = outside.lt_x;
     const top = outside.lt_y;
@@ -32,35 +110,30 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
         width,
         height,
     } as CSSProperties
+    const customGridStyle = {
+        ...customGridPosStyle,
+        ...customGridSizeStyle
+    };
+    const svgPoints = ([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
         setGridFocusId(grid.id);
         e.nativeEvent.stopImmediatePropagation();
     }
 
-    const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;
-
-    const gridContainerStyle = {
-        ...customGridPosStyle,
-        ...customGridSizeStyle
-    };
-
     const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
 
     return (
         <div>
-            <NewDiv
-                className={cn(
-                    "bg-slate-400 absolute flex flex-wrap content-center justify-center",
-                    (splitGrids || borderOnly) && "hidden"
-                )}
-                style={gridContainerStyle}
-                ref={gridRef}
-                onClick={handleClick}
-                {
-                ...(isFocused ? { layoutId: `grid-content-${grid.id}` } : {})
-                }
-            />
+            {
+                !(splitGrids || borderOnly) && (<RectGridContent
+                    disableMotion={!isFocused}
+                    gridId={grid.id}
+                    style={customGridStyle}
+                    ref={gridRef}
+                    onClick={handleClick}
+                />)
+            }
 
             {splitGrids?.map((grid_, index) => (
                 <Grid
@@ -70,29 +143,18 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
                 />
             ))}
 
-            <NewDiv
-                className="absolute pointer-events-none"
-                {
-                ...(isFocused ? { layoutId: `grid-border-${grid.id}` } : {})
-                }
-                style={customGridPosStyle}
-            >
-                <svg
-                    className={cn(
-                        "pointer-events-none",
-                        splitGrids && "hidden",
-                        shouldShowBorder ? "animate-breathe" : "text-gray-200"
-                    )}
-                    style={customGridSizeStyle}
-                >
-                    <polygon
-                        points={([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={borderWidth}
+            {
+                !splitGrids && (
+                    <RectGridBorder
+                        disableMotion={!isFocused}
+                        gridId={grid.id}
+                        svgPoints={svgPoints}
+                        containerStyle={customGridPosStyle}
+                        svgStyle={customGridSizeStyle}
+                        focused={shouldShowBorder}
                     />
-                </svg>
-            </NewDiv>
+                )
+            }
         </div>
     )
 }

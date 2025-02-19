@@ -20,9 +20,6 @@ export default function ImgCrop() {
   const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId) as RectGridConfig;
   const IsImgCropShowed = getIsImgCropShowed();
   const isShowed = IsImgCropShowed && grid;
-  console.log("IsImgCropShowed", IsImgCropShowed);
-  console.log("isShowed", isShowed);
-
 
   const { outside } = getRectGridPoint({
     ...grid!
