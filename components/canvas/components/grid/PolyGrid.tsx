@@ -1,8 +1,8 @@
-import { CSSProperties, MouseEventHandler, useEffect, useRef } from "react";
+import {  MouseEventHandler,  useRef } from "react";
 import useFocusStore from "@/store/config";
 import { isDef } from "@/lib";
 import { useSplit } from "./hooks/useSplit";
-import { getGridStyle, getPolyContainerPoint, getPolyGridPoint, getPolyPointBySort } from "./utils";
+import { getGridStyle } from "./utils";
 import { borderWidth } from "./constant";
 import { PolyGridConfig } from "./types";
 import { GridBorder } from "./GridBorder";
@@ -41,7 +41,7 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
         e.stopPropagation();
     }
 
-    useEventListener("click", handleClick, gridRef);
+    useEventListener("click", handleClick, gridRef && gridRef.current);
 
     return (
         <div>

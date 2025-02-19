@@ -25,7 +25,7 @@ export function useDrawLine(isFocused: boolean) {
 
   const checkTimeElapsed = () => {
     if (mouseDownTimeRef.current) {
-      if (Date.now() - mouseDownTimeRef.current > 200) {
+      if (Date.now() - mouseDownTimeRef.current > 150) {
         return true;
       }
     }

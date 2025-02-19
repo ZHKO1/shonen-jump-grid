@@ -1,7 +1,7 @@
-import { CSSProperties, MouseEventHandler, useRef } from "react";
+import { MouseEventHandler, useRef } from "react";
 import useFocusStore from "@/store/config";
 import { RectGridConfig } from "./types";
-import { getGridStyle, getRectGridPoint } from "./utils";
+import { getGridStyle } from "./utils";
 import { borderWidth } from "./constant";
 import { GridBorder } from "./GridBorder";
 import { GridContent } from "./GridContent";
@@ -40,7 +40,7 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
         // e.nativeEvent.stopImmediatePropagation();
     }
 
-    useEventListener("click", handleClick, gridRef);
+    useEventListener("click", handleClick, gridRef && gridRef.current);
 
     return (
         <div>
