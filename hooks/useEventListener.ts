@@ -74,7 +74,7 @@ export function useEventListener(
       if (!(targetElement && targetElement.removeEventListener)) {
         return
       }
-      off(targetElement, eventName, eventListener)
+      off(targetElement, eventName, eventListener, options)
     }
 
   }, [eventName, element, options]);
