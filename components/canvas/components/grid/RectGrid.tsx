@@ -1,7 +1,7 @@
 import { MouseEventHandler, useRef } from "react";
 import useFocusStore from "@/store/config";
 import { RectGridConfig } from "./types";
-import { getGridStyle } from "./utils";
+import { getGridStyle, getSvgPoints } from "./utils";
 import { borderWidth } from "./constant";
 import { GridBorder } from "./GridBorder";
 import { GridContent } from "./GridContent";
@@ -24,14 +24,15 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
     const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
 
     const {
-        gridPosStyle,
-        gridSizeStyle,
-        svgPoints,
+        posStyleWithBorder,
+        sizeStyleWithBorder,
+        svgPath,
     } = getGridStyle(grid);
+    const svgPoints = getSvgPoints(svgPath);
 
     const gridStyle = {
-        ...gridPosStyle,
-        ...gridSizeStyle
+        ...posStyleWithBorder,
+        ...sizeStyleWithBorder
     }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -68,8 +69,8 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
                         disableMotion={!isFocused}
                         gridId={grid.id}
                         svgPoints={svgPoints}
-                        containerStyle={gridPosStyle}
-                        svgStyle={gridSizeStyle}
+                        containerStyle={posStyleWithBorder}
+                        svgStyle={sizeStyleWithBorder}
                         focused={shouldShowBorder}
                     />
                 )

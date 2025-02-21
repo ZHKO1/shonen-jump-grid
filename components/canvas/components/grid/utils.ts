@@ -572,10 +572,26 @@ export const getAdjustedPoint = (
 };
 
 interface GridStyle {
-    gridPosStyle: CSSProperties,
-    gridSizeStyle: CSSProperties,
-    svgPoints: string,
-    clipPath?: string
+    // 左上位置（不考虑边框宽度）
+    posStyle: CSSProperties,
+    // 大小（不考虑边框宽度）
+    sizeStyle: CSSProperties,
+    // 边框最外一圈的左上位置（考虑边框宽度）
+    posStyleWithBorder: CSSProperties,
+    // 边框最外一圈的大小（考虑边框宽度）
+    sizeStyleWithBorder: CSSProperties,
+    // 边框svg路径（不考虑边框宽度）
+    svgPath: [Point, Point, Point, Point],
+    // 边框最外一圈的路径（考虑边框宽度）
+    svgPathWithBorder?: [Point, Point, Point, Point],
+}
+
+export function getSvgPoints(path: [Point, Point, Point, Point]) {
+    return path.map(p => `${p.x},${p.y}`).join(' ')
+}
+
+export function getClipPath(path: [Point, Point, Point, Point]) {
+    return `polygon(${path.map(p => `${p.x}px ${p.y}px`).join(',')})`;
 }
 
 const getRectGridStyle = (grid: RectGridConfig): GridStyle => {
@@ -586,23 +602,34 @@ const getRectGridStyle = (grid: RectGridConfig): GridStyle => {
     const top = outside.lt_y;
     const width = outside.rb_x - outside.lt_x;
     const height = outside.rb_y - outside.lt_y;
-    const gridPosStyle = {
+    const posStyleWithBorder = {
         left,
         top,
     } as CSSProperties
-    const gridSizeStyle = {
+    const sizeStyleWithBorder = {
         width,
         height,
     } as CSSProperties
-    const svgPoints = ([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }]).map(p => `${p.x - left},${p.y - top}`).join(' ')
+    const svgPath = ([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }])
+        .map(p => ({ x: p.x - left, y: p.y - top })) as [Point, Point, Point, Point]
     return {
-        gridPosStyle,
-        gridSizeStyle,
-        svgPoints
+        posStyle: {
+            left: grid.lt_x,
+            top: grid.lt_y,
+        },
+        sizeStyle: {
+            width: grid.rb_x - grid.lt_x,
+            height: grid.rb_y - grid.lt_y,
+        },
+        posStyleWithBorder,
+        sizeStyleWithBorder,
+        svgPath,
     }
 }
 
 const getPolyGridStyle = (grid: PolyGridConfig): GridStyle => {
+    const lt = getPolyContainerPoint(grid.path, 'lt');
+    const rb = getPolyContainerPoint(grid.path, 'rb');
     const { outside } = getPolyGridPoint(grid.path, borderWidth);
     const lt_outside = getPolyContainerPoint(outside, 'lt');
     const rb_outside = getPolyContainerPoint(outside, 'rb');
@@ -611,23 +638,35 @@ const getPolyGridStyle = (grid: PolyGridConfig): GridStyle => {
     const width = rb_outside.x - lt_outside.x;
     const height = rb_outside.y - lt_outside.y;
     const sortPath = getPolyPointBySort(outside);
-    const clipPath = `polygon(${sortPath.map(p => `${p.x - left}px ${p.y - top}px`).join(',')})`;
-    const gridPosStyle = {
+    const svgPathWithBorder = sortPath.map(p => ({
+        x: p.x - left,
+        y: p.y - top,
+    })) as [Point, Point, Point, Point];
+    const posStyleWithBorder = {
         left,
         top,
     } as CSSProperties
-    const gridSizeStyle = {
+    const sizeStyleWithBorder = {
         width,
         height,
     } as CSSProperties
 
-    const svgPoints = grid.path.map(p => `${p.x - left},${p.y - top}`).join(' ');
+    const svgPath = grid.path
+        .map(p => ({ x: p.x - left, y: p.y - top })) as [Point, Point, Point, Point]
 
     return {
-        gridPosStyle,
-        gridSizeStyle,
-        svgPoints,
-        clipPath,
+        posStyle: {
+            left: lt.x,
+            top: lt.y,
+        },
+        sizeStyle: {
+            width: rb.x - lt.x,
+            height: rb.y - lt.y,
+        },
+        posStyleWithBorder,
+        sizeStyleWithBorder,
+        svgPath,
+        svgPathWithBorder,
     }
 }
 

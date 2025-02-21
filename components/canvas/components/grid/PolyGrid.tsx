@@ -1,8 +1,8 @@
-import {  MouseEventHandler,  useRef } from "react";
+import { MouseEventHandler, useRef } from "react";
 import useFocusStore from "@/store/config";
 import { isDef } from "@/lib";
 import { useSplit } from "./hooks/useSplit";
-import { getGridStyle } from "./utils";
+import { getClipPath, getGridStyle, getSvgPoints } from "./utils";
 import { borderWidth } from "./constant";
 import { PolyGridConfig } from "./types";
 import { GridBorder } from "./GridBorder";
@@ -24,15 +24,17 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
     const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
 
     const {
-        gridPosStyle,
-        gridSizeStyle,
-        svgPoints,
-        clipPath,
+        posStyleWithBorder,
+        sizeStyleWithBorder,
+        svgPath,
+        svgPathWithBorder,
     } = getGridStyle(grid);
+    const svgPoints = getSvgPoints(svgPath);
+    const clipPath = getClipPath(svgPathWithBorder!);
 
     const gridStyle = {
-        ...gridPosStyle,
-        ...gridSizeStyle
+        ...posStyleWithBorder,
+        ...sizeStyleWithBorder
     }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -54,7 +56,7 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
                     }}
                     clipPath={clipPath}
                     ref={gridRef}
-                    // onClick={handleClick}
+                // onClick={handleClick}
                 />)
             }
 
@@ -72,8 +74,8 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
                         disableMotion={!isFocused}
                         gridId={grid.id}
                         svgPoints={svgPoints}
-                        containerStyle={gridPosStyle}
-                        svgStyle={gridSizeStyle}
+                        containerStyle={posStyleWithBorder}
+                        svgStyle={sizeStyleWithBorder}
                         focused={shouldShowBorder}
                     />
                 )
