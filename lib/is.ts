@@ -1,4 +1,4 @@
-import type { Fn } from "./type"
+import type { Fn } from "./types"
 
 export function isFunction<T extends Fn>(val: any): val is T {
     return typeof val === "function"

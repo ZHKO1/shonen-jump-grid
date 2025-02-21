@@ -1,5 +1,5 @@
 import { isBrowser } from "./is";
-import type { Fn } from "./type";
+import type { Fn } from "./types";
 
 export function on<T extends Window | Document | HTMLElement | EventTarget>(
   obj: T | null | undefined,

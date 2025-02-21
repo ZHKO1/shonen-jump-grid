@@ -29,6 +29,12 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      framer-motion:
+        specifier: ^12.4.3
+        version: 12.4.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       lucide-react:
         specifier: ^0.475.0
         version: 0.475.0(react@19.0.0)
@@ -47,6 +53,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
+      zustand:
+        specifier: ^5.0.3
+        version: 5.0.3(@types/react@19.0.7)(react@19.0.0)
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
@@ -69,12 +78,6 @@ importers:
       eslint-config-next:
         specifier: 15.1.5
         version: 15.1.5(eslint@9.18.0(jiti@1.21.7))(typescript@5.7.3)
-      framer-motion:
-        specifier: ^12.4.3
-        version: 12.4.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      lodash-es:
-        specifier: ^4.17.21
-        version: 4.17.21
       postcss:
         specifier: ^8
         version: 8.5.1
@@ -84,9 +87,6 @@ importers:
       typescript:
         specifier: ^5
         version: 5.7.3
-      zustand:
-        specifier: ^5.0.3
-        version: 5.0.3(@types/react@19.0.7)(react@19.0.0)
 
 packages:
 
