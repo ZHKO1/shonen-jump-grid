@@ -69,7 +69,13 @@ export default {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+			backgroundImage: {
+        grid: "conic-gradient(#FFF 0 25%, gray 0 50%, #FFF 0 75%, gray 0);",
+      },
+			backgroundSize: {
+				grid: '30px 30px',
+			}
   	}
   },
   plugins: [require("tailwindcss-animate")],

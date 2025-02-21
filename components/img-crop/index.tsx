@@ -5,10 +5,11 @@ import { AnimatePresence, motion, Point } from "framer-motion";
 // import { useOutsideClick } from "@/hooks/use-outside-click";
 import useConfigStore from "@/store/config";
 import useStepsStore from "@/store/step";
+import { useElementBounding } from "@/hooks/useElementBounding";
 import { getClipPath, getGridFromComicConfig, getSvgPoints, getGridStyle } from "../canvas/components/grid/utils";
 import { GridBorder } from "../canvas/components/grid/GridBorder";
 import { GridContent } from "../canvas/components/grid/GridContent";
-import { useElementBounding } from "@/hooks/useElementBounding";
+import { cn } from "@/lib/utils";
 
 export default function ImgCrop() {
   const ref = useRef<HTMLDivElement>(null);
@@ -29,6 +30,12 @@ export default function ImgCrop() {
   const currentStep = getCurrentStep();
   const comicConfig = currentStep?.comicConfig;
   const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
+
+  const [svgMaskShow, setSvgMaskShow] = useState(false);
+  const onAnimationComplete = () => {
+    setSvgMaskShow(true);
+  }
+
 
   if (!grid) {
     return null;
@@ -56,47 +63,27 @@ export default function ImgCrop() {
     y: y + maskSvgPosStyle.top,
   })) as [Point, Point, Point, Point]);
 
-  // const ref = useRef<HTMLDivElement>(null);
-  // useOutsideClick(ref, () => setActive(null));
-
   return (
     <>
       <AnimatePresence>
         {isShowed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 flex items-center justify-center h-full w-full z-10"
-            ref={ref}
-          >
-            <img className="block max-w-full max-h-full object-contain" width="720" height="1080" src={"/comic_.png"} alt={"background"} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {isShowed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            // transition={{delay: 0.25}}
-            className="fixed inset-0 bg-black/20 h-full w-full z-10"
-          >
-            <svg
-              className="absolute top-0 right-0 bottom-0 left-0 pointer-events-none" width="100%" height="100%">
-              <defs>
-                <mask id={`hole-${grid.id}`}>
-                  <rect width="100%" height="100%" fill="white" />
-                  <polygon
-                    points={maskSvgPoints}
-                    fill="black"
-                  />
-                </mask>
-              </defs>
-              <rect fill="black" fillOpacity={0.5} width="100%" height="100%" mask={`url(#hole-${grid.id})`} />
-            </svg>
-          </motion.div>
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 flex items-center justify-center h-full w-full z-10 bg-grid"
+              ref={ref}
+            >
+              <img className="block max-w-full max-h-full object-contain" width="720" height="1080" src={"/comic_.png"} alt={"background"} />
+            </motion.div>
+            {
+              !svgMaskShow && (<div
+                className="fixed inset-0 flex items-center justify-center h-full w-full z-10 bg-black/20"
+                ref={ref}
+              />)
+            }
+          </>
         )}
       </AnimatePresence>
       <AnimatePresence>
@@ -118,12 +105,14 @@ export default function ImgCrop() {
                 },
               }}
               className="flex absolute top-2 right-2 items-center justify-center bg-white rounded-full h-6 w-6"
-              onClick={() => setIsImgCropShowed(false)}
+              onClick={() => { setIsImgCropShowed(false); setSvgMaskShow(false) }}
             >
               <CloseIcon />
             </motion.button>
             <GridContent
-              className="bg-transparent"
+              className={
+                cn(svgMaskShow ? "bg-transparent" : "bg-green-500")
+              }
               gridId={grid.id}
               style={sizeStyleWithBorder}
               clipPath={clipPath}
@@ -133,10 +122,30 @@ export default function ImgCrop() {
               svgPoints={svgPoints}
               containerStyle={sizeStyleWithBorder}
               svgStyle={sizeStyleWithBorder}
+              onLayoutAnimationComplete={onAnimationComplete}
             />
           </div>
         )}
       </AnimatePresence>
+      {isShowed && svgMaskShow && (
+        <div
+          className="fixed inset-0 h-full w-full z-10"
+        >
+          <svg
+            className="absolute top-0 right-0 bottom-0 left-0 pointer-events-none" width="100%" height="100%">
+            <defs>
+              <mask id={`hole-${grid.id}`}>
+                <rect width="100%" height="100%" fill="white" />
+                <polygon
+                  points={maskSvgPoints}
+                  fill="black"
+                />
+              </mask>
+            </defs>
+            <rect fill="black" fillOpacity={0.2} width="100%" height="100%" mask={`url(#hole-${grid.id})`} />
+          </svg>
+        </div>
+      )}
     </>
   );
 }
