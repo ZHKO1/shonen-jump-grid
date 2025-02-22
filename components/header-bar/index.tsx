@@ -12,34 +12,32 @@ export default function HeaderBar() {
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex h-full flex-col">
-        <div className="flex items-center p-2">
-          <div className="flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={prevStep}>
-                  <Reply className="h-4 w-4" />
-                  <span className="sr-only">Previous</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Previous</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={nextStep}>
-                  <Forward className="h-4 w-4" />
-                  <span className="sr-only">Next</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Next</TooltipContent>
-            </Tooltip>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <Toggle aria-label="Toggle italic" pressed={getShowAttrCard()} onPressedChange={(pressed) => setShowAttrCard(pressed)}>
-              <LayoutDashboard className="h-4 w-4" />
-              <span className="sr-only">Detail</span>
-            </Toggle>
-          </div>
+      <div className="flex h-full p-2">
+        <div className="flex items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" onClick={prevStep}>
+                <Reply className="h-4 w-4" />
+                <span className="sr-only">Previous</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Previous</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" onClick={nextStep}>
+                <Forward className="h-4 w-4" />
+                <span className="sr-only">Next</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Next</TooltipContent>
+          </Tooltip>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <Toggle aria-label="Toggle italic" pressed={getShowAttrCard()} onPressedChange={(pressed) => setShowAttrCard(pressed)}>
+            <LayoutDashboard className="h-4 w-4" />
+            <span className="sr-only">Detail</span>
+          </Toggle>
         </div>
       </div>
     </TooltipProvider>

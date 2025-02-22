@@ -5,15 +5,15 @@ import ImgCrop from "@/components/img-crop";
 
 export default function Home() {
   return (
-    <div>
-      <header>
+    <div className="w-full h-screen flex flex-col">
+      <header className="h-12">
         <HeaderBar />
       </header>
-      <main className="w-full bg-blue-100 p-3 relative">
+      <main className="flex-1 bg-blue-100 p-3 relative overflow-auto">
         <section className="">
           <Canvas />
         </section>
-        <section className="absolute right-3 top-3">
+        <section className="fixed right-3 top-16 z-10">
           <AttrCard />
         </section>
         <section>

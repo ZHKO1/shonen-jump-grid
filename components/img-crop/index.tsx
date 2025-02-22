@@ -10,25 +10,21 @@ import { getClipPath, getGridFromComicConfig, getSvgPoints, getGridStyle } from 
 import { GridBorder } from "../canvas/components/grid/GridBorder";
 import { GridContent } from "../canvas/components/grid/GridContent";
 import Mask, { MaskType } from "./Mask";
+import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "./Icons";
+import ActionBar from "./ActionBar";
 
 export default function ImgCrop() {
   const { getCurrentStep } = useStepsStore();
   const { getGridFocusId, getShowImgCrop, setShowImgCrop } = useConfigStore();
   const showImgCrop = getShowImgCrop();
-  
+
   const focusId = getGridFocusId();
   const currentStep = getCurrentStep();
   const comicConfig = currentStep?.comicConfig;
   const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
 
   const [maskType, setMaskType] = useState<MaskType>("full");
-  const onAnimationComplete = () => {
-    setMaskType("grid");
-  }
-  const handleClose = () => {
-    setMaskType("full");
-    setShowImgCrop(false);
-  }
+
 
   if (!grid) {
     return null;
@@ -48,6 +44,43 @@ export default function ImgCrop() {
     document.body.style.overflow = "auto";
   }
 
+  const onAnimationComplete = () => {
+    setMaskType("grid");
+  }
+
+  const onClose = () => {
+    setMaskType("full");
+    setShowImgCrop(false);
+  }
+
+  const onSubmit = () => {
+  }
+
+  const onUploadImg = () => {
+  }
+
+  const onClearImg = () => {
+  }
+
+  const actions = [
+    {
+      Icon: UploadImgIcon,
+      onClick: onUploadImg
+    },
+    {
+      Icon: ClearImgIcon,
+      onClick: onClearImg
+    },
+    {
+      Icon: CloseIcon,
+      onClick: onClose
+    },
+    {
+      Icon: SubmitIcon,
+      onClick: onSubmit
+    }
+  ]
+
   return (
     <>
       <AnimatePresence>
@@ -65,26 +98,10 @@ export default function ImgCrop() {
       <AnimatePresence>
         {
           showImgCrop && (<div className="fixed inset-0  grid place-items-center z-[100]">
-            <motion.button
-              key={`grid-${grid.id}`}
-              layout
-              initial={{
-                opacity: 0,
-              }}
-              animate={{
-                opacity: 1,
-              }}
-              exit={{
-                opacity: 0,
-                transition: {
-                  duration: 0.05,
-                },
-              }}
-              className="flex absolute top-2 right-2 items-center justify-center bg-white rounded-full h-6 w-6"
-              onClick={handleClose}
-            >
-              <CloseIcon />
-            </motion.button>
+            <ActionBar
+              className="absolute top-4 right-4 "
+              actions={actions}
+            />
             <GridContent
               className={
                 cn(maskType === "grid" ? "bg-transparent" : "")
@@ -113,35 +130,3 @@ export default function ImgCrop() {
   );
 }
 
-export const CloseIcon = () => {
-  return (
-    <motion.svg
-      initial={{
-        opacity: 0,
-      }}
-      animate={{
-        opacity: 1,
-      }}
-      exit={{
-        opacity: 0,
-        transition: {
-          duration: 0.05,
-        },
-      }}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-4 w-4 text-black"
-    >
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M18 6l-12 12" />
-      <path d="M6 6l12 12" />
-    </motion.svg>
-  );
-};
