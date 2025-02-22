@@ -9,6 +9,7 @@ import { GridBorder } from "./GridBorder";
 import { GridContent } from "./GridContent";
 import { Grid } from ".";
 import { useEventListener } from "@/hooks";
+import { cn } from "@/lib/utils";
 
 export interface PolyGridProps {
     grid: PolyGridConfig,
@@ -49,6 +50,7 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
         <div>
             {
                 !(splitGrids || borderOnly) && (<GridContent
+                    className={cn(isFocused && "z-10")}
                     disableMotion={!isFocused}
                     gridId={grid.id}
                     style={{
@@ -71,6 +73,7 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
             {
                 !splitGrids && (
                     <GridBorder
+                        className={cn(isFocused && "z-10")}
                         disableMotion={!isFocused}
                         gridId={grid.id}
                         svgPoints={svgPoints}

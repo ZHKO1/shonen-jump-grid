@@ -15,7 +15,7 @@ export default function ImgCrop() {
   const { getCurrentStep } = useStepsStore();
   const { getGridFocusId, getShowImgCrop, setShowImgCrop } = useConfigStore();
   const showImgCrop = getShowImgCrop();
-
+  
   const focusId = getGridFocusId();
   const currentStep = getCurrentStep();
   const comicConfig = currentStep?.comicConfig;
@@ -42,6 +42,11 @@ export default function ImgCrop() {
   } = grid && getGridStyle(grid);
   const svgPoints = getSvgPoints(svgPath);
   const clipPath = svgPathWithBorder && getClipPath(svgPathWithBorder) || "";
+  if (showImgCrop) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "auto";
+  }
 
   return (
     <>

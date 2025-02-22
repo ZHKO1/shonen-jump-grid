@@ -8,6 +8,7 @@ import { GridContent } from "./GridContent";
 import { Grid } from ".";
 import { useSplit } from "./hooks/useSplit";
 import { useEventListener } from "@/hooks";
+import { cn } from "@/lib/utils";
 
 export interface RectGridProps {
     grid: RectGridConfig,
@@ -47,11 +48,12 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
         <div>
             {
                 !(splitGrids || borderOnly) && (<GridContent
+                    className={cn(isFocused && "z-10")}
                     disableMotion={!isFocused}
                     gridId={grid.id}
                     style={gridStyle}
                     ref={gridRef}
-                    onClick={handleClick}
+                    // onClick={handleClick}
                 />)
             }
 
@@ -66,6 +68,7 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
             {
                 !splitGrids && (
                     <GridBorder
+                        className={cn(isFocused && "z-10")}
                         disableMotion={!isFocused}
                         gridId={grid.id}
                         svgPoints={svgPoints}
