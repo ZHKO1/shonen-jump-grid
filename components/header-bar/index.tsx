@@ -8,7 +8,7 @@ import useConfigStore from "@/store/config";
 
 export default function HeaderBar() {
   const { nextStep, prevStep } = useStepsStore();
-  const { setIsAttrCardShowed, getIsAttrCardShowed } = useConfigStore();
+  const { setShowAttrCard, getShowAttrCard } = useConfigStore();
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -35,7 +35,7 @@ export default function HeaderBar() {
             </Tooltip>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Toggle aria-label="Toggle italic" pressed={getIsAttrCardShowed()} onPressedChange={(pressed) => setIsAttrCardShowed(pressed)}>
+            <Toggle aria-label="Toggle italic" pressed={getShowAttrCard()} onPressedChange={(pressed) => setShowAttrCard(pressed)}>
               <LayoutDashboard className="h-4 w-4" />
               <span className="sr-only">Detail</span>
             </Toggle>

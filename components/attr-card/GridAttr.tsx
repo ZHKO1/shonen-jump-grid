@@ -25,7 +25,7 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
   const isSplit = isGridSplited(grid);
   const splitLineStart = splitLine[0];
   const splitLineEnd = splitLine[1];
-  const { setIsImgCropShowed } = useConfigStore();
+  const { setShowImgCrop } = useConfigStore();
 
   const onRectChange = (key: keyof RectGridPoint): React.ChangeEventHandler<HTMLInputElement> => (e) => {
     adjustGrid(id, {
@@ -49,7 +49,7 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
   }
 
   const handleImgConfig = (e: React.MouseEvent) => {
-    setIsImgCropShowed(true);
+    setShowImgCrop(true);
     e.preventDefault();
   }
 

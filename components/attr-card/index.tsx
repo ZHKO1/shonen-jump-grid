@@ -10,7 +10,7 @@ import { isDef } from "@/lib";
 
 export default function AttrCard() {
   const { getCurrentStep } = useStepsStore();
-  const { getIsAttrCardShowed, getGridFocusId } = useConfigStore();
+  const { getShowAttrCard, getGridFocusId } = useConfigStore();
   const focusId = getGridFocusId();
 
   const currentStep = getCurrentStep();
@@ -18,8 +18,12 @@ export default function AttrCard() {
 
   const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
 
+  if (!getShowAttrCard()) {
+    return null;
+  }
+
   return (
-    <div className={getIsAttrCardShowed() ? "" : "hidden"}>
+    <div>
       {
         (focusId !== "") && grid ? <GridAttr grid={grid} /> : <CanvasAttr />
       }
