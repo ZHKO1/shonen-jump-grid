@@ -209,7 +209,7 @@ export function makePolyToRect(grid: GridConfig): GridConfig {
     if (grid.type == "poly") {
         const [p0, p1, p2, p3] = grid.path;
         if ((p0.y == p1.y) && (p1.x == p2.x) && (p2.y == p3.y) && (p3.x == p0.x)) {
-            let newGrid = {
+            const newGrid = {
                 ...grid
             } as Record<string, any>;
             delete newGrid.path;

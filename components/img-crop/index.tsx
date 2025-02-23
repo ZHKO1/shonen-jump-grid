@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { act, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, Point } from "framer-motion";
 // import { useOutsideClick } from "@/hooks/use-outside-click";
@@ -11,7 +11,8 @@ import { GridBorder } from "../canvas/components/grid/GridBorder";
 import { GridContent } from "../canvas/components/grid/GridContent";
 import Mask, { MaskType } from "./Mask";
 import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "./Icons";
-import ActionBar from "./ActionBar";
+import ActionBar, { ActionType } from "./ActionBar";
+import { useFileDialog } from "@/hooks/useFileDialog";
 
 export default function ImgCrop() {
   const { getCurrentStep } = useStepsStore();
@@ -25,6 +26,8 @@ export default function ImgCrop() {
 
   const [maskType, setMaskType] = useState<MaskType>("full");
 
+  const [imgUrl, setImgUrl] = useState<string>(grid?.content?.url || "");
+  const [, open, reset] = useFileDialog();
 
   if (!grid) {
     return null;
@@ -49,6 +52,7 @@ export default function ImgCrop() {
   }
 
   const onClose = () => {
+    onClearImg();
     setMaskType("full");
     setShowImgCrop(false);
   }
@@ -56,30 +60,39 @@ export default function ImgCrop() {
   const onSubmit = () => {
   }
 
-  const onUploadImg = () => {
+  const onUploadImg = async () => {
+    reset();
+    const files = await open();
+    const imgFile = files![0]!;
+    const dataUrl = URL.createObjectURL(imgFile)
+    setImgUrl(dataUrl);
   }
 
   const onClearImg = () => {
+    reset();
+    setImgUrl("");
   }
 
   const actions = [
-    {
+    !imgUrl && {
       Icon: UploadImgIcon,
-      onClick: onUploadImg
+      onClick: onUploadImg,
+      iconkey: "upload"
     },
-    {
+    imgUrl && {
       Icon: ClearImgIcon,
-      onClick: onClearImg
+      onClick: onClearImg,
+      iconkey: "upload",
     },
     {
       Icon: CloseIcon,
-      onClick: onClose
+      onClick: onClose,
     },
     {
       Icon: SubmitIcon,
-      onClick: onSubmit
+      onClick: onSubmit,
     }
-  ]
+  ].filter(action => action) as ActionType[];
 
   return (
     <>
@@ -89,15 +102,21 @@ export default function ImgCrop() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 flex items-center justify-center h-full w-full z-10 bg-grid"
-          >
-            <img className="block max-w-full max-h-full object-contain" width="720" height="1080" src={"/comic_.png"} alt={"background"} />
-          </motion.div>
+            className="fixed inset-0 h-full w-full z-10 bg-grid"
+          />
         )}
       </AnimatePresence>
+      {
+        showImgCrop && imgUrl && <div
+          className="fixed inset-0 h-full w-full z-10"
+        >
+          <img className="absolute top-0 bottom-0 left-0 right-0 m-auto max-w-full max-h-full" src={imgUrl} alt={"background"} />
+        </div>
+      }
       <AnimatePresence>
         {
-          showImgCrop && (<div className="fixed inset-0  grid place-items-center z-[100]">
+          showImgCrop && (<div
+            className="fixed inset-0  grid place-items-center z-[100]">
             <ActionBar
               className="absolute top-4 right-4 "
               actions={actions}

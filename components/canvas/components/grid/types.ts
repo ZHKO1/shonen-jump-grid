@@ -5,6 +5,9 @@ export type GridShareConfig = {
     splitLine?: [Point, Point],
     splitResult?: [GridConfig, GridConfig],
     splitSpaceWidth?: number,
+    content?: {
+        url: string,
+    }
 }
 
 export type PolyGridPoint = {

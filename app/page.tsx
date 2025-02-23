@@ -13,7 +13,7 @@ export default function Home() {
         <section className="">
           <Canvas />
         </section>
-        <section className="fixed right-3 top-16 z-10">
+        <section className="fixed right-8 top-16 z-10">
           <AttrCard />
         </section>
         <section>
