@@ -38,13 +38,13 @@ export default function Mask({ gridId, gridSize, svgPath, maskType }: {
   }, [])
 
   return (<div
-    className="fixed inset-0 h-full w-full z-10"
+    className="fixed inset-0 h-full w-full z-10 pointer-events-none"
     ref={ref}
   >
     {
       maskType == "grid" ?
         (<svg
-          className="absolute top-0 right-0 bottom-0 left-0 pointer-events-none" width="100%" height="100%">
+          className="absolute top-0 right-0 bottom-0 left-0" width="100%" height="100%">
           <defs>
             <mask id={`hole-${gridId}`}>
               <rect width="100%" height="100%" fill="white" />

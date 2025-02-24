@@ -98,29 +98,22 @@ export default function ImgCrop() {
     <>
       <AnimatePresence>
         {showImgCrop && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 h-full w-full z-10 bg-grid"
-          />
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 h-full w-full z-10 bg-grid"
+            >
+              {imgUrl && <img className="absolute top-0 bottom-0 left-0 right-0 m-auto max-w-full max-h-full select-none cursor-grab" src={imgUrl} alt={"background"} />}
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
-      {
-        showImgCrop && imgUrl && <div
-          className="fixed inset-0 h-full w-full z-10"
-        >
-          <img className="absolute top-0 bottom-0 left-0 right-0 m-auto max-w-full max-h-full" src={imgUrl} alt={"background"} />
-        </div>
-      }
       <AnimatePresence>
         {
           showImgCrop && (<div
-            className="fixed inset-0  grid place-items-center z-[100]">
-            <ActionBar
-              className="absolute top-4 right-4 "
-              actions={actions}
-            />
+            className="fixed inset-0  grid place-items-center z-[100] pointer-events-none">
             <GridContent
               className={
                 cn(maskType === "grid" ? "bg-transparent" : "")
@@ -145,6 +138,14 @@ export default function ImgCrop() {
         svgPath={svgPath}
         maskType={maskType}
       />)}
+      <AnimatePresence>
+        {
+          showImgCrop && <ActionBar
+            className="fixed top-4 right-4 z-[101]"
+            actions={actions}
+          />
+        }
+      </AnimatePresence>
     </>
   );
 }
