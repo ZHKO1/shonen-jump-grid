@@ -5,6 +5,7 @@ import { AnimatePresence, motion, Point } from "framer-motion";
 // import { useOutsideClick } from "@/hooks/use-outside-click";
 import useConfigStore from "@/store/config";
 import useStepsStore from "@/store/step";
+import { useFileDialog } from "@/hooks/useFileDialog";
 import { cn } from "@/lib/utils";
 import { getClipPath, getGridFromComicConfig, getSvgPoints, getGridStyle } from "../canvas/components/grid/utils";
 import { GridBorder } from "../canvas/components/grid/GridBorder";
@@ -12,7 +13,7 @@ import { GridContent } from "../canvas/components/grid/GridContent";
 import Mask, { MaskType } from "./Mask";
 import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "./Icons";
 import ActionBar, { ActionType } from "./ActionBar";
-import { useFileDialog } from "@/hooks/useFileDialog";
+import { useDragZoom } from "./hooks/useDragZoom";
 
 export default function ImgCrop() {
   const { getCurrentStep } = useStepsStore();
@@ -24,8 +25,10 @@ export default function ImgCrop() {
   const comicConfig = currentStep?.comicConfig;
   const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
 
-  const [maskType, setMaskType] = useState<MaskType>("full");
-
+  const containerRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const [imageX, imageY, imageZoom] = useDragZoom(containerRef, imageRef);
+  const [maskType, setMaskType] = useState<MaskType>("full")
   const [imgUrl, setImgUrl] = useState<string>(grid?.content?.url || "");
   const [, open, reset] = useFileDialog();
 
@@ -104,8 +107,18 @@ export default function ImgCrop() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 h-full w-full z-10 bg-grid"
+              ref={containerRef}
             >
-              {imgUrl && <img className="absolute top-0 bottom-0 left-0 right-0 m-auto max-w-full max-h-full select-none cursor-grab" src={imgUrl} alt={"background"} />}
+              {
+                imgUrl && <img
+                  className="absolute top-0 bottom-0 left-0 right-0 m-auto max-w-full max-h-full select-none"
+                  src={imgUrl}
+                  style={{
+                    transform: `translate(${imageX}px, ${imageY}px) scale(${imageZoom})`,
+                  }}
+                  ref={imageRef}
+                  alt={"background"} />
+              }
             </motion.div>
           </>
         )}
