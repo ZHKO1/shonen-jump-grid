@@ -1,19 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useElementBounding } from "@/hooks/useElementBounding";
 import { Point } from "../canvas/components/grid/types";
 import { getSvgPoints } from "../canvas/components/grid/utils";
 
 export type MaskType = "full" | "grid"
+export interface MaskRef {
+  getMaskPosStyle: () => { left: number; top: number };
+}
 
-export default function Mask({ gridId, gridSize, svgPath, maskType }: {
+const Mask = forwardRef(({ gridId, gridSize, svgPath, maskType }: {
   gridId: string | number,
   gridSize: { width: number, height: number },
   svgPath: [Point, Point, Point, Point],
   maskType: MaskType,
-}) {
-  const ref = useRef<HTMLDivElement>(null);
+}, ref) => {
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const { width: windowWidth, height: windowHeight, update } = useElementBounding(ref, {
+  const { width: windowWidth, height: windowHeight, update } = useElementBounding(containerRef, {
     windowResize: true,
     windowScroll: false,
   });
@@ -31,15 +34,21 @@ export default function Mask({ gridId, gridSize, svgPath, maskType }: {
   })) as [Point, Point, Point, Point]);
 
   useEffect(() => {
-    const element = ref.current;
+    const element = containerRef.current;
     if (element) {
       update();
     }
   }, [])
 
+  useImperativeHandle(ref, () => ({
+    getMaskPosStyle: () => {
+      return maskSvgPosStyle
+    }
+  }));
+
   return (<div
     className="fixed inset-0 h-full w-full z-10 pointer-events-none"
-    ref={ref}
+    ref={containerRef}
   >
     {
       maskType == "grid" ?
@@ -62,4 +71,6 @@ export default function Mask({ gridId, gridSize, svgPath, maskType }: {
     }
   </div>
   );
-}
+})
+
+export default Mask;

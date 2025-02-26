@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { getClipPath, getGridFromComicConfig, getSvgPoints, getGridStyle } from "../canvas/components/grid/utils";
 import { GridBorder } from "../canvas/components/grid/GridBorder";
 import { GridContent } from "../canvas/components/grid/GridContent";
-import Mask, { MaskType } from "./Mask";
+import Mask, { MaskRef, MaskType } from "./Mask";
 import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "./Icons";
 import ActionBar, { ActionType } from "./ActionBar";
 import { useDragZoom } from "./hooks/useDragZoom";
@@ -25,6 +25,8 @@ export default function ImgCrop() {
   const comicConfig = currentStep?.comicConfig;
   const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
 
+  const maskRef = useRef<MaskRef>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [imageX, imageY, imageZoom] = useDragZoom(containerRef, imageRef);
@@ -61,6 +63,41 @@ export default function ImgCrop() {
   }
 
   const onSubmit = () => {
+    const canvas = canvasRef.current;
+    const image = imageRef.current;
+    const mask = maskRef.current;
+    if (!canvas || !image || !mask) {
+      return;
+    }
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return;
+    }
+
+    const { x: imageX, y: imageY, width: imageWidth, height: imageHeight } = image.getBoundingClientRect()
+    const { left: maskX, top: maskY } = mask.getMaskPosStyle();
+
+    const scaleX = image.naturalWidth / imageWidth
+    const scaleY = image.naturalHeight / imageHeight
+    const pixelRatio = window.devicePixelRatio
+    const { width: cropWidth, height: cropHeight } = sizeStyle as { width: number; height: number };
+    canvas.width = Math.floor(cropWidth * scaleX * pixelRatio)
+    canvas.height = Math.floor(cropHeight * scaleY * pixelRatio)
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.scale(pixelRatio, pixelRatio)
+    ctx.imageSmoothingQuality = 'high'
+
+    const cropX = (maskX - imageX) * scaleX
+    const cropY = (maskY - imageY) * scaleY
+    const centerX = image.naturalWidth / 2
+    const centerY = image.naturalHeight / 2
+
+    ctx.save()
+    ctx.translate(-cropX, -cropY)
+    ctx.translate(centerX, centerY)
+    ctx.translate(-centerX, -centerY)
+    ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, image.naturalWidth, image.naturalHeight)
+    ctx.restore()
   }
 
   const onUploadImg = async () => {
@@ -146,6 +183,7 @@ export default function ImgCrop() {
         }
       </AnimatePresence>
       {showImgCrop && (<Mask
+        ref={maskRef}
         gridId={grid.id}
         gridSize={sizeStyle as { width: number, height: number }}
         svgPath={svgPath}
@@ -156,6 +194,17 @@ export default function ImgCrop() {
           showImgCrop && <ActionBar
             className="fixed top-4 right-4 z-[101]"
             actions={actions}
+          />
+        }
+        {
+          showImgCrop && <canvas
+            key="canvas"
+            className="fixed left-0 bottom-0 z-10"
+            ref={canvasRef}
+            style={{
+              border: '1px solid black',
+              ...sizeStyle,
+            }}
           />
         }
       </AnimatePresence>
