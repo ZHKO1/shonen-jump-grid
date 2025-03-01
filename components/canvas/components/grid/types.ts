@@ -7,6 +7,14 @@ export type GridShareConfig = {
     splitSpaceWidth?: number,
     content?: {
         url: string,
+        originImg: {
+            url: string,
+            width: number,
+            height: number,
+            dragX: number,
+            dragY: number,
+            zoom: number,
+        }
     }
 }
 

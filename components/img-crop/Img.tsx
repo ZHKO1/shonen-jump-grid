@@ -1,23 +1,31 @@
-import { forwardRef, HTMLAttributes, useMemo, useState } from "react";
+import { forwardRef, HTMLAttributes, RefObject, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { useIsomorphicLayoutEffect, useWindowSize } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { getImageSize } from "./utils";
+import { HTMLMotionProps, motion } from "framer-motion";
 
-interface ImgProps extends HTMLAttributes<HTMLImageElement> {
-  imgUrl: string;
-  imageX: number;
-  imageY: number;
-  imageZoom: number;
+export type ImgTarget = {
+  getImgStyle: () => { width: number, height: number, left: number, top: number }
+} & HTMLImageElement
+
+interface ImgProps extends HTMLMotionProps<'img'> {
+  url: string;
+  dragX: number;
+  dragY: number;
+  zoom: number;
+  defaultWidth?: number;
+  defaultHeight?: number;
 }
 
 const Img = forwardRef<
-  HTMLImageElement,
+  ImgTarget,
   ImgProps
->(({ imgUrl, imageX, imageY, imageZoom, className, style, ...props }, ref) => {
-  const [dimensions, setDimensions] = useState({ left: 0, top: 0, width: 0, height: 0 });
+>(({ url, dragX, dragY, zoom, defaultWidth = 0, defaultHeight = 0, className, style, ...props }, ref) => {
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [dimensions, setDimensions] = useState({ left: 0, top: 0, width: defaultWidth, height: defaultHeight });
   const { width: windowWidth, height: windowHeight } = useWindowSize();
 
-  const imageSizePromise = useMemo(() => getImageSize(imgUrl), [imgUrl]);
+  const imageSizePromise = useMemo(() => getImageSize(url), [url]);
 
   const initImageWH = () => {
     return imageSizePromise.then(({ width, height }) => {
@@ -31,7 +39,6 @@ const Img = forwardRef<
         const maxWidth_W = windowWidth - 20;
         const maxHeight_W = maxWidth_W / width * height;
         if (maxHeight_W < windowHeight - 20) {
-          console.log(maxWidth_W, maxHeight_W);
           setDimensions(state => ({
             ...state,
             width: maxWidth_W,
@@ -42,7 +49,6 @@ const Img = forwardRef<
         const maxHeight_H = windowHeight - 20;
         const maxWidth_H = maxHeight_H / height * width;
         if (maxWidth_H < windowWidth - 20) {
-          console.log(maxWidth_H, maxHeight_H);
           setDimensions(state => ({
             ...state,
             width: maxWidth_H,
@@ -56,6 +62,14 @@ const Img = forwardRef<
       console.error(e);
     });
   }
+
+  useImperativeHandle(ref, () => {
+    return Object.assign(imgRef.current!, {
+      getImgStyle: () => {
+        return dimensions
+      }
+    })
+  });
 
   useIsomorphicLayoutEffect(() => {
     let promise = Promise.resolve();
@@ -73,18 +87,27 @@ const Img = forwardRef<
     })
   }, [imageSizePromise, windowWidth, windowHeight]);
 
-  return <img
+  return <motion.img
+    initial={{
+      opacity: 0,
+    }}
+    animate={{
+      opacity: 1,
+    }}
+    exit={{
+      opacity: 0,
+    }}
     className={cn("absolute select-none max-w-none max-h-none", className)}
-    src={imgUrl}
+    src={url}
     style={{
       ...style,
-      transform: `translate(${imageX}px, ${imageY}px) scale(${imageZoom})`,
+      transform: `translate(${dragX}px, ${dragY}px) scale(${zoom})`,
       left: dimensions.left,
       top: dimensions.top,
       width: dimensions.width,
       height: dimensions.height,
     }}
-    ref={ref}
+    ref={imgRef}
     {...props}
   />
 })

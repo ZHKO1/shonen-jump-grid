@@ -12,16 +12,20 @@ import ActionBar, { ActionType } from "./ActionBar";
 import { useDragZoom } from "./hooks/useDragZoom";
 import { GridConfig } from "../canvas/components/grid/types";
 import Background from "./Background";
-import Img from "./Img";
+import Img, { ImgTarget } from "./Img";
 
 export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: () => void }) {
   const maskRef = useRef<MaskRef>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  const imageRef = useRef<ImgTarget>(null);
   const [maskType, setMaskType] = useState<MaskType>("full")
-  const [imgUrl, setImgUrl] = useState<string>(grid?.content?.url || "");
-  const [imageX, imageY, imageZoom] = useDragZoom(containerRef);
+  const [imgUrl, setImgUrl] = useState<string>(grid?.content?.originImg.url || "");
+  const [dragX, dragY, zoom] = useDragZoom(containerRef, {
+    dragX: grid?.content?.originImg.dragX,
+    dragY: grid?.content?.originImg.dragY,
+    zoom: grid?.content?.originImg.zoom,
+  });
   const [, open, reset] = useFileDialog();
   const ajustGrid = useAdjustGrid();
 
@@ -50,7 +54,7 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
     const canvas = canvasRef.current;
     const image = imageRef.current;
     const mask = maskRef.current;
-    if (!canvas || !image || !mask) {
+    if (!canvas || !(image && image.src) || !mask) {
       return;
     }
     const ctx = canvas.getContext('2d');
@@ -58,7 +62,7 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
       return;
     }
 
-    const { x: imageX, y: imageY, width: imageWidth, height: imageHeight } = image.getBoundingClientRect()
+    const { x, y, width: imageWidth, height: imageHeight } = image.getBoundingClientRect()
     const { left: maskX, top: maskY } = mask.getMaskPosStyle();
 
     const scaleX = image.naturalWidth / imageWidth
@@ -71,8 +75,8 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
     ctx.scale(pixelRatio, pixelRatio)
     ctx.imageSmoothingQuality = 'high'
 
-    const cropX = (maskX - imageX) * scaleX
-    const cropY = (maskY - imageY) * scaleY
+    const cropX = (maskX - x) * scaleX
+    const cropY = (maskY - y) * scaleY
     const centerX = image.naturalWidth / 2
     const centerY = image.naturalHeight / 2
 
@@ -84,9 +88,18 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
     ctx.restore()
 
     const url = canvas.toDataURL('image/png');
+
     ajustGrid(grid.id, {
       content: {
         url,
+        originImg: {
+          url: imgUrl,
+          width: image.getImgStyle().width,
+          height: image.getImgStyle().height,
+          dragX,
+          dragY,
+          zoom,
+        }
       }
     });
     handleClose();
@@ -131,10 +144,12 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
       >
         {imgUrl && <Img
           ref={imageRef}
-          imgUrl={imgUrl}
-          imageX={imageX}
-          imageY={imageY}
-          imageZoom={imageZoom}
+          url={imgUrl}
+          dragX={dragX}
+          dragY={dragY}
+          zoom={zoom}
+          defaultWidth={grid?.content?.originImg.width}
+          defaultHeight={grid?.content?.originImg.height}
         />}
       </Background>
       <div

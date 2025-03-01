@@ -14,11 +14,11 @@ function getMousePoint(e: MouseEvent | React.MouseEvent) {
   })
 }
 
-export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>) {
+export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, defaultValue: { dragX?: number, dragY?: number, zoom?: number }) {
   const containerPositionRef = useRef<Point>({ x: 0, y: 0 });
   const dragStartPositionRef = useRef<Point>({ x: 0, y: 0 });
-  const [dragPos, setDragPos] = useState<Point>({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState<number>(1);
+  const [dragPos, setDragPos] = useState<Point>({ x: defaultValue.dragX || 0, y: defaultValue.dragY || 0 });
+  const [zoom, setZoom] = useState<number>(defaultValue.zoom || 1);
   const rafDragTimeoutRef = useRef<number>(0);
 
   const saveContainerPosition = useCallback(() => {
