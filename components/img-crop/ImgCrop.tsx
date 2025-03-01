@@ -1,13 +1,8 @@
 "use client";
-import React, { act, useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import { AnimatePresence, motion, Point } from "framer-motion";
-// import { useOutsideClick } from "@/hooks/use-outside-click";
-import useConfigStore from "@/store/config";
-import useStepsStore from "@/store/step";
+import React, { useRef, useState } from "react";
 import { useFileDialog } from "@/hooks/useFileDialog";
 import { cn } from "@/lib/utils";
-import { getClipPath, getGridFromComicConfig, getSvgPoints, getGridStyle } from "../canvas/components/grid/utils";
+import { getClipPath, getSvgPoints, getGridStyle } from "../canvas/components/grid/utils";
 import { GridBorder } from "../canvas/components/grid/GridBorder";
 import { GridContent } from "../canvas/components/grid/GridContent";
 import { useAdjustGrid } from "../canvas/components/grid/hooks/useAdjustGrid";
@@ -17,14 +12,14 @@ import ActionBar, { ActionType } from "./ActionBar";
 import { useDragZoom } from "./hooks/useDragZoom";
 import { GridConfig } from "../canvas/components/grid/types";
 
-export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: Function }) {
+export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: () => void }) {
   const maskRef = useRef<MaskRef>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
-  const [imageX, imageY, imageZoom] = useDragZoom(containerRef, imageRef);
   const [maskType, setMaskType] = useState<MaskType>("full")
   const [imgUrl, setImgUrl] = useState<string>(grid?.content?.url || "");
+  const [imageX, imageY, imageZoom] = useDragZoom(containerRef);
   const [, open, reset] = useFileDialog();
 
   const ajustGrid = useAdjustGrid();
@@ -87,7 +82,7 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
     ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, image.naturalWidth, image.naturalHeight)
     ctx.restore()
 
-    let url = canvas.toDataURL('image/png');
+    const url = canvas.toDataURL('image/png');
     ajustGrid(grid.id, {
       content: {
         url,
@@ -110,7 +105,7 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
   }
 
   const actions = [
-     {
+    {
       Icon: UploadImgIcon,
       onClick: handleSelectImg,
     },

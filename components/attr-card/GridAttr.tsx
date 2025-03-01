@@ -3,7 +3,6 @@ import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
 import {
   Card,
@@ -15,7 +14,7 @@ import {
 } from "@/components/ui/card"
 import useConfigStore from "@/store/config"
 import { getGridsBySplit, isGridSplited } from "../canvas/components/grid/utils";
-import { GridConfig, Point, RectGridPoint } from "../canvas/components/grid/types"
+import { GridConfig, Point } from "../canvas/components/grid/types"
 import { useAdjustGrid } from "../canvas/components/grid/hooks/useAdjustGrid"
 import { borderWidth } from "../canvas/components/grid/constant"
 
@@ -27,11 +26,11 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
   const splitLineEnd = splitLine[1];
   const { setShowImgCrop } = useConfigStore();
 
-  const onRectChange = (key: keyof RectGridPoint): React.ChangeEventHandler<HTMLInputElement> => (e) => {
-    adjustGrid(id, {
-      [key]: Number(e.target.value)
-    })
-  }
+  // const onRectChange = (key: keyof RectGridPoint): React.ChangeEventHandler<HTMLInputElement> => (e) => {
+  //   adjustGrid(id, {
+  //     [key]: Number(e.target.value)
+  //   })
+  // }
 
   const onSplitSpaceWidthChange = (isCommit: boolean) => (number: number[]) => {
     if (isGridSplited(grid)) {

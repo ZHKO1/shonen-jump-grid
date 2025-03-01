@@ -1,7 +1,6 @@
 "use client";
-import React, { act, useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import { AnimatePresence, motion, Point } from "framer-motion";
+import React from "react";
+import { AnimatePresence } from "framer-motion";
 // import { useOutsideClick } from "@/hooks/use-outside-click";
 import useConfigStore from "@/store/config";
 import useStepsStore from "@/store/step";

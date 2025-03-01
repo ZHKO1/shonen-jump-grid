@@ -2,7 +2,6 @@ import { CSSProperties, forwardRef } from "react";
 import { HTMLMotionProps, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { GridConfig } from "./types";
-import { borderWidth } from "./constant";
 
 export interface GridContentProps
     extends HTMLMotionProps<"div"> {
@@ -47,3 +46,5 @@ export const GridContent = forwardRef<HTMLDivElement, GridContentProps>(
         )
     }
 );
+
+GridContent.displayName = "GridContent";

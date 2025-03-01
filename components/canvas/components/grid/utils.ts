@@ -1,4 +1,3 @@
-import { CSSProperties } from "react";
 import { ComicConfig, GridConfig, Point, PolyGridConfig, PolyGridPoint, RectGridConfig, RectGridPoint } from "./types";
 import { borderWidth } from "./constant";
 

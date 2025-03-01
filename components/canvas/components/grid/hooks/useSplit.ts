@@ -1,7 +1,6 @@
-import useStepsStore from "@/store/step";
 import { useEffect } from "react";
 import { useDrawLine } from "./useDrawLine";
-import { getGridFromComicConfig, getGridsBySplit } from "../utils";
+import { getGridsBySplit } from "../utils";
 import { GridConfig } from "../types";
 import { useAdjustGrid } from "./useAdjustGrid";
 

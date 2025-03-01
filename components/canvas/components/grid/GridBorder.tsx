@@ -49,3 +49,5 @@ export const GridBorder = forwardRef<HTMLDivElement, GridBorderProps>(
         )
     }
 );
+
+GridBorder.displayName = "GridBorder";

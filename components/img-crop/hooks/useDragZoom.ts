@@ -14,7 +14,7 @@ function getMousePoint(e: MouseEvent | React.MouseEvent) {
   })
 }
 
-export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, imageRef: RefObject<HTMLImageElement | null>) {
+export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>) {
   const containerPositionRef = useRef<Point>({ x: 0, y: 0 });
   const dragStartPositionRef = useRef<Point>({ x: 0, y: 0 });
   const [dragPos, setDragPos] = useState<Point>({ x: 0, y: 0 });
@@ -26,7 +26,7 @@ export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, imag
       const bounds = containerRef.current.getBoundingClientRect()
       containerPositionRef.current = { x: bounds.left, y: bounds.top }
     }
-  }, [])
+  }, [containerRef.current])
 
   const getPointOnContainer = ({ x, y }: Point, containerTopLeft: Point): Point => {
     if (!containerRef.current) {
@@ -58,13 +58,13 @@ export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, imag
       on(defaultDocument, "mousemove", onMouseMove);
       on(defaultDocument, "mouseup", onDragStopped);
       saveContainerPosition()
-      let { x, y } = getMousePoint(e);
+      const { x, y } = getMousePoint(e);
       dragStartPositionRef.current = { x, y }
     };
 
     const onMouseMove = (e: MouseEvent) => {
       if (!defaultWindow) return
-      let { x, y } = getMousePoint(e);
+      const { x, y } = getMousePoint(e);
       if (rafDragTimeoutRef.current) defaultWindow.cancelAnimationFrame(rafDragTimeoutRef.current)
 
       rafDragTimeoutRef.current = defaultWindow.requestAnimationFrame(() => {
@@ -79,7 +79,7 @@ export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, imag
       });
     };
 
-    const onDragStopped = (e: MouseEvent) => {
+    const onDragStopped = () => {
       off(defaultDocument, "mousemove", onMouseMove);
       off(defaultDocument, "mouseup", onDragStopped);
     };
@@ -87,7 +87,7 @@ export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, imag
     const onWheel = (e: WheelEvent) => {
       if (!defaultWindow) return
       e.preventDefault()
-      let point = getMousePoint(e);
+      const point = getMousePoint(e);
       const { pixelY } = normalizeWheel(e);
       const newZoom = Math.min(Math.max(zoom - (pixelY * ZOOMSPEED) / 200, MIN_ZOOM), MAX_ZOOM)
       const zoomPoint = getPointOnContainer(point, containerPositionRef.current)

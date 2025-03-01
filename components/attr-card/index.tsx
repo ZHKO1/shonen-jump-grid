@@ -6,7 +6,6 @@ import useConfigStore from "@/store/config";
 import { getGridFromComicConfig } from "../canvas/components/grid/utils";
 import GridAttr from "./GridAttr"
 import CanvasAttr from "./CanvasAttr"
-import { isDef } from "@/lib";
 
 export default function AttrCard() {
   const { getCurrentStep } = useStepsStore();

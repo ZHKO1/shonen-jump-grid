@@ -1,6 +1,5 @@
 import { MouseEventHandler, useRef } from "react";
 import useFocusStore from "@/store/config";
-import { isDef } from "@/lib";
 import { useSplit } from "./hooks/useSplit";
 import { getClipPath, getGridStyle, getSvgPoints } from "./utils";
 import { borderWidth } from "./constant";
@@ -26,8 +25,6 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
 
     const {
         imgStyle,
-        posStyle,
-        sizeStyle,
         posStyleWithBorder,
         sizeStyleWithBorder,
         svgPath,

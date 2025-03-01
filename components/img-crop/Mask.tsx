@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { useElementBounding } from "@/hooks/useElementBounding";
 import { Point } from "../canvas/components/grid/types";
 import { getSvgPoints } from "../canvas/components/grid/utils";
@@ -85,5 +85,7 @@ const Mask = forwardRef(({ gridId, gridSize, svgPath, maskType }: {
   </motion.div>
   );
 })
+
+Mask.displayName = "Mask";
 
 export default Mask;
