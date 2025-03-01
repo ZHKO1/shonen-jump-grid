@@ -572,14 +572,19 @@ export const getAdjustedPoint = (
 };
 
 interface GridStyle {
+    // 相对容器（包括边框），内部图片的大小和位置
+    imgStyle: {
+        left: number, top: number,
+        width: number, height: number
+    },
     // 左上位置（不考虑边框宽度）
-    posStyle: CSSProperties,
+    posStyle: { left: number, top: number },
     // 大小（不考虑边框宽度）
-    sizeStyle: CSSProperties,
+    sizeStyle: { width: number, height: number },
     // 边框最外一圈的左上位置（考虑边框宽度）
-    posStyleWithBorder: CSSProperties,
+    posStyleWithBorder: { left: number, top: number },
     // 边框最外一圈的大小（考虑边框宽度）
-    sizeStyleWithBorder: CSSProperties,
+    sizeStyleWithBorder: { width: number, height: number },
     // 边框svg路径（不考虑边框宽度）
     svgPath: [Point, Point, Point, Point],
     // 边框最外一圈的路径（考虑边框宽度）
@@ -602,28 +607,35 @@ const getRectGridStyle = (grid: RectGridConfig): GridStyle => {
     const top = outside.lt_y;
     const width = outside.rb_x - outside.lt_x;
     const height = outside.rb_y - outside.lt_y;
+    const posStyle = {
+        left: grid.lt_x,
+        top: grid.lt_y,
+    }
+    const sizeStyle = {
+        width: grid.rb_x - grid.lt_x,
+        height: grid.rb_y - grid.lt_y,
+    }
     const posStyleWithBorder = {
         left,
         top,
-    } as CSSProperties
+    }
     const sizeStyleWithBorder = {
         width,
         height,
-    } as CSSProperties
+    }
     const svgPath = ([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }])
         .map(p => ({ x: p.x - left, y: p.y - top })) as [Point, Point, Point, Point]
     return {
-        posStyle: {
-            left: grid.lt_x,
-            top: grid.lt_y,
-        },
-        sizeStyle: {
-            width: grid.rb_x - grid.lt_x,
-            height: grid.rb_y - grid.lt_y,
-        },
+        posStyle,
+        sizeStyle,
         posStyleWithBorder,
         sizeStyleWithBorder,
         svgPath,
+        imgStyle: {
+            left: posStyle.left - posStyleWithBorder.left,
+            top: posStyle.top - posStyleWithBorder.top,
+            ...sizeStyle
+        }
     }
 }
 
@@ -642,31 +654,38 @@ const getPolyGridStyle = (grid: PolyGridConfig): GridStyle => {
         x: p.x - left,
         y: p.y - top,
     })) as [Point, Point, Point, Point];
+    const posStyle = {
+        left: lt.x,
+        top: lt.y,
+    }
+    const sizeStyle = {
+        width: rb.x - lt.x,
+        height: rb.y - lt.y,
+    }
     const posStyleWithBorder = {
         left,
         top,
-    } as CSSProperties
+    }
     const sizeStyleWithBorder = {
         width,
         height,
-    } as CSSProperties
+    }
 
     const svgPath = grid.path
         .map(p => ({ x: p.x - left, y: p.y - top })) as [Point, Point, Point, Point]
 
     return {
-        posStyle: {
-            left: lt.x,
-            top: lt.y,
-        },
-        sizeStyle: {
-            width: rb.x - lt.x,
-            height: rb.y - lt.y,
-        },
+        posStyle,
+        sizeStyle,
         posStyleWithBorder,
         sizeStyleWithBorder,
         svgPath,
         svgPathWithBorder,
+        imgStyle: {
+            left: posStyle.left - posStyleWithBorder.left,
+            top: posStyle.top - posStyleWithBorder.top,
+            ...sizeStyle
+        }
     }
 }
 

@@ -3,7 +3,7 @@ import normalizeWheel from 'normalize-wheel'
 import { defaultDocument, defaultWindow, getTargetElement, off, on } from "@/lib";
 import { Point } from "@/components/canvas/components/grid/types";
 
-const ZOOMSPEED = 1;
+const ZOOMSPEED = 0.1;
 const MIN_ZOOM = 0.5
 const MAX_ZOOM = 3
 

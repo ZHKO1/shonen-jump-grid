@@ -5,17 +5,11 @@ import { AnimatePresence, motion, Point } from "framer-motion";
 // import { useOutsideClick } from "@/hooks/use-outside-click";
 import useConfigStore from "@/store/config";
 import useStepsStore from "@/store/step";
-import { useFileDialog } from "@/hooks/useFileDialog";
-import { cn } from "@/lib/utils";
-import { getClipPath, getGridFromComicConfig, getSvgPoints, getGridStyle } from "../canvas/components/grid/utils";
-import { GridBorder } from "../canvas/components/grid/GridBorder";
-import { GridContent } from "../canvas/components/grid/GridContent";
-import Mask, { MaskRef, MaskType } from "./Mask";
-import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "./Icons";
-import ActionBar, { ActionType } from "./ActionBar";
-import { useDragZoom } from "./hooks/useDragZoom";
+import { getGridFromComicConfig } from "../canvas/components/grid/utils";
+import ImgCrop from "./ImgCrop";
+import { defaultDocument } from "@/lib";
 
-export default function ImgCrop() {
+export default function ImgCropContainer() {
   const { getCurrentStep } = useStepsStore();
   const { getGridFocusId, getShowImgCrop, setShowImgCrop } = useConfigStore();
   const showImgCrop = getShowImgCrop();
@@ -25,190 +19,26 @@ export default function ImgCrop() {
   const comicConfig = currentStep?.comicConfig;
   const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
 
-  const maskRef = useRef<MaskRef>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const [imageX, imageY, imageZoom] = useDragZoom(containerRef, imageRef);
-  const [maskType, setMaskType] = useState<MaskType>("full")
-  const [imgUrl, setImgUrl] = useState<string>(grid?.content?.url || "");
-  const [, open, reset] = useFileDialog();
+  if (defaultDocument) {
+    if (showImgCrop) {
+      defaultDocument.body.style.overflow = "hidden";
+    } else {
+      defaultDocument.body.style.overflow = "auto";
+    }
+  }
+
 
   if (!grid) {
     return null;
   }
 
-  const {
-    sizeStyle,
-    sizeStyleWithBorder,
-    svgPath,
-    svgPathWithBorder,
-  } = grid && getGridStyle(grid);
-  const svgPoints = getSvgPoints(svgPath);
-  const clipPath = svgPathWithBorder && getClipPath(svgPathWithBorder) || "";
-  if (showImgCrop) {
-    document.body.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = "auto";
-  }
-
-  const onAnimationComplete = () => {
-    setMaskType("grid");
-  }
-
-  const onClose = () => {
-    onClearImg();
-    setMaskType("full");
-    setShowImgCrop(false);
-  }
-
-  const onSubmit = () => {
-    const canvas = canvasRef.current;
-    const image = imageRef.current;
-    const mask = maskRef.current;
-    if (!canvas || !image || !mask) {
-      return;
-    }
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      return;
-    }
-
-    const { x: imageX, y: imageY, width: imageWidth, height: imageHeight } = image.getBoundingClientRect()
-    const { left: maskX, top: maskY } = mask.getMaskPosStyle();
-
-    const scaleX = image.naturalWidth / imageWidth
-    const scaleY = image.naturalHeight / imageHeight
-    const pixelRatio = window.devicePixelRatio
-    const { width: cropWidth, height: cropHeight } = sizeStyle as { width: number; height: number };
-    canvas.width = Math.floor(cropWidth * scaleX * pixelRatio)
-    canvas.height = Math.floor(cropHeight * scaleY * pixelRatio)
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.scale(pixelRatio, pixelRatio)
-    ctx.imageSmoothingQuality = 'high'
-
-    const cropX = (maskX - imageX) * scaleX
-    const cropY = (maskY - imageY) * scaleY
-    const centerX = image.naturalWidth / 2
-    const centerY = image.naturalHeight / 2
-
-    ctx.save()
-    ctx.translate(-cropX, -cropY)
-    ctx.translate(centerX, centerY)
-    ctx.translate(-centerX, -centerY)
-    ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, image.naturalWidth, image.naturalHeight)
-    ctx.restore()
-  }
-
-  const onUploadImg = async () => {
-    reset();
-    const files = await open();
-    const imgFile = files![0]!;
-    const dataUrl = URL.createObjectURL(imgFile)
-    setImgUrl(dataUrl);
-  }
-
-  const onClearImg = () => {
-    reset();
-    setImgUrl("");
-  }
-
-  const actions = [
-    !imgUrl && {
-      Icon: UploadImgIcon,
-      onClick: onUploadImg,
-      iconkey: "upload"
-    },
-    imgUrl && {
-      Icon: ClearImgIcon,
-      onClick: onClearImg,
-      iconkey: "upload",
-    },
-    {
-      Icon: CloseIcon,
-      onClick: onClose,
-    },
-    {
-      Icon: SubmitIcon,
-      onClick: onSubmit,
-    }
-  ].filter(action => action) as ActionType[];
-
   return (
-    <>
-      <AnimatePresence>
-        {showImgCrop && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 h-full w-full z-10 bg-grid"
-              ref={containerRef}
-            >
-              {
-                imgUrl && <img
-                  className="absolute top-0 bottom-0 left-0 right-0 m-auto max-w-full max-h-full select-none"
-                  src={imgUrl}
-                  style={{
-                    transform: `translate(${imageX}px, ${imageY}px) scale(${imageZoom})`,
-                  }}
-                  ref={imageRef}
-                  alt={"background"} />
-              }
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {
-          showImgCrop && (<div
-            className="fixed inset-0  grid place-items-center z-[100] pointer-events-none">
-            <GridContent
-              className={
-                cn(maskType === "grid" ? "bg-transparent" : "")
-              }
-              gridId={grid.id}
-              style={sizeStyleWithBorder}
-              clipPath={clipPath}
-            />
-            <GridBorder
-              gridId={grid.id}
-              svgPoints={svgPoints}
-              containerStyle={sizeStyleWithBorder}
-              svgStyle={sizeStyleWithBorder}
-              onLayoutAnimationComplete={onAnimationComplete}
-            />
-          </div>)
-        }
-      </AnimatePresence>
-      {showImgCrop && (<Mask
-        ref={maskRef}
-        gridId={grid.id}
-        gridSize={sizeStyle as { width: number, height: number }}
-        svgPath={svgPath}
-        maskType={maskType}
+    <AnimatePresence>
+      {showImgCrop && (<ImgCrop
+        grid={grid}
+        onClose={() => setShowImgCrop(false)}
       />)}
-      <AnimatePresence>
-        {
-          showImgCrop && <ActionBar
-            className="fixed top-4 right-4 z-[101]"
-            actions={actions}
-          />
-        }
-        {
-          showImgCrop && <canvas
-            key="canvas"
-            className="fixed left-0 bottom-0 z-10"
-            ref={canvasRef}
-            style={{
-              border: '1px solid black',
-              ...sizeStyle,
-            }}
-          />
-        }
-      </AnimatePresence>
-    </>
+    </AnimatePresence>
   );
 }
 

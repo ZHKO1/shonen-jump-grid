@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "re
 import { useElementBounding } from "@/hooks/useElementBounding";
 import { Point } from "../canvas/components/grid/types";
 import { getSvgPoints } from "../canvas/components/grid/utils";
+import { motion } from "framer-motion";
 
 export type MaskType = "full" | "grid"
 export interface MaskRef {
@@ -46,7 +47,19 @@ const Mask = forwardRef(({ gridId, gridSize, svgPath, maskType }: {
     }
   }));
 
-  return (<div
+  return (<motion.div
+    initial={{
+      opacity: 0,
+    }}
+    animate={{
+      opacity: 1,
+    }}
+    exit={{
+      opacity: 0,
+      transition: {
+        duration: 0,
+      },
+    }}
     className="fixed inset-0 h-full w-full z-10 pointer-events-none"
     ref={containerRef}
   >
@@ -69,7 +82,7 @@ const Mask = forwardRef(({ gridId, gridSize, svgPath, maskType }: {
           className="fixed inset-0 flex items-center justify-center h-full w-full z-10 bg-black/20"
         />)
     }
-  </div>
+  </motion.div>
   );
 })
 

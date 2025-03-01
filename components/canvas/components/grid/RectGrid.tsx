@@ -25,6 +25,7 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
     const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
 
     const {
+        imgStyle,
         posStyleWithBorder,
         sizeStyleWithBorder,
         svgPath,
@@ -53,6 +54,8 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
                     gridId={grid.id}
                     style={gridStyle}
                     ref={gridRef}
+                    url={grid.content?.url}
+                    imgStyle={imgStyle}
                     // onClick={handleClick}
                 />)
             }
