@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 // import { useOutsideClick } from "@/hooks/use-outside-click";
 import useConfigStore from "@/store/config";
@@ -26,6 +26,11 @@ export default function ImgCropContainer() {
     }
   }
 
+  const onClose = useCallback(() => {
+    setTimeout(() => {
+      setShowImgCrop(false)
+    }, 100);
+  }, []);
 
   if (!grid) {
     return null;
@@ -35,7 +40,7 @@ export default function ImgCropContainer() {
     <AnimatePresence>
       {showImgCrop && (<ImgCrop
         grid={grid}
-        onClose={() => setShowImgCrop(false)}
+        onClose={onClose}
       />)}
     </AnimatePresence>
   );

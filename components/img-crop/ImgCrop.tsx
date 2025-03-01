@@ -11,6 +11,9 @@ import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "./Icons";
 import ActionBar, { ActionType } from "./ActionBar";
 import { useDragZoom } from "./hooks/useDragZoom";
 import { GridConfig } from "../canvas/components/grid/types";
+import { getImageSize } from "./utils";
+import Background from "./Background";
+import Img from "./Img";
 
 export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: () => void }) {
   const maskRef = useRef<MaskRef>(null);
@@ -96,6 +99,7 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
     const files = await open();
     const imgFile = files![0]!;
     const dataUrl = URL.createObjectURL(imgFile)
+    const { width, height } = await getImageSize(dataUrl);
     setImgUrl(dataUrl);
   }
 
@@ -125,24 +129,17 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 h-full w-full z-10 bg-grid"
+      <Background
         ref={containerRef}
       >
-        {
-          imgUrl && <img
-            className="absolute top-0 bottom-0 left-0 right-0 m-auto max-w-full max-h-full select-none"
-            src={imgUrl}
-            style={{
-              transform: `translate(${imageX}px, ${imageY}px) scale(${imageZoom})`,
-            }}
-            ref={imageRef}
-            alt={"background"} />
-        }
-      </motion.div>
+        <Img
+          ref={imageRef}
+          imgUrl={imgUrl}
+          imageX={imageX}
+          imageY={imageY}
+          imageZoom={imageZoom}
+        />
+      </Background>
       <div
         className="fixed inset-0  grid place-items-center z-[100] pointer-events-none">
         <GridContent
