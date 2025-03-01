@@ -4,7 +4,7 @@ import { defaultDocument, defaultWindow, getTargetElement, off, on } from "@/lib
 import { Point } from "@/components/canvas/components/grid/types";
 
 const ZOOMSPEED = 0.1;
-const MIN_ZOOM = 0.5
+const MIN_ZOOM = 0.01
 const MAX_ZOOM = 3
 
 function getMousePoint(e: MouseEvent | React.MouseEvent) {

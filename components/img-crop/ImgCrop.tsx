@@ -11,7 +11,6 @@ import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "./Icons";
 import ActionBar, { ActionType } from "./ActionBar";
 import { useDragZoom } from "./hooks/useDragZoom";
 import { GridConfig } from "../canvas/components/grid/types";
-import { getImageSize } from "./utils";
 import Background from "./Background";
 import Img from "./Img";
 
@@ -24,7 +23,6 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
   const [imgUrl, setImgUrl] = useState<string>(grid?.content?.url || "");
   const [imageX, imageY, imageZoom] = useDragZoom(containerRef);
   const [, open, reset] = useFileDialog();
-
   const ajustGrid = useAdjustGrid();
 
   const {
@@ -66,7 +64,7 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
     const scaleX = image.naturalWidth / imageWidth
     const scaleY = image.naturalHeight / imageHeight
     const pixelRatio = window.devicePixelRatio
-    const { width: cropWidth, height: cropHeight } = sizeStyle as { width: number; height: number };
+    const { width: cropWidth, height: cropHeight } = sizeStyle;
     canvas.width = Math.floor(cropWidth * scaleX * pixelRatio)
     canvas.height = Math.floor(cropHeight * scaleY * pixelRatio)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -95,11 +93,10 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
   }
 
   const handleSelectImg = async () => {
-    reset();
+    handleClearImg();
     const files = await open();
     const imgFile = files![0]!;
     const dataUrl = URL.createObjectURL(imgFile)
-    const { width, height } = await getImageSize(dataUrl);
     setImgUrl(dataUrl);
   }
 
@@ -132,13 +129,13 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
       <Background
         ref={containerRef}
       >
-        <Img
+        {imgUrl && <Img
           ref={imageRef}
           imgUrl={imgUrl}
           imageX={imageX}
           imageY={imageY}
           imageZoom={imageZoom}
-        />
+        />}
       </Background>
       <div
         className="fixed inset-0  grid place-items-center z-[100] pointer-events-none">

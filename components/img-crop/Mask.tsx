@@ -3,6 +3,7 @@ import { useElementBounding } from "@/hooks/useElementBounding";
 import { Point } from "../canvas/components/grid/types";
 import { getSvgPoints } from "../canvas/components/grid/utils";
 import { motion } from "framer-motion";
+import { useWindowSize } from "@/hooks";
 
 export type MaskType = "full" | "grid"
 export interface MaskRef {
@@ -17,10 +18,7 @@ const Mask = forwardRef(({ gridId, gridSize, svgPath, maskType }: {
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { width: windowWidth, height: windowHeight, update } = useElementBounding(containerRef, {
-    windowResize: true,
-    windowScroll: false,
-  });
+  const { width: windowWidth, height: windowHeight } = useWindowSize();
   const {
     width: gridWidth = 0,
     height: gridHeight = 0,
@@ -33,13 +31,6 @@ const Mask = forwardRef(({ gridId, gridSize, svgPath, maskType }: {
     x: x + maskSvgPosStyle.left,
     y: y + maskSvgPosStyle.top,
   })) as [Point, Point, Point, Point]);
-
-  useEffect(() => {
-    const element = containerRef.current;
-    if (element) {
-      update();
-    }
-  }, [])
 
   useImperativeHandle(ref, () => ({
     getMaskPosStyle: () => {
