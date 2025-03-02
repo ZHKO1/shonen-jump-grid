@@ -1,5 +1,5 @@
 import { MouseEventHandler, useRef } from "react";
-import useFocusStore from "@/store/config";
+import useConfigStore from "@/store/config";
 import { RectGridConfig } from "./types";
 import { getGridStyle, getSvgPoints } from "./utils";
 import { borderWidth } from "./constant";
@@ -18,7 +18,7 @@ export interface RectGridProps {
 
 export default function RectGrid({ grid, showAsFocused = false, borderOnly = false }: RectGridProps) {
     const gridRef = useRef<HTMLDivElement>(null);
-    const { getGridFocusId, setGridFocusId } = useFocusStore();
+    const { getGridFocusId, setGridFocusId } = useConfigStore();
     const isFocused = getGridFocusId() === grid.id;
     const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
     const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;

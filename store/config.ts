@@ -4,12 +4,21 @@ import { combine } from 'zustand/middleware'
 const useConfigStore = create(
   combine(
     {
+      currentPage: -1,
       gridFocusId: "" as string | number,
       showAttrCard: true,
       showImgCrop: false,
     },
     (set, get) => {
       return {
+        setCurrentPage: (page: number) => {
+          set(() => ({
+            currentPage: page,
+          }))
+        },
+        getCurrentPage: () => {
+          return get().currentPage;
+        },
         setGridFocusId: (id: string | number) => {
           set(() => ({
             gridFocusId: id,

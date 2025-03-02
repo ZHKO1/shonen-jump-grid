@@ -1,7 +1,7 @@
 import { MouseEventHandler, useContext, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useDraggable } from "@/hooks";
-import useFocusStore from "@/store/config";
+import useConfigStore from "@/store/config";
 import { GridConfig, Point } from "./types";
 import { ContainerContext } from "../../context/container";
 import { getAdjustedPoint, getGridsBySplit } from "./utils";
@@ -37,7 +37,7 @@ function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, 
 export type SplitContainerProps = { grid: GridConfig, showAsFocused?: boolean, borderOnly?: boolean };
 export default function SplitContainer({ grid }: SplitContainerProps) {
     const adjustGrid = useAdjustGrid();
-    const { getGridFocusId, setGridFocusId, cleanGridFocus } = useFocusStore();
+    const { getGridFocusId, setGridFocusId, cleanGridFocus } = useConfigStore();
     const isFocused = getGridFocusId() === grid.id;
 
     const splitResult = grid.splitResult!;

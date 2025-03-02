@@ -500,9 +500,13 @@ export function getGridsBySplit(grid: GridConfig, line: [Point, Point], options:
  * @param targetId
  * @returns GridConfig | null
  */
-export function getGridFromComicConfig(comicConfig: ComicConfig, targetId: string | number): GridConfig | null {
-    for (let i = 0; i < comicConfig.length; i++) {
-        const grid = comicConfig[i];
+export function getGridFromComicConfig(comicConfig: ComicConfig, page: number, targetId: string | number): GridConfig | null {
+    const comicPageConfig = comicConfig.pages[page];
+    if (!comicPageConfig) {
+        return null;
+    }
+    for (let i = 0; i < comicPageConfig.grids.length; i++) {
+        const grid = comicPageConfig.grids[i];
         const result_ = deepfind(grid);
         if (result_) return result_;
     }

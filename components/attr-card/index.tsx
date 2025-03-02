@@ -9,13 +9,14 @@ import CanvasAttr from "./CanvasAttr"
 
 export default function AttrCard() {
   const { getCurrentStep } = useStepsStore();
-  const { getShowAttrCard, getGridFocusId } = useConfigStore();
+  const { getShowAttrCard, getGridFocusId, getCurrentPage } = useConfigStore();
+  const currentPage = getCurrentPage();
   const focusId = getGridFocusId();
 
   const currentStep = getCurrentStep();
   const comicConfig = currentStep?.comicConfig;
 
-  const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
+  const grid = comicConfig && getGridFromComicConfig(comicConfig, currentPage, focusId);
 
   if (!getShowAttrCard()) {
     return null;

@@ -10,13 +10,14 @@ import { defaultDocument } from "@/lib";
 
 export default function ImgCropContainer() {
   const { getCurrentStep } = useStepsStore();
-  const { getGridFocusId, getShowImgCrop, setShowImgCrop } = useConfigStore();
+  const { getGridFocusId, getShowImgCrop, setShowImgCrop, getCurrentPage } = useConfigStore();
   const showImgCrop = getShowImgCrop();
 
   const focusId = getGridFocusId();
   const currentStep = getCurrentStep();
+  const currentPage = getCurrentPage();
   const comicConfig = currentStep?.comicConfig;
-  const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
+  const grid = comicConfig && getGridFromComicConfig(comicConfig, currentPage, focusId);
 
   if (defaultDocument) {
     if (showImgCrop) {

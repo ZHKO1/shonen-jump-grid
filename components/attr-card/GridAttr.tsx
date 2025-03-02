@@ -41,7 +41,7 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
           splitSpaceWidth,
           splitResult: result.grids,
         }, {
-          preview: isCommit ? false : true
+          tmp: isCommit ? false : true
         })
       }
     }

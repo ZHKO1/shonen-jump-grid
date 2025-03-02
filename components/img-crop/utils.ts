@@ -1,6 +1,6 @@
 export function getImageSize(url: string): Promise<{width: number, height: number}> {
   return new Promise(function (resolve, reject) {
-    let image = new Image();
+    const image = new Image();
     image.onload = function () {
       resolve({
         width: image.naturalWidth,

@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import { useEventListener } from "@/hooks";
 import useStepsStore from '@/store/step';
-import useFocusStore from "@/store/config";
+import useConfigStore from "@/store/config";
 import { Grid } from "./components/grid";
 import { GridConfig } from "./components/grid/types";
 import { ContainerContext } from "./context/container";
@@ -232,17 +232,27 @@ const defaultConfig3: GridConfig[] = [
 ]
 
 export default function Canvas() {
-  const { cleanGridFocus } = useFocusStore();
+  const { cleanGridFocus, getCurrentPage, setCurrentPage } = useConfigStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const { addStep, getCurrentStep } = useStepsStore();
   const step = getCurrentStep();
+  const page = getCurrentPage();
+  const grids = step?.comicConfig.pages[page]?.grids;
 
   const handleDocumentClick = () => {
     cleanGridFocus();
   }
 
   useEffect(() => {
-    addStep({ type: "init", comicConfig: defaultConfig3 });
+    setCurrentPage(0);
+    addStep({
+      type: "init",
+      comicConfig: {
+        pages: [{
+          grids: defaultConfig3
+        }]
+      }
+    });
   }, []);
 
   useEventListener("click", handleDocumentClick, containerRef);
@@ -251,7 +261,7 @@ export default function Canvas() {
     <div className="p-3 flex items-center justify-center text-4xl font-bold text-black">
       <div ref={containerRef} className="canvas-content w-[720px] h-[1080px] bg-gray-100 relative overflow-hidden before:absolute before:border-2 before:top-0 before:left-0 before:w-[720px] before:h-[1080px] before:border-gray-400 before:pointer-events-none">
         <ContainerContext.Provider value={{ container: containerRef }}>
-          {step && step.comicConfig.map((grid) => (<Grid grid={grid} key={grid.id} />))}
+          {grids && grids.map((grid) => (<Grid grid={grid} key={grid.id} />))}
         </ContainerContext.Provider>
       </div>
     </div>
