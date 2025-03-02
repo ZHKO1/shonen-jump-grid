@@ -21,6 +21,11 @@ export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, defa
   const [zoom, setZoom] = useState<number>(defaultValue.zoom || 1);
   const rafDragTimeoutRef = useRef<number>(0);
 
+  const reset = useCallback(() => {
+    setDragPos({x: 0, y: 0});
+    setZoom(1);
+  }, [])
+
   const saveContainerPosition = useCallback(() => {
     if (containerRef.current) {
       const bounds = containerRef.current.getBoundingClientRect()
@@ -113,5 +118,5 @@ export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, defa
 
   }, [containerRef.current, dragPos.x, dragPos.y]);
 
-  return [dragPos.x, dragPos.y, zoom] as const;
+  return [dragPos.x, dragPos.y, zoom, reset] as const;
 }

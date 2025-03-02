@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState } from "react";
-import { useFileDialog } from "@/hooks/useFileDialog";
+import { useFileDialog } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { getClipPath, getSvgPoints, getGridStyle } from "../canvas/components/grid/utils";
 import { GridBorder } from "../canvas/components/grid/GridBorder";
@@ -21,7 +21,11 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
   const imageRef = useRef<ImgTarget>(null);
   const [maskType, setMaskType] = useState<MaskType>("full")
   const [imgUrl, setImgUrl] = useState<string>(grid?.content?.originImg.url || "");
-  const [dragX, dragY, zoom] = useDragZoom(containerRef, {
+  const [originImgSize, setOriginImgSize] = useState({
+    width: grid?.content?.originImg.width || 0,
+    height: grid?.content?.originImg.height || 0
+  });
+  const [dragX, dragY, zoom, resetDragZoom] = useDragZoom(containerRef, {
     dragX: grid?.content?.originImg.dragX,
     dragY: grid?.content?.originImg.dragY,
     zoom: grid?.content?.originImg.zoom,
@@ -127,6 +131,11 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
   const handleClearImg = () => {
     reset();
     setImgUrl("");
+    setOriginImgSize({
+      width: 0,
+      height: 0,
+    })
+    resetDragZoom();
   }
 
   const actions = [
@@ -159,8 +168,8 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
           dragX={dragX}
           dragY={dragY}
           zoom={zoom}
-          defaultWidth={grid?.content?.originImg.width}
-          defaultHeight={grid?.content?.originImg.height}
+          defaultWidth={originImgSize.width}
+          defaultHeight={originImgSize.height}
         />}
       </Background>
       <div

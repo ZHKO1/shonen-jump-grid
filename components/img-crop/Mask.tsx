@@ -1,5 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { useElementBounding } from "@/hooks/useElementBounding";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 import { Point } from "../canvas/components/grid/types";
 import { getSvgPoints } from "../canvas/components/grid/utils";
 import { motion } from "framer-motion";
