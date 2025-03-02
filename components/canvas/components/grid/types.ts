@@ -39,4 +39,9 @@ export type RectGridConfig = {
 
 export type GridConfig = (PolyGridConfig | RectGridConfig);
 
+export interface ComicPageConfig {
+    id: string | number,
+    grids: GridConfig[],
+}
+
 export type ComicConfig = GridConfig[];

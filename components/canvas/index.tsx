@@ -248,8 +248,8 @@ export default function Canvas() {
   useEventListener("click", handleDocumentClick, containerRef);
 
   return (
-    <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-black">
-      <div ref={containerRef} className="canvas-content w-[720px] h-[1080px] bg-gray-100 relative overflow-hidden before:absolute before:border-2 before:top-0 before:left-0 before:right-0 before:bottom-0 before:border-gray-400 before:pointer-events-none">
+    <div className="p-3 flex items-center justify-center text-4xl font-bold text-black">
+      <div ref={containerRef} className="canvas-content w-[720px] h-[1080px] bg-gray-100 relative overflow-hidden before:absolute before:border-2 before:top-0 before:left-0 before:w-[720px] before:h-[1080px] before:border-gray-400 before:pointer-events-none">
         <ContainerContext.Provider value={{ container: containerRef }}>
           {step && step.comicConfig.map((grid) => (<Grid grid={grid} key={grid.id} />))}
         </ContainerContext.Provider>

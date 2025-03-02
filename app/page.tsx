@@ -2,6 +2,7 @@ import Canvas from "@/components/canvas";
 import HeaderBar from "@/components/header-bar";
 import AttrCard from "@/components/attr-card";
 import ImgCrop from "@/components/img-crop";
+import Slider from "@/components/slider";
 
 export default function Home() {
   return (
@@ -9,17 +10,20 @@ export default function Home() {
       <header className="h-12">
         <HeaderBar />
       </header>
-      <main className="flex-1 bg-blue-100 p-3 relative overflow-auto">
-        <section className="">
+      <main className="flex-1 relative flex overflow-auto">
+        <section className="w-[150px] ">
+          <Slider />
+        </section>
+        <section className="bg-blue-100 flex-1 overflow-auto">
           <Canvas />
         </section>
-        <section className="fixed right-8 top-16 z-10">
-          <AttrCard />
-        </section>
-        <section>
-          <ImgCrop />
-        </section>
       </main>
+      <section className="fixed right-8 top-16 z-10">
+        <AttrCard />
+      </section>
+      <section>
+        <ImgCrop />
+      </section>
     </div>
   );
 }

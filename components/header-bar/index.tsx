@@ -12,7 +12,7 @@ export default function HeaderBar() {
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="flex h-full p-2">
+      <div className="flex h-full p-2 border-b-2">
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
