@@ -16,9 +16,9 @@ const useStepsStore = create(
     },
     (set, get) => {
       return {
-        addStep: (step: Step, isTmp?: boolean) => {
+        addStep: (step: Step, options?: { tmp?: boolean }) => {
           set((state) => {
-            if (isTmp) {
+            if (options && options.tmp) {
               // 说明要添加的step是tmp
               if (!state.isCurrentTmp) {
                 // 正常添加，修改isCurrentTmp
@@ -56,7 +56,7 @@ const useStepsStore = create(
           const step = get().steps[currentIndex];
           return step;
         },
-        setCurrentStep: (step: Step, createTmp: boolean) => {
+        setCurrentStep: (step: Step) => {
           const currentIndex = get().currentIndex;
           if (currentIndex < 0) return null;
           set((state) => ({

@@ -52,13 +52,24 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
 
   const handleSubmit = () => {
     const canvas = canvasRef.current;
-    const image = imageRef.current;
     const mask = maskRef.current;
-    if (!canvas || !(image && image.src) || !mask) {
+    if (!canvas || !mask) {
+      console.error("handleSubmit canvas and mask is undefined?");
       return;
     }
+
+    if (!imgUrl) {
+      ajustGrid(grid.id, {
+        content: undefined
+      });
+      handleClose();
+      return;
+    }
+
+    const image = imageRef.current;
     const ctx = canvas.getContext('2d');
-    if (!ctx) {
+    if (!ctx || !image) {
+      console.error("handleSubmit ctx and image is undefined?");
       return;
     }
 

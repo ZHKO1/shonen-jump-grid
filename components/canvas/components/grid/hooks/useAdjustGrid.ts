@@ -4,37 +4,28 @@ import { getGridFromComicConfig } from "../utils";
 
 
 type Fun = (id: string | number, value: any, options?: {
-    preview: boolean
+    tmp: boolean,
 }) => void
 
 export function useAdjustGrid(): Fun {
     const { addStep, getCurrentStep, setCurrentStep } = useStepsStore();
 
-    const ajustGrid = useCallback((id: string | number, params: any, { preview } = {
-        preview: false
+    const ajustGrid = useCallback((id: string | number, params: any, { tmp } = {
+        tmp: false,
     }) => {
         const currentStep = getCurrentStep();
         if (currentStep) {
             const comicConfig = currentStep.comicConfig;
-            const newComicConfig = JSON.parse(JSON.stringify(comicConfig));
-            if (preview) {
-                const oldGrid = getGridFromComicConfig(newComicConfig, id);
-                if (oldGrid) {
-                    Object.assign(oldGrid, params);
-                    addStep({
-                        type: "adjust",
-                        comicConfig: newComicConfig,
-                    }, true);
-                }
-            } else {
-                const newGrid = getGridFromComicConfig(newComicConfig, id);
-                if (newGrid) {
-                    Object.assign(newGrid, params);
-                    addStep({
-                        type: "adjust",
-                        comicConfig: newComicConfig,
-                    });
-                }
+            const comicConfigCopy = JSON.parse(JSON.stringify(comicConfig));
+            const targetGrid = getGridFromComicConfig(comicConfigCopy, id);
+            if (targetGrid) {
+                Object.assign(targetGrid, params);
+                addStep({
+                    type: "adjust",
+                    comicConfig: comicConfigCopy,
+                }, {
+                    tmp,
+                });
             }
         }
     }, []);
