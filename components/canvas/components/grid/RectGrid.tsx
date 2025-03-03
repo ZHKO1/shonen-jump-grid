@@ -18,8 +18,8 @@ export interface RectGridProps {
 
 export default function RectGrid({ grid, showAsFocused = false, borderOnly = false }: RectGridProps) {
     const gridRef = useRef<HTMLDivElement>(null);
-    const { getGridFocusId, setGridFocusId } = useConfigStore();
-    const isFocused = getGridFocusId() === grid.id;
+    const { getCurrentGridId, setCurrentGridId } = useConfigStore();
+    const isFocused = getCurrentGridId() === grid.id;
     const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
     const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;
     const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
@@ -38,7 +38,7 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
     }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
-        setGridFocusId(grid.id);
+        setCurrentGridId(grid.id);
         e.stopPropagation();
         // e.nativeEvent.stopImmediatePropagation();
     }

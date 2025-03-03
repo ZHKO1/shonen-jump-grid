@@ -1,36 +1,37 @@
 import { create } from 'zustand';
 import { combine } from 'zustand/middleware'
+import { GridId, PageId } from '@/components/canvas/components/grid/types';
 
 const useConfigStore = create(
   combine(
     {
-      currentPage: -1,
-      gridFocusId: "" as string | number,
+      currentPageId: "" as PageId,
+      currentGridId: "" as GridId,
       showAttrCard: true,
       showImgCrop: false,
     },
     (set, get) => {
       return {
-        setCurrentPage: (page: number) => {
+        setCurrentPageId: (pageId: PageId) => {
           set(() => ({
-            currentPage: page,
+            currentPageId: pageId,
           }))
         },
-        getCurrentPage: () => {
-          return get().currentPage;
+        getCurrentPageId: () => {
+          return get().currentPageId;
         },
-        setGridFocusId: (id: string | number) => {
+        setCurrentGridId: (id: GridId) => {
           set(() => ({
-            gridFocusId: id,
+            currentGridId: id,
           }))
         },
-        cleanGridFocus: () => {
+        resetCurrentGridId: () => {
           set(() => ({
-            gridFocusId: "",
+            currentGridId: "",
           }))
         },
-        getGridFocusId: () => {
-          return get().gridFocusId;
+        getCurrentGridId: () => {
+          return get().currentGridId;
         },
         setShowAttrCard: (val: boolean) => {
           set(() => ({

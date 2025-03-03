@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { combine } from 'zustand/middleware'
 import { ComicConfig } from '../components/canvas/components/grid/types';
 
-type Step = {
+type HistoryStep = {
   type: "init" | "split" | "adjust",
   comicConfig: ComicConfig,
 }
@@ -10,67 +10,67 @@ type Step = {
 const useStepsStore = create(
   combine(
     {
-      steps: [] as Step[],
-      currentIndex: -1,
-      isCurrentTmp: false,
+      historySteps: [] as HistoryStep[],
+      currentHistoryStepIndex: -1,
+      isCurrentHistoryStepTmp: false,
     },
     (set, get) => {
       return {
-        addStep: (step: Step, options?: { tmp?: boolean }) => {
+        addHistoryStep: (step: HistoryStep, options?: { tmp?: boolean }) => {
           set((state) => {
             if (options && options.tmp) {
               // 说明要添加的step是tmp
-              if (!state.isCurrentTmp) {
+              if (!state.isCurrentHistoryStepTmp) {
                 // 正常添加，修改isCurrentTmp
                 return {
-                  steps: [...state.steps.slice(0, state.currentIndex + 1), step],
-                  currentIndex: state.currentIndex + 1,
-                  isCurrentTmp: true,
+                  historySteps: [...state.historySteps.slice(0, state.currentHistoryStepIndex + 1), step],
+                  currentHistoryStepIndex: state.currentHistoryStepIndex + 1,
+                  isCurrentHistoryStepTmp: true,
                 }
               } else {
                 // 替换currentStep（tmp）
                 return {
-                  steps: [...state.steps.slice(0, state.currentIndex), step],
+                  historySteps: [...state.historySteps.slice(0, state.currentHistoryStepIndex), step],
                 }
               }
             } else {
-              if (!state.isCurrentTmp) {
+              if (!state.isCurrentHistoryStepTmp) {
                 // 正常添加step
                 return {
-                  steps: [...state.steps.slice(0, state.currentIndex + 1), step],
-                  currentIndex: state.currentIndex + 1,
+                  historySteps: [...state.historySteps.slice(0, state.currentHistoryStepIndex + 1), step],
+                  currentHistoryStepIndex: state.currentHistoryStepIndex + 1,
                 }
               } else {
                 // 替换currentStep（tmp），isCurrentTmp赋予false
                 return {
-                  steps: [...state.steps.slice(0, state.currentIndex), step],
-                  isCurrentTmp: false,
+                  historySteps: [...state.historySteps.slice(0, state.currentHistoryStepIndex), step],
+                  isCurrentHistoryStepTmp: false,
                 }
               }
             }
           })
         },
-        getCurrentStep: () => {
-          const currentIndex = get().currentIndex;
-          if (currentIndex < 0) return null;
-          const step = get().steps[currentIndex];
+        getCurrentHistoryStep: () => {
+          const currentHistoryStepIndex = get().currentHistoryStepIndex;
+          if (currentHistoryStepIndex < 0) return null;
+          const step = get().historySteps[currentHistoryStepIndex];
           return step;
         },
-        setCurrentStep: (step: Step) => {
-          const currentIndex = get().currentIndex;
-          if (currentIndex < 0) return null;
+        setCurrentHistoryStep: (step: HistoryStep) => {
+          const currentHistoryStepIndex = get().currentHistoryStepIndex;
+          if (currentHistoryStepIndex < 0) return null;
           set((state) => ({
-            steps: [...state.steps.slice(0, state.currentIndex), step],
+            historySteps: [...state.historySteps.slice(0, state.currentHistoryStepIndex), step],
           }))
         },
-        nextStep: () => {
+        nextHistoryStep: () => {
           set((state) => ({
-            currentIndex: Math.min(state.currentIndex + 1, state.steps.length - 1),
+            currentHistoryStepIndex: Math.min(state.currentHistoryStepIndex + 1, state.historySteps.length - 1),
           }))
         },
-        prevStep: () => {
+        prevHistoryStep: () => {
           set((state) => ({
-            currentIndex: Math.max(state.currentIndex - 1, 0),
+            currentHistoryStepIndex: Math.max(state.currentHistoryStepIndex - 1, 0),
           }))
         },
       }

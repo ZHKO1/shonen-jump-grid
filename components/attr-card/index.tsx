@@ -8,15 +8,14 @@ import GridAttr from "./GridAttr"
 import CanvasAttr from "./CanvasAttr"
 
 export default function AttrCard() {
-  const { getCurrentStep } = useStepsStore();
-  const { getShowAttrCard, getGridFocusId, getCurrentPage } = useConfigStore();
-  const currentPage = getCurrentPage();
-  const focusId = getGridFocusId();
+  const { getCurrentHistoryStep } = useStepsStore();
+  const { getShowAttrCard, getCurrentGridId } = useConfigStore();
+  const focusId = getCurrentGridId();
 
-  const currentStep = getCurrentStep();
+  const currentStep = getCurrentHistoryStep();
   const comicConfig = currentStep?.comicConfig;
 
-  const grid = comicConfig && getGridFromComicConfig(comicConfig, currentPage, focusId);
+  const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
 
   if (!getShowAttrCard()) {
     return null;

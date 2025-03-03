@@ -37,8 +37,8 @@ function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, 
 export type SplitContainerProps = { grid: GridConfig, showAsFocused?: boolean, borderOnly?: boolean };
 export default function SplitContainer({ grid }: SplitContainerProps) {
     const adjustGrid = useAdjustGrid();
-    const { getGridFocusId, setGridFocusId, cleanGridFocus } = useConfigStore();
-    const isFocused = getGridFocusId() === grid.id;
+    const { getCurrentGridId, setCurrentGridId, resetCurrentGridId } = useConfigStore();
+    const isFocused = getCurrentGridId() === grid.id;
 
     const splitResult = grid.splitResult!;
     const splitLine = grid.splitLine!;
@@ -71,9 +71,9 @@ export default function SplitContainer({ grid }: SplitContainerProps) {
             if (isFocused) {
                 return;
             }
-            cleanGridFocus();
+            resetCurrentGridId();
             setTimeout(() => {
-                setGridFocusId(grid.id);
+                setCurrentGridId(grid.id);
             });
         } finally {
             e.nativeEvent.stopImmediatePropagation();

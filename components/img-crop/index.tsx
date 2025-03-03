@@ -9,15 +9,14 @@ import ImgCrop from "./ImgCrop";
 import { defaultDocument } from "@/lib";
 
 export default function ImgCropContainer() {
-  const { getCurrentStep } = useStepsStore();
-  const { getGridFocusId, getShowImgCrop, setShowImgCrop, getCurrentPage } = useConfigStore();
+  const { getCurrentHistoryStep } = useStepsStore();
+  const { getCurrentGridId, getShowImgCrop, setShowImgCrop } = useConfigStore();
   const showImgCrop = getShowImgCrop();
 
-  const focusId = getGridFocusId();
-  const currentStep = getCurrentStep();
-  const currentPage = getCurrentPage();
+  const focusId = getCurrentGridId();
+  const currentStep = getCurrentHistoryStep();
   const comicConfig = currentStep?.comicConfig;
-  const grid = comicConfig && getGridFromComicConfig(comicConfig, currentPage, focusId);
+  const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
 
   if (defaultDocument) {
     if (showImgCrop) {

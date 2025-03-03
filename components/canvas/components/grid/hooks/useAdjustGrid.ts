@@ -1,29 +1,29 @@
 import { useCallback } from "react";
 import useStepsStore from "@/store/step";
-import { getGridFromComicConfig } from "../utils";
 import useConfigStore from "@/store/config";
+import { getGridFromComicConfig } from "../utils";
+import { GridId } from "../types";
 
 
-type Fun = (id: string | number, value: any, options?: {
+type UseAdjustGrid = (id: GridId, value: any, options?: {
     tmp: boolean,
 }) => void
 
-export function useAdjustGrid(): Fun {
-    const { addStep, getCurrentStep } = useStepsStore();
-    const { getCurrentPage } = useConfigStore();
+export function useAdjustGrid(): UseAdjustGrid {
+    const { addHistoryStep, getCurrentHistoryStep } = useStepsStore();
+    const { getCurrentPageId } = useConfigStore();
 
-    const ajustGrid = useCallback((id: string | number, params: any, { tmp } = {
+    const ajustGrid = useCallback((id: GridId, params: any, { tmp } = {
         tmp: false,
     }) => {
-        const currentStep = getCurrentStep();
-        const currentPage = getCurrentPage();
+        const currentStep = getCurrentHistoryStep();
         if (currentStep) {
             const comicConfig = currentStep.comicConfig;
             const comicConfigCopy = JSON.parse(JSON.stringify(comicConfig));
-            const targetGrid = getGridFromComicConfig(comicConfigCopy, currentPage, id);
+            const targetGrid = getGridFromComicConfig(comicConfigCopy, id);
             if (targetGrid) {
                 Object.assign(targetGrid, params);
-                addStep({
+                addHistoryStep({
                     type: "adjust",
                     comicConfig: comicConfigCopy,
                 }, {

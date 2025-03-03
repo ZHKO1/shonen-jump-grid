@@ -7,7 +7,7 @@ import useStepsStore from "@/store/step";
 import useConfigStore from "@/store/config";
 
 export default function HeaderBar() {
-  const { nextStep, prevStep } = useStepsStore();
+  const { nextHistoryStep, prevHistoryStep } = useStepsStore();
   const { setShowAttrCard, getShowAttrCard } = useConfigStore();
 
   return (
@@ -16,7 +16,7 @@ export default function HeaderBar() {
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={prevStep}>
+              <Button variant="ghost" size="icon" onClick={prevHistoryStep}>
                 <Reply className="h-4 w-4" />
                 <span className="sr-only">Previous</span>
               </Button>
@@ -25,7 +25,7 @@ export default function HeaderBar() {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={nextStep}>
+              <Button variant="ghost" size="icon" onClick={nextHistoryStep}>
                 <Forward className="h-4 w-4" />
                 <span className="sr-only">Next</span>
               </Button>

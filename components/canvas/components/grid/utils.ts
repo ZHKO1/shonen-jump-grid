@@ -1,4 +1,4 @@
-import { ComicConfig, GridConfig, Point, PolyGridConfig, PolyGridPoint, RectGridConfig, RectGridPoint } from "./types";
+import { ComicConfig, PageConfig, GridConfig, GridId, PageId, Point, PolyGridConfig, PolyGridPoint, RectGridConfig, RectGridPoint } from "./types";
 import { borderWidth } from "./constant";
 
 type Pos = "lt" | "rt" | "lb" | "rb";
@@ -494,26 +494,45 @@ export function getGridsBySplit(grid: GridConfig, line: [Point, Point], options:
     return null;
 }
 
+
+/**
+ * 从配置里获取指定的page
+ * @param comicConfig 
+ * @param targetId
+ * @returns PageConfig | null
+ */
+export function getPageFromComicConfig(comicConfig: ComicConfig, targetId: PageId): PageConfig | null {
+    if (!comicConfig || !comicConfig.pages) {
+        return null;
+    }
+    for (let i = 0; i < comicConfig.pages.length; i++) {
+        const page = comicConfig.pages[i];
+        if (page.id === targetId) {
+            return page;
+        }
+    }
+    return null;
+}
+
 /**
  * 从配置里获取指定的grid
  * @param comicConfig 
  * @param targetId
  * @returns GridConfig | null
  */
-export function getGridFromComicConfig(comicConfig: ComicConfig, page: number, targetId: string | number): GridConfig | null {
-    const comicPageConfig = comicConfig.pages[page];
-    if (!comicPageConfig) {
-        return null;
-    }
-    for (let i = 0; i < comicPageConfig.grids.length; i++) {
-        const grid = comicPageConfig.grids[i];
-        const result_ = deepfind(grid);
-        if (result_) return result_;
+export function getGridFromComicConfig(comicConfig: ComicConfig, targetId: GridId): GridConfig | null {
+    for (let i = 0; i < comicConfig.pages.length; i++) {
+        const page = comicConfig.pages[i];
+        for (let j = 0; j < page.grids.length; j++) {
+            const grid = page.grids[j];
+            const result_ = deepfind(grid);
+            if (result_) return result_;
+        }
     }
     return null;
 
     function deepfind(grid: GridConfig): GridConfig | null {
-        if (grid.id == targetId) {
+        if (grid.id === targetId) {
             return grid;
         }
         if (isGridSplited(grid)) {

@@ -6,6 +6,7 @@ import useConfigStore from "@/store/config";
 import { Grid } from "./components/grid";
 import { GridConfig } from "./components/grid/types";
 import { ContainerContext } from "./context/container";
+import { getPageFromComicConfig } from "./components/grid/utils";
 
 const defaultConfig: GridConfig[] = [
   {
@@ -232,23 +233,26 @@ const defaultConfig3: GridConfig[] = [
 ]
 
 export default function Canvas() {
-  const { cleanGridFocus, getCurrentPage, setCurrentPage } = useConfigStore();
+  const { resetCurrentGridId, getCurrentPageId, setCurrentPageId } = useConfigStore();
   const containerRef = useRef<HTMLDivElement>(null);
-  const { addStep, getCurrentStep } = useStepsStore();
-  const step = getCurrentStep();
-  const page = getCurrentPage();
-  const grids = step?.comicConfig.pages[page]?.grids;
+  const { addHistoryStep, getCurrentHistoryStep } = useStepsStore();
+  const step = getCurrentHistoryStep();
+  const pageId = getCurrentPageId();
+  const comicConfig = step?.comicConfig;
+  const page = comicConfig && getPageFromComicConfig(comicConfig, pageId);
+  const grids = page && page.grids;
 
   const handleDocumentClick = () => {
-    cleanGridFocus();
+    resetCurrentGridId();
   }
 
   useEffect(() => {
-    setCurrentPage(0);
-    addStep({
+    setCurrentPageId("page0");
+    addHistoryStep({
       type: "init",
       comicConfig: {
         pages: [{
+          id: "page0",
           grids: defaultConfig3
         }]
       }

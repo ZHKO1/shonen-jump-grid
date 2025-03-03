@@ -1,16 +1,12 @@
 "use client";
-import React, { useCallback } from "react";
-import { AnimatePresence } from "framer-motion";
-// import { useOutsideClick } from "@/hooks/use-outside-click";
+import React from "react";
 import useConfigStore from "@/store/config";
 import useStepsStore from "@/store/step";
-import { getGridFromComicConfig } from "../canvas/components/grid/utils";
-import { defaultDocument } from "@/lib";
 import SliderItem from "./SliderItem";
 
 export default function Slider() {
-    const { getCurrentStep } = useStepsStore();
-    const { getGridFocusId, getShowImgCrop, setShowImgCrop } = useConfigStore();
+    const { getCurrentHistoryStep } = useStepsStore();
+    const { getCurrentGridId, getShowImgCrop, setShowImgCrop } = useConfigStore();
 
     const array = [
         {

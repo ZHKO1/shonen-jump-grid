@@ -1,8 +1,8 @@
 import { forwardRef, useImperativeHandle, useRef } from "react";
-import { Point } from "../canvas/components/grid/types";
-import { getSvgPoints } from "../canvas/components/grid/utils";
 import { motion } from "framer-motion";
 import { useWindowSize } from "@/hooks";
+import { GridId, Point } from "../canvas/components/grid/types";
+import { getSvgPoints } from "../canvas/components/grid/utils";
 
 export type MaskType = "full" | "grid"
 export interface MaskRef {
@@ -10,7 +10,7 @@ export interface MaskRef {
 }
 
 const Mask = forwardRef(({ gridId, gridSize, svgPath, maskType }: {
-  gridId: string | number,
+  gridId: GridId,
   gridSize: { width: number, height: number },
   svgPath: [Point, Point, Point, Point],
   maskType: MaskType,

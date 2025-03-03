@@ -1,7 +1,9 @@
 export type Point = { x: number, y: number };
 
+export type GridId = string | number
+
 export type GridShareConfig = {
-    id: string | number,
+    id: GridId,
     splitLine?: [Point, Point],
     splitResult?: [GridConfig, GridConfig],
     splitSpaceWidth?: number,
@@ -39,10 +41,13 @@ export type RectGridConfig = {
 
 export type GridConfig = (PolyGridConfig | RectGridConfig);
 
-export interface ComicPageConfig {
+
+export type PageId = string | number
+export interface PageConfig {
+    id: PageId,
     grids: GridConfig[],
 }
 
 export interface ComicConfig {
-    pages: ComicPageConfig[],
+    pages: PageConfig[],
 }
