@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import useStepsStore from "@/store/step";
-import useConfigStore from "@/store/config";
+import useComicStatusStore from "@/store";
 import { getGridFromComicConfig } from "../utils";
 import { GridId } from "../types";
 
@@ -11,7 +11,7 @@ type UseAdjustGrid = (id: GridId, value: any, options?: {
 
 export function useAdjustGrid(): UseAdjustGrid {
     const { addHistoryStep, getCurrentHistoryStep } = useStepsStore();
-    const { getCurrentPageId } = useConfigStore();
+    const { getCurrentPageId } = useComicStatusStore();
 
     const ajustGrid = useCallback((id: GridId, params: any, { tmp } = {
         tmp: false,

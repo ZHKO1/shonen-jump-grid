@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import useConfigStore from "@/store/config"
+import useComicStatusStore from "@/store"
 import { getGridsBySplit, isGridSplited } from "../canvas/components/grid/utils";
 import { GridConfig, Point } from "../canvas/components/grid/types"
 import { useAdjustGrid } from "../canvas/components/grid/hooks/useAdjustGrid"
@@ -24,7 +24,7 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
   const isSplit = isGridSplited(grid);
   const splitLineStart = splitLine[0];
   const splitLineEnd = splitLine[1];
-  const { setShowImgCrop } = useConfigStore();
+  const setShowImgCrop = useComicStatusStore(state => state.setShowImgCrop);
 
   // const onRectChange = (key: keyof RectGridPoint): React.ChangeEventHandler<HTMLInputElement> => (e) => {
   //   adjustGrid(id, {

@@ -1,12 +1,10 @@
 "use client";
 import React from "react";
-import useConfigStore from "@/store/config";
+import useComicStatusStore from "@/store";
 import useStepsStore from "@/store/step";
 import SliderItem from "./SliderItem";
 
 export default function Slider() {
-    const { getCurrentHistoryStep } = useStepsStore();
-    const { getCurrentGridId, getShowImgCrop, setShowImgCrop } = useConfigStore();
 
     const array = [
         {

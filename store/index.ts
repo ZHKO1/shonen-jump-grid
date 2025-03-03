@@ -2,12 +2,16 @@ import { create } from 'zustand';
 import { combine } from 'zustand/middleware'
 import { GridId, PageId } from '@/components/canvas/components/grid/types';
 
-const useConfigStore = create(
+const useComicStatusStore = create(
   combine(
     {
+      // 焦点页
       currentPageId: "" as PageId,
+      // 焦点Grid
       currentGridId: "" as GridId,
+      // AttrCard组件是否显示
       showAttrCard: true,
+      // ImgCrop组件是否显示
       showImgCrop: false,
     },
     (set, get) => {
@@ -55,4 +59,4 @@ const useConfigStore = create(
   ),
 )
 
-export default useConfigStore;
+export default useComicStatusStore;

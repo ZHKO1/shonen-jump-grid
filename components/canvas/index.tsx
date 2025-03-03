@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import { useEventListener } from "@/hooks";
 import useStepsStore from '@/store/step';
-import useConfigStore from "@/store/config";
+import useComicStatusStore from "@/store";
 import { Grid } from "./components/grid";
 import { GridConfig } from "./components/grid/types";
 import { ContainerContext } from "./context/container";
@@ -233,11 +233,12 @@ const defaultConfig3: GridConfig[] = [
 ]
 
 export default function Canvas() {
-  const { resetCurrentGridId, getCurrentPageId, setCurrentPageId } = useConfigStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const { addHistoryStep, getCurrentHistoryStep } = useStepsStore();
+  const pageId = useComicStatusStore(state => state.currentPageId);
+  const setCurrentPageId = useComicStatusStore(state => state.setCurrentPageId);
+  const resetCurrentGridId = useComicStatusStore(state => state.resetCurrentGridId);
   const step = getCurrentHistoryStep();
-  const pageId = getCurrentPageId();
   const comicConfig = step?.comicConfig;
   const page = comicConfig && getPageFromComicConfig(comicConfig, pageId);
   const grids = page && page.grids;
