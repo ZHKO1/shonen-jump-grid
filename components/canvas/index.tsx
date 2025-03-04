@@ -7,17 +7,6 @@ import { GridConfig } from "./components/grid/types";
 import { ContainerContext } from "./context/container";
 import { getPageFromComicConfig } from "./components/grid/utils";
 
-const defaultConfig: GridConfig[] = [
-  {
-    "type": "rect",
-    "lt_x": 18,
-    "lt_y": 18,
-    "rb_x": 703,
-    "rb_y": 1063,
-    "id": 0,
-  }
-]
-
 const defaultConfig1: GridConfig[] = [
   {
     "type": "poly",

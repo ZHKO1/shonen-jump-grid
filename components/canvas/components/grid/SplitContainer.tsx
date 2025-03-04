@@ -1,7 +1,7 @@
 import { MouseEventHandler, useContext, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useDraggable } from "@/hooks";
-import { useAdjustGrid } from "@/hooks/custom/useAdjustGrid";
+import { useAdjustComic } from "@/hooks/custom/useAdjustComic";
 import useComicStatusStore from "@/store";
 import { GridConfig, Point } from "./types";
 import { ContainerContext } from "../../context/container";
@@ -36,7 +36,7 @@ function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, 
 
 export type SplitContainerProps = { grid: GridConfig, showAsFocused?: boolean, borderOnly?: boolean };
 export default function SplitContainer({ grid }: SplitContainerProps) {
-    const adjustGrid = useAdjustGrid();
+    const { adjustGrid } = useAdjustComic();
     const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId);
     const resetCurrentGridId = useComicStatusStore(state => state.resetCurrentGridId);
     const { getCurrentGridId } = useComicStatusStore();
@@ -152,7 +152,7 @@ export default function SplitContainer({ grid }: SplitContainerProps) {
             splitGrids && (splitGrids.map(grid_ => (<Grid grid={grid_} key={grid_.id} />)))
         }
         {
-            isFocused && borderGrids && (borderGrids.map(grid_ => (<Grid grid={grid_} key={"border" + grid_.id} borderOnly showAsFocused/>)))
+            isFocused && borderGrids && (borderGrids.map(grid_ => (<Grid grid={grid_} key={"border" + grid_.id} borderOnly showAsFocused />)))
         }
         {
             isFocused && startPoint && endPoint && (

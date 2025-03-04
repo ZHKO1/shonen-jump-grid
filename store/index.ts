@@ -25,7 +25,7 @@ interface ShowComponentSlice {
 }
 
 type HistoryStep = {
-  type: "init" | "split" | "adjust",
+  type: "init" | "split" | "adjust-grid" | "add-page",
   comicConfig: ComicConfig,
 }
 

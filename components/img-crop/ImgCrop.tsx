@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useState } from "react";
 import { useFileDialog } from "@/hooks";
-import { useAdjustGrid } from "@/hooks/custom/useAdjustGrid";
+import { useAdjustComic } from "@/hooks/custom/useAdjustComic";
 import { cn } from "@/lib/utils";
 import { getClipPath, getSvgPoints, getGridStyle } from "../canvas/components/grid/utils";
 import { GridBorder } from "../canvas/components/grid/GridBorder";
@@ -31,7 +31,7 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
     zoom: grid?.content?.originImg.zoom,
   });
   const [, open, reset] = useFileDialog();
-  const ajustGrid = useAdjustGrid();
+  const { adjustGrid } = useAdjustComic();
 
   const {
     imgStyle,
@@ -63,7 +63,7 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
     }
 
     if (!imgUrl) {
-      ajustGrid(grid.id, {
+      adjustGrid(grid.id, {
         content: undefined
       });
       handleClose();
@@ -104,7 +104,7 @@ export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: 
 
     const url = canvas.toDataURL('image/png');
 
-    ajustGrid(grid.id, {
+    adjustGrid(grid.id, {
       content: {
         url,
         originImg: {
