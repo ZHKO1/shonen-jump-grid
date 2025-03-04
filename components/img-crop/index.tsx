@@ -3,17 +3,15 @@ import React, { useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 // import { useOutsideClick } from "@/hooks/use-outside-click";
 import useComicStatusStore from "@/store";
-import useStepsStore from "@/store/step";
 import { getGridFromComicConfig } from "../canvas/components/grid/utils";
 import ImgCrop from "./ImgCrop";
 import { defaultDocument } from "@/lib";
 
 export default function ImgCropContainer() {
-  const { getCurrentHistoryStep } = useStepsStore();
   const focusId = useComicStatusStore(state => state.currentGridId);
   const showImgCrop = useComicStatusStore(state => state.showImgCrop);
   const setShowImgCrop = useComicStatusStore(state => state.setShowImgCrop);
-  const currentStep = getCurrentHistoryStep();
+  const currentStep = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex]);
   const comicConfig = currentStep?.comicConfig;
   const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId);
 

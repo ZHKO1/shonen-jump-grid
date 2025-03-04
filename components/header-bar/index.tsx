@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Forward, LayoutDashboard, Reply } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { Toggle } from "@/components/ui/toggle";
-import useStepsStore from "@/store/step";
 import useComicStatusStore from "@/store";
 
 export default function HeaderBar() {
-  const { nextHistoryStep, prevHistoryStep } = useStepsStore();
+  const nextHistoryStep = useComicStatusStore(state => state.nextHistoryStep);
+  const prevHistoryStep = useComicStatusStore(state => state.prevHistoryStep);
   const showAttrCard = useComicStatusStore(state => state.showAttrCard);
   const setShowAttrCard = useComicStatusStore(state => state.setShowAttrCard);
 

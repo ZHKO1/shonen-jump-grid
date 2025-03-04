@@ -12,10 +12,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { useAdjustGrid } from "@/hooks/custom/useAdjustGrid"
 import useComicStatusStore from "@/store"
 import { getGridsBySplit, isGridSplited } from "../canvas/components/grid/utils";
 import { GridConfig, Point } from "../canvas/components/grid/types"
-import { useAdjustGrid } from "../canvas/components/grid/hooks/useAdjustGrid"
 import { borderWidth } from "../canvas/components/grid/constant"
 
 export default function GridAttr({ grid }: { grid: GridConfig }) {

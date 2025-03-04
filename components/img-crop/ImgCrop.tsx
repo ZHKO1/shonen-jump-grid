@@ -1,11 +1,11 @@
 "use client";
 import React, { useRef, useState } from "react";
 import { useFileDialog } from "@/hooks";
+import { useAdjustGrid } from "@/hooks/custom/useAdjustGrid";
 import { cn } from "@/lib/utils";
 import { getClipPath, getSvgPoints, getGridStyle } from "../canvas/components/grid/utils";
 import { GridBorder } from "../canvas/components/grid/GridBorder";
 import { GridContent } from "../canvas/components/grid/GridContent";
-import { useAdjustGrid } from "../canvas/components/grid/hooks/useAdjustGrid";
 import Mask, { MaskRef, MaskType } from "./Mask";
 import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "./Icons";
 import ActionBar, { ActionType } from "./ActionBar";

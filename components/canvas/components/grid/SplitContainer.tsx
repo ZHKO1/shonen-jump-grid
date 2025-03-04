@@ -1,12 +1,12 @@
 import { MouseEventHandler, useContext, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useDraggable } from "@/hooks";
+import { useAdjustGrid } from "@/hooks/custom/useAdjustGrid";
 import useComicStatusStore from "@/store";
 import { GridConfig, Point } from "./types";
 import { ContainerContext } from "../../context/container";
 import { getAdjustedPoint, getGridsBySplit } from "./utils";
 import { Grid } from ".";
-import { useAdjustGrid } from "./hooks/useAdjustGrid";
 
 function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, isDrawing: boolean) => void }) {
     const pointRef = useRef<HTMLDivElement>(null);
