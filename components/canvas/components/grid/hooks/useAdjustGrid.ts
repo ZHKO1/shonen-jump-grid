@@ -11,7 +11,6 @@ type UseAdjustGrid = (id: GridId, value: any, options?: {
 
 export function useAdjustGrid(): UseAdjustGrid {
     const { addHistoryStep, getCurrentHistoryStep } = useStepsStore();
-    const { getCurrentPageId } = useComicStatusStore();
 
     const ajustGrid = useCallback((id: GridId, params: any, { tmp } = {
         tmp: false,

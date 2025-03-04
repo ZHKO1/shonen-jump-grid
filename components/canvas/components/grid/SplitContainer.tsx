@@ -37,10 +37,10 @@ function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, 
 export type SplitContainerProps = { grid: GridConfig, showAsFocused?: boolean, borderOnly?: boolean };
 export default function SplitContainer({ grid }: SplitContainerProps) {
     const adjustGrid = useAdjustGrid();
-    const currentGridId = useComicStatusStore(state => state.currentGridId);
     const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId);
     const resetCurrentGridId = useComicStatusStore(state => state.resetCurrentGridId);
-    const isFocused = currentGridId === grid.id;
+    const { getCurrentGridId } = useComicStatusStore();
+    const isFocused = getCurrentGridId() === grid.id;
 
     const splitResult = grid.splitResult!;
     const splitLine = grid.splitLine!;

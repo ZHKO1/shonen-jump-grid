@@ -17,9 +17,9 @@ export interface PolyGridProps {
 };
 export default function PolyGrid({ grid, showAsFocused = false, borderOnly = false }: PolyGridProps) {
     const gridRef = useRef<HTMLDivElement>(null);
-    const currentGridId = useComicStatusStore(state => state.currentGridId);
     const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId);
-    const isFocused = currentGridId === grid.id;
+    const { getCurrentGridId } = useComicStatusStore();
+    const isFocused = getCurrentGridId() === grid.id;
     const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
     const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;
     const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
