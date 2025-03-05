@@ -45,6 +45,7 @@ export type GridConfig = (PolyGridConfig | RectGridConfig);
 export type PageId = string | number
 export interface PageConfig {
     id: PageId,
+    height: number,
     grids: GridConfig[],
 }
 

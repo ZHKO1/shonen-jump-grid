@@ -2,19 +2,9 @@
 import React from "react";
 import useComicStatusStore from "@/store";
 import SliderItem from "./SliderItem";
-import { GridConfig, PageId } from "../canvas/components/grid/types";
+import { PageConfig, PageId } from "../canvas/components/grid/types";
 import { useAdjustComic } from "@/hooks/custom/useAdjustComic";
-
-let GlobalPageId = 1;
-
-const NewGridConfig: GridConfig = {
-    "type": "rect",
-    "lt_x": 18,
-    "lt_y": 18,
-    "rb_x": 703,
-    "rb_y": 1063,
-    "id": 0,
-}
+import AddPageDialog from "./AddPageDialog";
 
 export default function Slider() {
     const step = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex]);
@@ -31,47 +21,41 @@ export default function Slider() {
         e.stopPropagation();
     }
 
-    const handleAdd = () => {
-        let pageId = "page" + GlobalPageId++;
-        const page = {
-            id: pageId,
-            grids: [
-                {
-                    ...NewGridConfig,
-                    id: pageId + ":" + 0
-                }
-            ]
-        }
-        addPage(page);
-        setCurrentPageId(pageId);
-    }
-
     const handleDelete = (e: React.MouseEvent, pageId: PageId) => {
         deletePage(pageId);
         e.stopPropagation();
     }
 
+    const handleSubmit = (page: PageConfig) => {
+        addPage(page);
+        setCurrentPageId(page.id);
+    }
+
     return (
-        <div className="w-full h-full border-r-2 border-gray-200 overflow-y-auto no-scrollbar">
-            {
-                pages.map((page) => {
-                    return (
-                        <SliderItem
-                            key={page.id}
-                            page={page}
-                            onClick={(e) => handleClick(e, page.id)}
-                            onDelete={(e) => handleDelete(e, page.id)}
-                            focused={currentPageId == page.id}
-                        />
-                    );
-                })
-            }
-            <SliderItem
-                key={"add"}
-                add
-                onClick={handleAdd}
-            />
-        </div>
+        <>
+            <div className="w-full h-full border-r-2 border-gray-200 overflow-y-auto no-scrollbar">
+                {
+                    pages.map((page) => {
+                        return (
+                            <SliderItem
+                                key={page.id}
+                                page={page}
+                                onClick={(e) => handleClick(e, page.id)}
+                                onDelete={(e) => handleDelete(e, page.id)}
+                                focused={currentPageId == page.id}
+                            />
+                        );
+                    })
+                }
+                <AddPageDialog onSubmit={handleSubmit}>
+                    <SliderItem
+                        key={"add"}
+                        add
+                    // onClick={handleAdd}
+                    />
+                </AddPageDialog>
+            </div>
+        </>
     );
 }
 

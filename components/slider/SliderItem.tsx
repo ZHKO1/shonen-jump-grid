@@ -3,10 +3,10 @@ import { Plus, X } from "lucide-react";
 import { PageConfig, PageId } from "../canvas/components/grid/types";
 import { cn } from "@/lib/utils";
 
-export default function SliderItem({ page, add = false, focused = false, onClick, onDelete }: { page?: PageConfig, add?: boolean, focused?: boolean, onClick: React.MouseEventHandler<HTMLDivElement>, onDelete?: React.MouseEventHandler<HTMLDivElement> }) {
+export default function SliderItem({ page, add = false, focused = false, onClick, onDelete }: { page?: PageConfig, add?: boolean, focused?: boolean, onClick?: React.MouseEventHandler<HTMLDivElement>, onDelete?: React.MouseEventHandler<HTMLDivElement> }) {
     const id = page?.id || "";
     const handleClick: React.MouseEventHandler<HTMLDivElement> = useCallback((e) => {
-        onClick(e)
+        onClick && onClick(e)
     }, [onClick]);
     const handleDelete: React.MouseEventHandler<HTMLDivElement> = useCallback((e) => {
         onDelete && onDelete(e)
