@@ -14,13 +14,13 @@ import {
     SelectContent,
     SelectGroup,
     SelectItem,
-    SelectLabel,
+    // SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { GridConfig, PageConfig, PageId } from "../canvas/components/grid/types"
+import { GridConfig, PageConfig } from "../canvas/components/grid/types"
 import { BLANK_GRID_MARGIN, LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT, NEW_PAGE_GRID_CONFIG } from "../canvas/components/grid/constant"
 
 let GlobalPageId = 1;
@@ -85,8 +85,10 @@ const AddPageDialog: React.FC<{ children: React.ReactNode, onSubmit: (data: Page
     }
 
     useEffect(() => {
-        setId("page" + GlobalPageId);
-    });
+        if (open) {
+            setId("page" + GlobalPageId);
+        }
+    }, [open]);
 
     return (
         <>
@@ -98,7 +100,7 @@ const AddPageDialog: React.FC<{ children: React.ReactNode, onSubmit: (data: Page
                     <DialogHeader>
                         <DialogTitle>Add Page</DialogTitle>
                         <DialogDescription>
-                            Please fill in the page info and select a template. Click save when you're done.
+                            Please fill in the page info and select a template. Click save when you&apos;re done.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">

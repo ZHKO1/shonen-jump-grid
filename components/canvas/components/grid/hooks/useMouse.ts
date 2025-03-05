@@ -25,16 +25,20 @@ export function useMouse() {
     elementPositionY: 0,
   });
 
-  const ref = gridRef;
+  const grid = gridRef.current;
 
   const handleMouseMove = useCallback((event: MouseEvent) => {
+    if (!grid) {
+      return;
+    }
+
     const newState = {
       x: event.pageX,
       y: event.pageY,
     } as MouseState;
 
-    if (ref.current?.nodeType === Node.ELEMENT_NODE) {
-      const { left, top } = ref.current.getBoundingClientRect();
+    if (grid.nodeType === Node.ELEMENT_NODE) {
+      const { left, top } = grid.getBoundingClientRect();
       const elementPositionX = left + window.scrollX;
       const elementPositionY = top + window.scrollY;
       const elementX = event.pageX - elementPositionX;
@@ -47,7 +51,7 @@ export function useMouse() {
     }
 
     stateRef.current = newState;
-  }, [ref.current]);
+  }, [grid]);
 
   useEventListener("mousemove", handleMouseMove, defaultDocument);
 

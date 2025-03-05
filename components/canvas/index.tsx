@@ -3,10 +3,9 @@ import { useEffect, useRef } from "react";
 import { useEventListener } from "@/hooks";
 import useComicStatusStore from "@/store";
 import { Grid } from "./components/grid";
-import { GridConfig } from "./components/grid/types";
 import { ContainerContext } from "./context/container";
 import { getPageFromComicConfig } from "./components/grid/utils";
-import { LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT, NEW_PAGE_GRID_CONFIG } from "./components/grid/constant";
+import { LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT } from "./components/grid/constant";
 
 export default function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -37,7 +36,7 @@ export default function Canvas() {
         }]
       }
     });
-  }, []);
+  }, [setCurrentPageId, addHistoryStep]);
 
   useEventListener("click", handleDocumentClick, containerRef);
 

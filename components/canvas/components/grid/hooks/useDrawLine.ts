@@ -109,7 +109,7 @@ export function useDrawLine(isFocused: boolean) {
       // off(defaultDocument, "mousemove", handleMouseMove); // 不确定这样是否合适，所以先注释
       // off(defaultDocument, "mouseup", handleMouseUp); // 不确定这样是否合适，所以先注释
     };
-  }, [isFocused]);
+  }, [isFocused, container, latestDrawState, mouseStateRef]);
 
   return [drawState.start, drawState.end, drawState.isDrawing] as const;
 }

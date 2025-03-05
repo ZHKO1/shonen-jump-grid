@@ -2,11 +2,7 @@ import React, { forwardRef } from "react";
 import { HTMLMotionProps, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-export interface BackgroundProps
-  extends HTMLMotionProps<"div"> {
-}
-
-const Background = forwardRef<HTMLDivElement, BackgroundProps>(
+const Background = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
   ({ className, children, ...props }, ref) => {
     return (
       <motion.div

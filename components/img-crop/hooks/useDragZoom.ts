@@ -1,6 +1,6 @@
 import React, { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import normalizeWheel from 'normalize-wheel'
-import { defaultDocument, defaultWindow, getTargetElement, off, on } from "@/lib";
+import { defaultDocument, defaultWindow, off, on } from "@/lib";
 import { Point } from "@/components/canvas/components/grid/types";
 
 const ZOOMSPEED = 0.1;
@@ -14,45 +14,46 @@ function getMousePoint(e: MouseEvent | React.MouseEvent) {
   })
 }
 
+const getPointOnMedia = ({ x, y }: Point, { x: dragPosX, y: dragPosY }: Point, zoom: number) => {
+  return {
+    x: (x + dragPosX) / zoom,
+    y: (y + dragPosY) / zoom,
+  }
+}
+
+const getPointOnContainer = ({ x, y }: Point, container: HTMLDivElement, containerTopLeft: Point): Point => {
+  if (!container) {
+    throw new Error('The Cropper is not mounted')
+  }
+  const bounds = container.getBoundingClientRect()
+  return {
+    x: bounds.width / 2 - (x - containerTopLeft.x),
+    y: bounds.height / 2 - (y - containerTopLeft.y),
+  }
+}
+
 export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, defaultValue: { dragX?: number, dragY?: number, zoom?: number }) {
   const containerPositionRef = useRef<Point>({ x: 0, y: 0 });
   const dragStartPositionRef = useRef<Point>({ x: 0, y: 0 });
   const [dragPos, setDragPos] = useState<Point>({ x: defaultValue.dragX || 0, y: defaultValue.dragY || 0 });
   const [zoom, setZoom] = useState<number>(defaultValue.zoom || 1);
   const rafDragTimeoutRef = useRef<number>(0);
+  const { current: container } = containerRef;
 
   const reset = useCallback(() => {
-    setDragPos({x: 0, y: 0});
+    setDragPos({ x: 0, y: 0 });
     setZoom(1);
   }, [])
 
   const saveContainerPosition = useCallback(() => {
-    if (containerRef.current) {
-      const bounds = containerRef.current.getBoundingClientRect()
+    if (container) {
+      const bounds = container.getBoundingClientRect()
       containerPositionRef.current = { x: bounds.left, y: bounds.top }
     }
-  }, [containerRef.current])
-
-  const getPointOnContainer = ({ x, y }: Point, containerTopLeft: Point): Point => {
-    if (!containerRef.current) {
-      throw new Error('The Cropper is not mounted')
-    }
-    const bounds = containerRef.current.getBoundingClientRect()
-    return {
-      x: bounds.width / 2 - (x - containerTopLeft.x),
-      y: bounds.height / 2 - (y - containerTopLeft.y),
-    }
-  }
-
-  const getPointOnMedia = ({ x, y }: Point) => {
-    return {
-      x: (x + dragPos.x) / zoom,
-      y: (y + dragPos.y) / zoom,
-    }
-  }
+  }, [container])
 
   useEffect(() => {
-    const targetElement = getTargetElement(containerRef);
+    const targetElement = container;
     if (!(targetElement && targetElement.addEventListener)) {
       return;
     }
@@ -95,8 +96,8 @@ export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, defa
       const point = getMousePoint(e);
       const { pixelY } = normalizeWheel(e);
       const newZoom = Math.min(Math.max(zoom - (pixelY * ZOOMSPEED) / 200, MIN_ZOOM), MAX_ZOOM)
-      const zoomPoint = getPointOnContainer(point, containerPositionRef.current)
-      const zoomTarget = getPointOnMedia(zoomPoint)
+      const zoomPoint = getPointOnContainer(point, container, containerPositionRef.current)
+      const zoomTarget = getPointOnMedia(zoomPoint, { x: dragPos.x, y: dragPos.y }, zoom)
       const requestedPosition = {
         x: zoomTarget.x * newZoom - zoomPoint.x,
         y: zoomTarget.y * newZoom - zoomPoint.y,
@@ -116,7 +117,7 @@ export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, defa
       off(targetElement, "wheel", onWheel, { passive: false })
     }
 
-  }, [containerRef.current, dragPos.x, dragPos.y]);
+  }, [container, dragPos.x, dragPos.y, zoom, saveContainerPosition]);
 
   return [dragPos.x, dragPos.y, zoom, reset] as const;
 }

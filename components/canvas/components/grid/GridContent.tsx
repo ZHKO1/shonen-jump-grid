@@ -1,4 +1,5 @@
 import { CSSProperties, forwardRef } from "react";
+import Image from "next/image";
 import { HTMLMotionProps, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { GridConfig } from "./types";
@@ -36,8 +37,10 @@ export const GridContent = forwardRef<HTMLDivElement, GridContentProps>(
                 {url &&
                     <div className="absolute"
                         style={imgStyle}>
-                        <img
+                        <Image
                             className="absolute w-full h-full select-none"
+                            width={500}
+                            height={500}
                             src={url}
                             alt={"background"} />
                     </div>

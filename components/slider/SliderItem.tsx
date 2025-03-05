@@ -1,15 +1,19 @@
 import React, { useCallback } from "react";
 import { Plus, X } from "lucide-react";
-import { PageConfig, PageId } from "../canvas/components/grid/types";
+import { PageConfig } from "../canvas/components/grid/types";
 import { cn } from "@/lib/utils";
 
 export default function SliderItem({ page, add = false, focused = false, onClick, onDelete }: { page?: PageConfig, add?: boolean, focused?: boolean, onClick?: React.MouseEventHandler<HTMLDivElement>, onDelete?: React.MouseEventHandler<HTMLDivElement> }) {
     const id = page?.id || "";
     const handleClick: React.MouseEventHandler<HTMLDivElement> = useCallback((e) => {
-        onClick && onClick(e)
+        if (typeof onClick === "function") {
+            onClick(e)
+        }
     }, [onClick]);
     const handleDelete: React.MouseEventHandler<HTMLDivElement> = useCallback((e) => {
-        onDelete && onDelete(e)
+        if (typeof onDelete === "function") {
+            onDelete(e)
+        }
     }, [onDelete]);
     return (
         <div className={cn("group relative select-none w-[100px] h-32 border-2 mx-auto my-3 p-3 border-gray-200 flex items-center justify-center cursor-pointer hover:border-gray-400")} onClick={handleClick}>

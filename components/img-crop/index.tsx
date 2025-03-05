@@ -27,7 +27,7 @@ export default function ImgCropContainer() {
     setTimeout(() => {
       setShowImgCrop(false)
     }, 100);
-  }, []);
+  }, [setShowImgCrop]);
 
   if (!grid) {
     return null;

@@ -1,4 +1,4 @@
-import { forwardRef, HTMLAttributes, RefObject, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { useIsomorphicLayoutEffect, useWindowSize } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { getImageSize } from "./utils";
