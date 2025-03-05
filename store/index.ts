@@ -25,7 +25,7 @@ interface ShowComponentSlice {
 }
 
 type HistoryStep = {
-  type: "init" | "split" | "adjust-grid" | "add-page",
+  type: "init" | "split" | "adjust-grid" | "adjust-page",
   comicConfig: ComicConfig,
 }
 
@@ -175,5 +175,11 @@ const useComicStatusStore = create<ALLStore>()((...arg) => ({
   ...createShowComponentSlice(...arg),
   ...createHistoryStepSlice(...arg),
 }))
+
+// const unsub1 = useComicStatusStore.subscribe((state, prevstate) => {
+//   console.log("-------------------------");
+//   console.log(state)
+//   console.log(prevstate)
+// })
 
 export default useComicStatusStore;

@@ -20,12 +20,15 @@ export default function Slider() {
     const step = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex]);
     const comicConfig = step?.comicConfig;
     const pages = comicConfig?.pages || [];
-    const { addPage } = useAdjustComic();
+    const { addPage, deletePage } = useAdjustComic();
     const currentPageId = useComicStatusStore(state => state.currentPageId);
     const setCurrentPageId = useComicStatusStore(state => state.setCurrentPageId);
+    const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId);
 
-    const handleClick = (pageId: PageId) => {
+    const handleClick = (e: React.MouseEvent, pageId: PageId) => {
         setCurrentPageId(pageId);
+        setCurrentGridId("");
+        e.stopPropagation();
     }
 
     const handleAdd = () => {
@@ -43,15 +46,21 @@ export default function Slider() {
         setCurrentPageId(pageId);
     }
 
+    const handleDelete = (e: React.MouseEvent, pageId: PageId) => {
+        deletePage(pageId);
+        e.stopPropagation();
+    }
+
     return (
-        <div className="w-full h-full border-r-2 border-gray-200 overflow-y-auto">
+        <div className="w-full h-full border-r-2 border-gray-200 overflow-y-auto no-scrollbar">
             {
                 pages.map((page) => {
                     return (
                         <SliderItem
                             key={page.id}
                             page={page}
-                            onClick={handleClick}
+                            onClick={(e) => handleClick(e, page.id)}
+                            onDelete={(e) => handleDelete(e, page.id)}
                             focused={currentPageId == page.id}
                         />
                     );

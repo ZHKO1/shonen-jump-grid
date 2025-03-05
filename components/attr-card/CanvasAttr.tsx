@@ -9,8 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import useComicStatusStore from "@/store";
 
 export default function CanvasAttr() {
+  const currentPageId = useComicStatusStore(state => state.currentPageId);
   return (
     <Card className="w-[250px]">
       <CardHeader>
