@@ -16,7 +16,7 @@ import { useAdjustComic } from "@/hooks/custom/useAdjustComic"
 import useComicStatusStore from "@/store"
 import { getGridsBySplit, isGridSplited } from "../canvas/components/grid/utils";
 import { GridConfig, Point } from "../canvas/components/grid/types"
-import { borderWidth } from "../canvas/components/grid/constant"
+import { BORDER_WIDTH } from "../canvas/components/grid/constant"
 
 export default function GridAttr({ grid }: { grid: GridConfig }) {
   const { id, type, splitLine = [{ x: 0, y: 0 }, { x: 0, y: 0 }], splitSpaceWidth = 0 } = grid;
@@ -105,7 +105,7 @@ export default function GridAttr({ grid }: { grid: GridConfig }) {
                       <Label className="text-xs">split space width: {splitSpaceWidth}</Label>
                       <Slider
                         value={[splitSpaceWidth]}
-                        min={borderWidth * 2}
+                        min={BORDER_WIDTH * 2}
                         max={100}
                         step={1}
                         onValueChange={onSplitSpaceWidthChange(false)}

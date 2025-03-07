@@ -1,6 +1,6 @@
 import { GridConfig } from "./types";
 
-export const borderWidth = 6;
+export const BORDER_WIDTH = 6;
 
 export const LOGO_PAGE_HEIGHT = 1080;
 

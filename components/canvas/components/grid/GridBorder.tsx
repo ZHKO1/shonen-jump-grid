@@ -2,7 +2,7 @@ import { forwardRef, CSSProperties } from "react";
 import { HTMLMotionProps, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { GridConfig } from "./types";
-import { borderWidth } from "./constant";
+import { BORDER_WIDTH } from "./constant";
 
 export interface GridBorderProps
     extends HTMLMotionProps<"div"> {
@@ -42,7 +42,7 @@ export const GridBorder = forwardRef<HTMLDivElement, GridBorderProps>(
                         points={svgPoints}
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth={borderWidth}
+                        strokeWidth={BORDER_WIDTH}
                     />
                 </svg>
             </Comp>

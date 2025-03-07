@@ -1,5 +1,5 @@
 import { ComicConfig, PageConfig, GridConfig, GridId, PageId, Point, PolyGridConfig, PolyGridPoint, RectGridConfig, RectGridPoint } from "./types";
-import { borderWidth } from "./constant";
+import { BORDER_WIDTH } from "./constant";
 
 type Pos = "lt" | "rt" | "lb" | "rb";
 type PolyType = "horizon" | "vertical";
@@ -624,7 +624,7 @@ export function getClipPath(path: [Point, Point, Point, Point]) {
 const getRectGridStyle = (grid: RectGridConfig): GridStyle => {
     const { outside } = getRectGridPoint({
         ...grid
-    }, borderWidth);
+    }, BORDER_WIDTH);
     const left = outside.lt_x;
     const top = outside.lt_y;
     const width = outside.rb_x - outside.lt_x;
@@ -664,7 +664,7 @@ const getRectGridStyle = (grid: RectGridConfig): GridStyle => {
 const getPolyGridStyle = (grid: PolyGridConfig): GridStyle => {
     const lt = getPolyContainerPoint(grid.path, 'lt');
     const rb = getPolyContainerPoint(grid.path, 'rb');
-    const { outside } = getPolyGridPoint(grid.path, borderWidth);
+    const { outside } = getPolyGridPoint(grid.path, BORDER_WIDTH);
     const lt_outside = getPolyContainerPoint(outside, 'lt');
     const rb_outside = getPolyContainerPoint(outside, 'rb');
     const left = lt_outside.x;

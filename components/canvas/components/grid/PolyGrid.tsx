@@ -2,7 +2,7 @@ import { MouseEventHandler, useRef } from "react";
 import useComicStatusStore from "@/store";
 import { useSplit } from "./hooks/useSplit";
 import { getClipPath, getGridStyle, getSvgPoints } from "./utils";
-import { borderWidth } from "./constant";
+import { BORDER_WIDTH } from "./constant";
 import { PolyGridConfig } from "./types";
 import { GridBorder } from "./GridBorder";
 import { GridContent } from "./GridContent";
@@ -20,7 +20,7 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
     const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId);
     const { getCurrentGridId } = useComicStatusStore();
     const isFocused = getCurrentGridId() === grid.id;
-    const splitGrids = useSplit(grid, isFocused, borderWidth * 2);
+    const splitGrids = useSplit(grid, isFocused, BORDER_WIDTH * 2);
     const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;
     const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
 
