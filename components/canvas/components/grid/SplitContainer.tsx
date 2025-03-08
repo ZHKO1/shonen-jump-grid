@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { useDraggable } from "@/hooks";
 import { useAdjustComic } from "@/hooks/custom/useAdjustComic";
 import useComicStatusStore from "@/store";
-import { GridConfig, Point } from "./types";
+import { CanvasGridConfig, Point } from "./types";
 import { ContainerContext } from "../../context/container";
 import { getAdjustedPoint, getGridsBySplit } from "./utils";
 import { Grid } from ".";
@@ -34,7 +34,7 @@ function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, 
     )
 }
 
-export type SplitContainerProps = { grid: GridConfig, showAsFocused?: boolean, borderOnly?: boolean };
+export type SplitContainerProps = { grid: CanvasGridConfig, showAsFocused?: boolean, borderOnly?: boolean };
 export default function SplitContainer({ grid }: SplitContainerProps) {
     const { adjustGrid } = useAdjustComic();
     const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId);

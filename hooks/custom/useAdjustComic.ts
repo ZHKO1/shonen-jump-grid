@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import useComicStatusStore from "@/store";
 import { getGridFromComicConfig } from "../../components/canvas/components/grid/utils";
-import { ComicConfig, GridId, PageConfig, PageId } from "../../components/canvas/components/grid/types";
+import { CanvasComicConfig, GridId, CanvasPageConfig, PageId } from "../../components/canvas/components/grid/types";
 
 export function useAdjustComic() {
     const addHistoryStep = useComicStatusStore(state => state.addHistoryStep);
@@ -30,12 +30,12 @@ export function useAdjustComic() {
         }
     }, []);
 
-    const addPage = useCallback((page: PageConfig) => {
+    const addPage = useCallback((page: CanvasPageConfig) => {
         const currentStep = getCurrentHistoryStep();
         const currentPageId = getCurrentPageId();
         if (currentStep) {
             const comicConfig = currentStep.comicConfig;
-            const comicConfigCopy = JSON.parse(JSON.stringify(comicConfig)) as ComicConfig;
+            const comicConfigCopy = JSON.parse(JSON.stringify(comicConfig)) as CanvasComicConfig;
             comicConfigCopy.pages.push(page);
             addHistoryStep({
                 type: "adjust-page",
@@ -49,7 +49,7 @@ export function useAdjustComic() {
         const currentPageId = getCurrentPageId();
         if (currentStep) {
             const comicConfig = currentStep.comicConfig;
-            const comicConfigCopy = JSON.parse(JSON.stringify(comicConfig)) as ComicConfig;
+            const comicConfigCopy = JSON.parse(JSON.stringify(comicConfig)) as CanvasComicConfig;
             if (pageId === currentPageId) {
                 const index = comicConfigCopy.pages.findIndex(page => page.id === pageId);
                 let nextPageId: PageId = "";

@@ -1,12 +1,12 @@
 import { forwardRef, CSSProperties } from "react";
 import { HTMLMotionProps, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { GridConfig } from "./types";
+import { CanvasGridConfig } from "./types";
 import { BORDER_WIDTH } from "./constant";
 
 export interface GridBorderProps
     extends HTMLMotionProps<"div"> {
-    gridId: GridConfig["id"],
+    gridId: CanvasGridConfig["id"],
     disableMotion?: boolean,
     svgPoints: string,
     focused?: boolean,

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { GridConfig, PageConfig } from "../canvas/components/grid/types"
+import { CanvasGridConfig, CanvasPageConfig } from "../canvas/components/grid/types"
 import { BLANK_GRID_MARGIN, LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT, NEW_PAGE_GRID_CONFIG } from "../canvas/components/grid/constant"
 
 let GlobalPageId = 1;
@@ -41,7 +41,7 @@ export function TemplateSelect({ value, onChange }: { value: string, onChange: (
     )
 }
 
-const AddPageDialog: React.FC<{ children: React.ReactNode, onSubmit: (data: PageConfig) => void }> = ({ children, onSubmit }) => {
+const AddPageDialog: React.FC<{ children: React.ReactNode, onSubmit: (data: CanvasPageConfig) => void }> = ({ children, onSubmit }) => {
     const [open, setOpen] = React.useState(false);
     const [id, setId] = useState("");
     const [height, setHeight] = useState(LOGO_PAGE_HEIGHT);
@@ -73,7 +73,7 @@ const AddPageDialog: React.FC<{ children: React.ReactNode, onSubmit: (data: Page
                 rb_y: height - BLANK_GRID_MARGIN,
                 id: id + ":" + 0
             }
-        ] as GridConfig[];
+        ] as CanvasGridConfig[];
         onSubmit({
             id,
             height,

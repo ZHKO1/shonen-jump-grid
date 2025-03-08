@@ -1,4 +1,4 @@
-import { ComicConfig, PageConfig, GridConfig, GridId, PageId, Point, PolyGridConfig, PolyGridPoint, RectGridConfig, RectGridPoint } from "./types";
+import { CanvasComicConfig, CanvasPageConfig, CanvasGridConfig, GridId, PageId, Point, CanvasPolyGridConfig, PolyGridPoint, CanvasRectGridConfig, RectGridPoint } from "./types";
 import { BORDER_WIDTH } from "./constant";
 
 type Pos = "lt" | "rt" | "lb" | "rb";
@@ -202,9 +202,9 @@ export function getPolyGridPoint(path: PolyGridPoint["path"], borderWidth: numbe
 /**
  * 如果grid是正长方形，那么修改type为Rect，否则原样返回
  * @param grid 
- * @returns GridConfig
+ * @returns CanvasGridConfig
  */
-export function makePolyToRect(grid: GridConfig): GridConfig {
+export function makePolyToRect(grid: CanvasGridConfig): CanvasGridConfig {
     if (grid.type == "poly") {
         const [p0, p1, p2, p3] = grid.path;
         if ((p0.y == p1.y) && (p1.x == p2.x) && (p2.y == p3.y) && (p3.x == p0.x)) {
@@ -217,7 +217,7 @@ export function makePolyToRect(grid: GridConfig): GridConfig {
             newGrid.lt_y = p0.y;
             newGrid.rb_x = p2.x;
             newGrid.rb_y = p2.y;
-            return newGrid as RectGridConfig;
+            return newGrid as CanvasRectGridConfig;
         }
     }
     return grid;
@@ -228,9 +228,9 @@ export function makePolyToRect(grid: GridConfig): GridConfig {
  * @param grid 
  * @param newSubGrids
  * @param recursion
- * @returns [GridConfig, GridConfig]
+ * @returns [CanvasGridConfig, CanvasGridConfig]
  */
-export function updateSubGridsBySplit(grid: GridConfig, newSubGrids: [GridConfig, GridConfig], recursion: boolean): [GridConfig, GridConfig] {
+export function updateSubGridsBySplit(grid: CanvasGridConfig, newSubGrids: [CanvasGridConfig, CanvasGridConfig], recursion: boolean): [CanvasGridConfig, CanvasGridConfig] {
     newSubGrids = [makePolyToRect(newSubGrids[0]), makePolyToRect(newSubGrids[1])]
     if (!recursion) {
         return newSubGrids;
@@ -258,7 +258,7 @@ export function updateSubGridsBySplit(grid: GridConfig, newSubGrids: [GridConfig
             return {
                 ...subGrid
             }
-        }) as [GridConfig, GridConfig];
+        }) as [CanvasGridConfig, CanvasGridConfig];
     } else {
         return newSubGrids;
     }
@@ -271,9 +271,9 @@ export function updateSubGridsBySplit(grid: GridConfig, newSubGrids: [GridConfig
  * @param options
  * @param options.spaceWidth
  * @param options.recursion
- * @returns { grids: [GridConfig, GridConfig], line: [Point, Point] } | null
+ * @returns { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null
  */
-export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], { spaceWidth, recursion = true }: SplitOptions): { grids: [GridConfig, GridConfig], line: [Point, Point] } | null {
+export function getGridsBySplitRect(grid: CanvasRectGridConfig, line: [Point, Point], { spaceWidth, recursion = true }: SplitOptions): { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null {
     const lt_x = grid.lt_x;
     const lt_y = grid.lt_y;
     const rb_x = grid.rb_x;
@@ -358,9 +358,9 @@ export function getGridsBySplitRect(grid: RectGridConfig, line: [Point, Point], 
  * @param options
  * @param options.spaceWidth
  * @param options.recursion
- * @returns { grids: [GridConfig, GridConfig], line: [Point, Point] } | null
+ * @returns { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null
  */
-export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], { spaceWidth, recursion = true }: SplitOptions): { grids: [GridConfig, GridConfig], line: [Point, Point] } | null {
+export function getGridsBySplitPoly(grid: CanvasPolyGridConfig, line: [Point, Point], { spaceWidth, recursion = true }: SplitOptions): { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null {
     const path = grid.path;
     const lt = getPolyContainerPoint(path, "lt");
     const rb = getPolyContainerPoint(path, "rb");
@@ -483,9 +483,9 @@ export function getGridsBySplitPoly(grid: PolyGridConfig, line: [Point, Point], 
  * @param options
  * @param options.spaceWidth
  * @param options.recursion
- * @returns { grids: [GridConfig, GridConfig], line: [Point, Point] } | null
+ * @returns { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null
  */
-export function getGridsBySplit(grid: GridConfig, line: [Point, Point], options: SplitOptions): { grids: [GridConfig, GridConfig], line: [Point, Point] } | null {
+export function getGridsBySplit(grid: CanvasGridConfig, line: [Point, Point], options: SplitOptions): { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null {
     if (grid.type === 'rect') {
         return getGridsBySplitRect(grid, line, options);
     } else if (grid.type === 'poly') {
@@ -499,9 +499,9 @@ export function getGridsBySplit(grid: GridConfig, line: [Point, Point], options:
  * 从配置里获取指定的page
  * @param comicConfig 
  * @param targetId
- * @returns PageConfig | null
+ * @returns CanvasPageConfig | null
  */
-export function getPageFromComicConfig(comicConfig: ComicConfig, targetId: PageId): PageConfig | null {
+export function getPageFromComicConfig(comicConfig: CanvasComicConfig, targetId: PageId): CanvasPageConfig | null {
     if (!comicConfig || !comicConfig.pages) {
         return null;
     }
@@ -518,9 +518,9 @@ export function getPageFromComicConfig(comicConfig: ComicConfig, targetId: PageI
  * 从配置里获取指定的grid
  * @param comicConfig 
  * @param targetId
- * @returns GridConfig | null
+ * @returns CanvasGridConfig | null
  */
-export function getGridFromComicConfig(comicConfig: ComicConfig, targetId: GridId): GridConfig | null {
+export function getGridFromComicConfig(comicConfig: CanvasComicConfig, targetId: GridId): CanvasGridConfig | null {
     for (let i = 0; i < comicConfig.pages.length; i++) {
         const page = comicConfig.pages[i];
         for (let j = 0; j < page.grids.length; j++) {
@@ -531,7 +531,7 @@ export function getGridFromComicConfig(comicConfig: ComicConfig, targetId: GridI
     }
     return null;
 
-    function deepfind(grid: GridConfig): GridConfig | null {
+    function deepfind(grid: CanvasGridConfig): CanvasGridConfig | null {
         if (grid.id === targetId) {
             return grid;
         }
@@ -551,7 +551,7 @@ export function getGridFromComicConfig(comicConfig: ComicConfig, targetId: GridI
  * @param path 
  * @returns boolean
  */
-export function isGridSplited(grid: GridConfig) {
+export function isGridSplited(grid: CanvasGridConfig) {
     if (grid.splitLine && grid.splitResult && grid.splitResult.length > 0 && grid.splitSpaceWidth) {
         return true;
     }
@@ -621,7 +621,7 @@ export function getClipPath(path: [Point, Point, Point, Point]) {
     return `polygon(${path.map(p => `${p.x}px ${p.y}px`).join(',')})`;
 }
 
-const getRectGridStyle = (grid: RectGridConfig): GridStyle => {
+const getRectGridStyle = (grid: CanvasRectGridConfig): GridStyle => {
     const { outside } = getRectGridPoint({
         ...grid
     }, BORDER_WIDTH);
@@ -661,7 +661,7 @@ const getRectGridStyle = (grid: RectGridConfig): GridStyle => {
     }
 }
 
-const getPolyGridStyle = (grid: PolyGridConfig): GridStyle => {
+const getPolyGridStyle = (grid: CanvasPolyGridConfig): GridStyle => {
     const lt = getPolyContainerPoint(grid.path, 'lt');
     const rb = getPolyContainerPoint(grid.path, 'rb');
     const { outside } = getPolyGridPoint(grid.path, BORDER_WIDTH);
@@ -713,10 +713,10 @@ const getPolyGridStyle = (grid: PolyGridConfig): GridStyle => {
 
 /**
  * 从grid配置获取对应样式（容器位置样式，容器形状样式，容器大小样式，边框svg样式）
- * @param GridConfig
+ * @param CanvasGridConfig
  * @returns GridStyle
  */
-export function getGridStyle(grid: GridConfig): GridStyle {
+export function getGridStyle(grid: CanvasGridConfig): GridStyle {
     if (grid.type === 'rect') {
         return getRectGridStyle(grid);
     } else if (grid.type === 'poly') {

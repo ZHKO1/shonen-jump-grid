@@ -3,7 +3,7 @@ import useComicStatusStore from "@/store";
 import { useSplit } from "./hooks/useSplit";
 import { getClipPath, getGridStyle, getSvgPoints } from "./utils";
 import { BORDER_WIDTH } from "./constant";
-import { PolyGridConfig } from "./types";
+import { CanvasPolyGridConfig } from "./types";
 import { GridBorder } from "./GridBorder";
 import { GridContent } from "./GridContent";
 import { Grid } from ".";
@@ -11,7 +11,7 @@ import { useEventListener } from "@/hooks";
 import { cn } from "@/lib/utils";
 
 export interface PolyGridProps {
-    grid: PolyGridConfig,
+    grid: CanvasPolyGridConfig,
     showAsFocused?: boolean,
     borderOnly?: boolean
 };

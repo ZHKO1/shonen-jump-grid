@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { useAdjustComic } from "@/hooks/custom/useAdjustComic";
 import { useDrawLine } from "./useDrawLine";
 import { getGridsBySplit } from "../utils";
-import { GridConfig } from "../types";
+import { CanvasGridConfig } from "../types";
 
-export function useSplit(grid: GridConfig, isGridFocused: boolean, spaceWidth: number) {
+export function useSplit(grid: CanvasGridConfig, isGridFocused: boolean, spaceWidth: number) {
   const { adjustGrid } = useAdjustComic();
   const [startPoint, endPoint, isDrawing] = useDrawLine(isGridFocused);
   const { grids, line } = (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth }) || {};

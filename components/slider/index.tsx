@@ -2,7 +2,7 @@
 import React from "react";
 import useComicStatusStore from "@/store";
 import SliderItem from "./SliderItem";
-import { PageConfig, PageId } from "../canvas/components/grid/types";
+import { CanvasPageConfig, PageId } from "../canvas/components/grid/types";
 import { useAdjustComic } from "@/hooks/custom/useAdjustComic";
 import AddPageDialog from "./AddPageDialog";
 
@@ -26,7 +26,7 @@ export default function Slider() {
         e.stopPropagation();
     }
 
-    const handleSubmit = (page: PageConfig) => {
+    const handleSubmit = (page: CanvasPageConfig) => {
         addPage(page);
         setCurrentPageId(page.id);
     }

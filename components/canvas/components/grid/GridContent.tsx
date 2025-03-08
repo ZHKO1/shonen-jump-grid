@@ -2,11 +2,11 @@ import { CSSProperties, forwardRef } from "react";
 import Image from "next/image";
 import { HTMLMotionProps, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { GridConfig } from "./types";
+import { CanvasGridConfig } from "./types";
 
 export interface GridContentProps
     extends HTMLMotionProps<"div"> {
-    gridId: GridConfig["id"],
+    gridId: CanvasGridConfig["id"],
     imgStyle: CSSProperties,
     disableMotion?: boolean,
     clipPath?: string,

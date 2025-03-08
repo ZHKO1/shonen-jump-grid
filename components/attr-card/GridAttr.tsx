@@ -15,10 +15,10 @@ import {
 import { useAdjustComic } from "@/hooks/custom/useAdjustComic"
 import useComicStatusStore from "@/store"
 import { getGridsBySplit, isGridSplited } from "../canvas/components/grid/utils";
-import { GridConfig, Point } from "../canvas/components/grid/types"
+import { CanvasGridConfig, Point } from "../canvas/components/grid/types"
 import { BORDER_WIDTH } from "../canvas/components/grid/constant"
 
-export default function GridAttr({ grid }: { grid: GridConfig }) {
+export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
   const { id, type, splitLine = [{ x: 0, y: 0 }, { x: 0, y: 0 }], splitSpaceWidth = 0 } = grid;
   const { adjustGrid } = useAdjustComic();
   const isSplit = isGridSplited(grid);

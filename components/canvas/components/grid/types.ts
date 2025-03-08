@@ -1,14 +1,15 @@
-export type Point = { x: number, y: number };
+import { PageConfig, Point, PolyGridConfig, PolyGridPoint, RectGridConfig, RectGridPoint } from "@/components/comic/core/type"
+
+export type { Point, PolyGridPoint, RectGridPoint };
 
 export type GridId = string | number
 
-export type GridShareConfig = {
+interface CanvasGridShareConfig {
     id: GridId,
     splitLine?: [Point, Point],
-    splitResult?: [GridConfig, GridConfig],
+    splitResult?: [CanvasGridConfig, CanvasGridConfig],
     splitSpaceWidth?: number,
     content?: {
-        url: string,
         originImg: {
             url: string,
             width: number,
@@ -20,35 +21,24 @@ export type GridShareConfig = {
     }
 }
 
-export type PolyGridPoint = {
-    path: [Point, Point, Point, Point],
+export interface CanvasPolyGridConfig extends PolyGridConfig, Omit<CanvasGridShareConfig, 'content'> {
+    content?: PolyGridConfig['content'] & CanvasGridShareConfig['content']
 }
 
-export type PolyGridConfig = {
-    type: 'poly',
-} & GridShareConfig & PolyGridPoint
-
-export type RectGridPoint = {
-    lt_x: number,
-    lt_y: number,
-    rb_x: number,
-    rb_y: number,
+export interface CanvasRectGridConfig extends RectGridConfig, Omit<CanvasGridShareConfig, 'content'> {
+    content?: RectGridConfig['content'] & CanvasGridShareConfig['content']
 }
 
-export type RectGridConfig = {
-    type: 'rect',
-} & GridShareConfig & RectGridPoint
-
-export type GridConfig = (PolyGridConfig | RectGridConfig);
+export type CanvasGridConfig = (CanvasPolyGridConfig | CanvasRectGridConfig);
 
 
 export type PageId = string | number
-export interface PageConfig {
+export interface CanvasPageConfig extends PageConfig {
     id: PageId,
     height: number,
-    grids: GridConfig[],
+    grids: CanvasGridConfig[],
 }
 
-export interface ComicConfig {
-    pages: PageConfig[],
+export interface CanvasComicConfig {
+    pages: CanvasPageConfig[],
 }

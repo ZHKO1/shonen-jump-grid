@@ -1,6 +1,6 @@
 import { MouseEventHandler, useRef } from "react";
 import useComicStatusStore from "@/store";
-import { RectGridConfig } from "./types";
+import { CanvasRectGridConfig } from "./types";
 import { getGridStyle, getSvgPoints } from "./utils";
 import { BORDER_WIDTH } from "./constant";
 import { GridBorder } from "./GridBorder";
@@ -11,7 +11,7 @@ import { useEventListener } from "@/hooks";
 import { cn } from "@/lib/utils";
 
 export interface RectGridProps {
-    grid: RectGridConfig,
+    grid: CanvasRectGridConfig,
     showAsFocused?: boolean,
     borderOnly?: boolean
 }

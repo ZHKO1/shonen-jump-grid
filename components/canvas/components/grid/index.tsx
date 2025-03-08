@@ -1,11 +1,11 @@
 'use client';
 import { isGridSplited } from './utils';
-import { GridConfig } from './types';
+import { CanvasGridConfig } from './types';
 import SplitContainer from './SplitContainer';
 import RectGrid, { RectGridProps } from './RectGrid';
 import PolyGrid, { PolyGridProps } from './PolyGrid';
 
-export type GridProps = { grid: GridConfig, showAsFocused?: boolean, borderOnly?: boolean };
+export type GridProps = { grid: CanvasGridConfig, showAsFocused?: boolean, borderOnly?: boolean };
 export function Grid(props: GridProps) {
     if (isGridSplited(props.grid)) {
         return <SplitContainer {...props}/>;

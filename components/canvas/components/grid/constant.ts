@@ -1,10 +1,10 @@
-import { GridConfig } from "./types";
+import { CanvasGridConfig } from "./types";
 
 export const BORDER_WIDTH = 6;
 
 export const LOGO_PAGE_HEIGHT = 1080;
 
-export const LOGO_PAGE_GRIDS_CONFIG: GridConfig[] = [
+export const LOGO_PAGE_GRIDS_CONFIG: CanvasGridConfig[] = [
     {
         "type": "rect",
         "lt_x": 18,
@@ -105,7 +105,7 @@ export const LOGO_PAGE_GRIDS_CONFIG: GridConfig[] = [
 
 export const BLANK_GRID_MARGIN: number = 18;
 
-export const NEW_PAGE_GRID_CONFIG: GridConfig = {
+export const NEW_PAGE_GRID_CONFIG: CanvasGridConfig = {
     "type": "rect",
     "lt_x": BLANK_GRID_MARGIN,
     "lt_y": BLANK_GRID_MARGIN,

@@ -1,5 +1,5 @@
 import { create, StateCreator } from 'zustand';
-import { ComicConfig, GridId, PageId } from '@/components/canvas/components/grid/types';
+import { CanvasComicConfig, GridId, PageId } from '@/components/canvas/components/grid/types';
 
 interface CurrentStatusSlice {
   // 焦点页
@@ -26,7 +26,7 @@ interface ShowComponentSlice {
 
 type HistoryStep = {
   type: "init" | "split" | "adjust-grid" | "adjust-page",
-  comicConfig: ComicConfig,
+  comicConfig: CanvasComicConfig,
 }
 
 interface HistoryStepSlice {

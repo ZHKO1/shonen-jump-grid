@@ -10,11 +10,11 @@ import Mask, { MaskRef, MaskType } from "./Mask";
 import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "./Icons";
 import ActionBar, { ActionType } from "./ActionBar";
 import { useDragZoom } from "./hooks/useDragZoom";
-import { GridConfig } from "../canvas/components/grid/types";
+import { CanvasGridConfig } from "../canvas/components/grid/types";
 import Background from "./Background";
 import Img, { ImgTarget } from "./Img";
 
-export default function ImgCrop({ grid, onClose }: { grid: GridConfig, onClose: () => void }) {
+export default function ImgCrop({ grid, onClose }: { grid: CanvasGridConfig, onClose: () => void }) {
   const maskRef = useRef<MaskRef>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
