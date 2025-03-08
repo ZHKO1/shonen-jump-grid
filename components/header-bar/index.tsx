@@ -1,6 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button";
-import { Forward, LayoutDashboard, Reply } from "lucide-react";
+import { Forward, LayoutDashboard, Play, Reply } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { Toggle } from "@/components/ui/toggle";
 import useComicStatusStore from "@/store";
@@ -10,6 +10,7 @@ export default function HeaderBar() {
   const prevHistoryStep = useComicStatusStore(state => state.prevHistoryStep);
   const showAttrCard = useComicStatusStore(state => state.showAttrCard);
   const setShowAttrCard = useComicStatusStore(state => state.setShowAttrCard);
+  const setShowComic = useComicStatusStore(state => state.setShowComic);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -34,7 +35,18 @@ export default function HeaderBar() {
             <TooltipContent>Next</TooltipContent>
           </Tooltip>
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex flex-1 items-center justify-center gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" onClick={() => setShowComic(true)}>
+                <Play className="h-4 w-4"/>
+                <span className="sr-only">Play</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Play</TooltipContent>
+          </Tooltip>
+        </div>
+        <div className="flex items-center gap-2">
           <Toggle aria-label="Toggle italic" pressed={showAttrCard} onPressedChange={(pressed) => setShowAttrCard(pressed)}>
             <LayoutDashboard className="h-4 w-4" />
             <span className="sr-only">Detail</span>

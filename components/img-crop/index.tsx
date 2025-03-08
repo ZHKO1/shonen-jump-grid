@@ -1,7 +1,6 @@
 "use client";
 import React, { useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
-// import { useOutsideClick } from "@/hooks/use-outside-click";
 import useComicStatusStore from "@/store";
 import { getGridFromComicConfig } from "../canvas/components/grid/utils";
 import ImgCrop from "./ImgCrop";

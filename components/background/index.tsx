@@ -10,7 +10,7 @@ const Background = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className={cn(
-          "fixed inset-0 h-full w-full z-10 bg-grid",
+          "fixed inset-0 h-full w-full z-10",
           className
         )}
         ref={ref}

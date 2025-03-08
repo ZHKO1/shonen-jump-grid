@@ -21,7 +21,7 @@ export class Grid extends Container {
       this.y = config.lt_y;
     } else {
       this.x = config.path[0].x;
-      this.y = config.path[1].y;
+      this.y = config.path[0].y;
     }
   }
   rendBackground() {
@@ -104,9 +104,9 @@ export class Grid extends Container {
       return width;
     } else {
       let width = 0;
-      let firstx = config.path[0].x;
+      const firstx = config.path[0].x;
       for (let i = 0; i < config.path.length; i++) {
-        let point = config.path[i];
+        const point = config.path[i];
         width = Math.max(width, Math.abs(point.x - firstx));
       }
       return width;
@@ -119,7 +119,7 @@ export class Grid extends Container {
     } else {
       let maxY = config.path[0].y;
       for (let i = 0; i < config.path.length; i++) {
-        let y = config.path[i].y;
+        const y = config.path[i].y;
         maxY = Math.max(y, maxY);
       }
       return maxY;

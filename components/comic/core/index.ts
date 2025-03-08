@@ -23,8 +23,6 @@ export class Comic {
   public async init(comicConfig: ComicConfig, container: HTMLElement) {
     this.comicConfig = JSON.parse(JSON.stringify(comicConfig));
     this.container = container;
-    await this.loadAsset();
-
     await this.app.init(
       {
         width: Width,
@@ -42,7 +40,7 @@ export class Comic {
     this.app.stage.addChild(this.whiteOverlay);
 
     this.blackOverlay.alpha = 1;
-
+    await this.loadAsset();
     await this.initPages();
     this.initTimeline();
     this.handleEvent();
@@ -62,10 +60,10 @@ export class Comic {
           gridConfig.content.url = await getComicGridImage(gridConfig.content);
           await Assets.load(gridConfig.content.url);
 
-          let focus = gridConfig.content.focus;
+          const focus = gridConfig.content.focus;
           if (focus) {
             if (focus.type == "change-background") {
-              let focusUrl = await getComicGridImage(contentCopy, []);
+              const focusUrl = await getComicGridImage(contentCopy, []);
               await Assets.load(focusUrl);
               focus.focusUrl = focusUrl;
 
@@ -147,14 +145,14 @@ export class Comic {
     this.app.canvas.removeEventListener("click", this.downloadScreenshot);
   }
   public downloadScreenshot() {
-    var bloburl = this.app.canvas.toDataURL("image/jpeg", 1.0);
-    var anchor = document.createElement('a');
+    const bloburl = this.app.canvas.toDataURL("image/jpeg", 1.0);
+    const anchor = document.createElement('a');
     if ('download' in anchor) {
       anchor.style.visibility = 'hidden';
       anchor.href = bloburl;
       anchor.download = 'canvas_image.png';
       document.body.appendChild(anchor);
-      var evt = document.createEvent('MouseEvents');
+      const evt = document.createEvent('MouseEvents');
       evt.initEvent('click', true, true);
       anchor.dispatchEvent(evt);
       document.body.removeChild(anchor);

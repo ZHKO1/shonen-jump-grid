@@ -3,6 +3,7 @@ import HeaderBar from "@/components/header-bar";
 import AttrCard from "@/components/attr-card";
 import ImgCrop from "@/components/img-crop";
 import Slider from "@/components/slider";
+import Comic from "@/components/comic";
 
 export default function Home() {
   return (
@@ -23,6 +24,9 @@ export default function Home() {
       </section>
       <section>
         <ImgCrop />
+      </section>
+      <section>
+        <Comic />
       </section>
     </div>
   );

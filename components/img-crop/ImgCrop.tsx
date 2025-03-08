@@ -6,12 +6,12 @@ import { cn } from "@/lib/utils";
 import { getClipPath, getSvgPoints, getGridStyle } from "../canvas/components/grid/utils";
 import { GridBorder } from "../canvas/components/grid/GridBorder";
 import { GridContent } from "../canvas/components/grid/GridContent";
+import Background from "@/components/background";
+import ActionBar, { ActionType } from "@/components/action-bar";
+import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "@/components/action-bar/Icons";
 import Mask, { MaskRef, MaskType } from "./Mask";
-import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "./Icons";
-import ActionBar, { ActionType } from "./ActionBar";
 import { useDragZoom } from "./hooks/useDragZoom";
 import { CanvasGridConfig } from "../canvas/components/grid/types";
-import Background from "./Background";
 import Img, { ImgTarget } from "./Img";
 
 export default function ImgCrop({ grid, onClose }: { grid: CanvasGridConfig, onClose: () => void }) {
@@ -161,6 +161,7 @@ export default function ImgCrop({ grid, onClose }: { grid: CanvasGridConfig, onC
     <>
       <Background
         ref={containerRef}
+        className="bg-grid"
       >
         {imgUrl && <Img
           ref={imageRef}

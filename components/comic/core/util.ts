@@ -58,7 +58,7 @@ function handle(imgData: ImageData, type: HandleType) {
         }
         break;
       case "gray":
-        var average = (r + g + b) / 3;
+        const average = (r + g + b) / 3;
         imgData.data[i] = average;
         imgData.data[i + 1] = average;
         imgData.data[i + 2] = average;

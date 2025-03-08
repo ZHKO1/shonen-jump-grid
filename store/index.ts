@@ -18,10 +18,14 @@ interface ShowComponentSlice {
   showAttrCard: boolean,
   // ImgCrop组件是否显示
   showImgCrop: boolean,
+  // Comic组件是否显示
+  showComic: boolean,
   setShowAttrCard: (val: boolean) => void
   getShowAttrCard: () => boolean
   setShowImgCrop: (val: boolean) => void
   getShowImgCrop: () => boolean
+  setShowComic: (val: boolean) => void
+  getShowComic: () => boolean
 }
 
 type HistoryStep = {
@@ -84,6 +88,7 @@ const createShowComponentSlice: StateCreator<
 > = (set, get) => ({
   showAttrCard: true,
   showImgCrop: false,
+  showComic: false,
   setShowAttrCard: (val: boolean) => {
     set(() => ({
       showAttrCard: val,
@@ -99,6 +104,14 @@ const createShowComponentSlice: StateCreator<
   },
   getShowImgCrop: () => {
     return get().showImgCrop;
+  },
+  setShowComic: (val: boolean) => {
+    set(() => ({
+      showComic: val,
+    }))
+  },
+  getShowComic: () => {
+    return get().showComic;
   },
 })
 

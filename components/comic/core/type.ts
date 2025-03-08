@@ -14,10 +14,10 @@ export interface FocusChangeBackgroundType {
 interface GridShareConfig {
   content?: {
     url: string;
-    x: number,
-    y: number,
-    width: number,
-    height: number,
+    x?: number,
+    y?: number,
+    width?: number,
+    height?: number,
     focus?: FocusMoveType | FocusChangeBackgroundType
   };
 }

@@ -1,5 +1,6 @@
 import { CanvasComicConfig, CanvasPageConfig, CanvasGridConfig, GridId, PageId, Point, CanvasPolyGridConfig, PolyGridPoint, CanvasRectGridConfig, RectGridPoint } from "./types";
 import { BORDER_WIDTH } from "./constant";
+import { ComicConfig, GridConfig, PageConfig, PolyGridConfig, RectGridConfig } from "@/components/comic/core/type";
 
 type Pos = "lt" | "rt" | "lb" | "rb";
 type PolyType = "horizon" | "vertical";
@@ -723,4 +724,65 @@ export function getGridStyle(grid: CanvasGridConfig): GridStyle {
         return getPolyGridStyle(grid);
     }
     throw new Error("getGridStyle Unknown Type");
+}
+
+/**
+ * 将canvas的配置转化为comic的配置
+ * @param CanvasComicConfig
+ * @returns ComicConfig
+ */
+export function getComicConfigFromCanvas(canvasComicConfig: CanvasComicConfig): ComicConfig | null {
+    if (!canvasComicConfig) {
+        return null;
+    }
+    const result = {
+        pages: []
+    } as ComicConfig
+    for (let i = 0; i < canvasComicConfig.pages.length; i++) {
+        const canvasPageConfig = canvasComicConfig.pages[i];
+        const pageConfig = {
+            height: 0,
+            grids: []
+        } as PageConfig;
+        if (i == 0) {
+            pageConfig.logo = "/logo.jpg";
+        }
+        for (let j = 0; j < canvasPageConfig.grids.length; j++) {
+            const canvasGrid = canvasPageConfig.grids[j];
+            getAllGridConfig(canvasGrid, pageConfig.grids);
+        }
+        result.pages.push(pageConfig);
+    }
+    return result;
+
+    function getAllGridConfig(canvasGrid: CanvasGridConfig, allGrids: GridConfig[]) {
+        if (isGridSplited(canvasGrid)) {
+            for (let i = 0; i < canvasGrid.splitResult!.length; i++) {
+                const grid_ = canvasGrid.splitResult![i];
+                getAllGridConfig(grid_, allGrids)
+            }
+        } else {
+            let grid = {} as GridConfig;
+            if (canvasGrid.type === "rect") {
+                grid = {
+                    type: "rect",
+                    lt_x: canvasGrid.lt_x,
+                    lt_y: canvasGrid.lt_y,
+                    rb_x: canvasGrid.rb_x,
+                    rb_y: canvasGrid.rb_y,
+                } as RectGridConfig;
+            } else {
+                grid = {
+                    type: "poly",
+                    path: canvasGrid.path,
+                } as PolyGridConfig;
+            }
+            if (canvasGrid.content) {
+                grid.content = {
+                    url: canvasGrid.content.url
+                }
+            }
+            allGrids.push(grid);
+        }
+    }
 }

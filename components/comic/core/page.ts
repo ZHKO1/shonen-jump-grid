@@ -81,7 +81,7 @@ export class Page extends Container {
     // 最终页面焦点格子 颜色变成彩色
     if (this.focus) {
       if (this.focus.type.type == "change-background") {
-        let focusUrl = this.focus.type.focusUrl;
+        const focusUrl = this.focus.type.focusUrl;
         if (focusUrl) {
           timeline.call(() => {
             this.focus!.grid.updateContent(focusUrl)
@@ -96,7 +96,7 @@ export class LogoPage extends Page {
   logo: Logo;
   constructor(pageConfig: PageConfig) {
     super(pageConfig);
-    let logo_url = pageConfig.logo!;
+    const logo_url = pageConfig.logo!;
     this.logo = new Logo(logo_url);
     this.logo.x = 360;
     this.logo.y = 270;
