@@ -1,3 +1,4 @@
+import './App.css';
 import Canvas from "@/components/canvas";
 import HeaderBar from "@/components/header-bar";
 import AttrCard from "@/components/attr-card";

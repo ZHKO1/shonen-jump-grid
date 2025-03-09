@@ -1,5 +1,4 @@
 import { CSSProperties, forwardRef } from "react";
-import Image from "next/image";
 import { HTMLMotionProps, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { CanvasGridConfig } from "./types";
@@ -37,7 +36,7 @@ export const GridContent = forwardRef<HTMLDivElement, GridContentProps>(
                 {url &&
                     <div className="absolute"
                         style={imgStyle}>
-                        <Image
+                        <img
                             className="absolute w-full h-full select-none"
                             width={500}
                             height={500}
