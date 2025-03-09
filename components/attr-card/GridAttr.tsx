@@ -12,19 +12,64 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  // SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useAdjustComic } from "@/hooks/custom/useAdjustComic"
 import useComicStatusStore from "@/store"
 import { getGridsBySplit, isGridSplited } from "../canvas/components/grid/utils";
 import { CanvasGridConfig, Point } from "../canvas/components/grid/types"
 import { BORDER_WIDTH } from "../canvas/components/grid/constant"
 
+export function AnimationSelect({ value, onChange }: { value: string, onChange: (value: string) => void }) {
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className="h-6 rounded-md text-xs box-border">
+        <SelectValue placeholder="select type" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectItem className="h-6 text-xs" value="none">None</SelectItem>
+          <SelectItem className="h-6 text-xs" value="left-to-right">Left To Right</SelectItem>
+          <SelectItem className="h-6 text-xs" value="right-to-left">Right To Left</SelectItem>
+          <SelectItem className="h-6 text-xs" value="change-background">Gray To Color</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  )
+}
+
 export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
-  const { id, type, splitLine = [{ x: 0, y: 0 }, { x: 0, y: 0 }], splitSpaceWidth = 0 } = grid;
+  const {
+    id,
+    type,
+    splitLine = [{ x: 0, y: 0 }, { x: 0, y: 0 }],
+    splitSpaceWidth = 0,
+  } = grid;
   const { adjustGrid } = useAdjustComic();
   const isSplit = isGridSplited(grid);
   const splitLineStart = splitLine[0];
   const splitLineEnd = splitLine[1];
   const setShowImgCrop = useComicStatusStore(state => state.setShowImgCrop);
+
+  const { focus } = grid.content || {};
+  let animation = "none";
+  switch (focus?.type) {
+    case "move":
+      animation = focus.direction;
+      break;
+    case "change-background":
+      animation = "change-background";
+      break;
+    default:
+      break;
+  }
 
   // const onRectChange = (key: keyof RectGridPoint): React.ChangeEventHandler<HTMLInputElement> => (e) => {
   //   adjustGrid(id, {
@@ -50,6 +95,32 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
   const handleImgConfig = (e: React.MouseEvent) => {
     setShowImgCrop(true);
     e.preventDefault();
+  }
+
+  const onAnimationChange = (val: string) => {
+    let focus = undefined;
+    switch (val) {
+      case "left-to-right":
+      case "right-to-left":
+        focus = {
+          type: "move",
+          direction: val,
+        }
+        break;
+      case "change-background":
+        focus = {
+          type: "change-background",
+        }
+        break;
+      default:
+        break;
+    }
+    adjustGrid(id, {
+      content: {
+        ...grid.content,
+        focus
+      },
+    })
   }
 
   return (
@@ -114,12 +185,20 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
                     </div>
                   </>
                 ) : (
-                  <div className="grid col-span-4 grid-cols-5 gap-1">
-                    <Label className="col-span-2 text-xs flex items-center">image:</Label>
-                    <div className="grid grid-cols-2 col-span-3 text-xs gap-1">
-                      <Button variant="outline" size="sm" className="h-6" onClick={handleImgConfig}>config</Button>
+                  <>
+                    <div className="grid col-span-4 grid-cols-5 gap-1">
+                      <Label className="col-span-2 text-xs flex items-center">image:</Label>
+                      <div className="grid col-span-3 text-xs">
+                        <Button variant="outline" size="sm" className="h-6" onClick={handleImgConfig}>config</Button>
+                      </div>
                     </div>
-                  </div>
+                    <div className="grid col-span-4 grid-cols-5 gap-1">
+                      <Label className="col-span-2 text-xs flex items-center">Animation:</Label>
+                      <div className="grid col-span-3 text-xs">
+                        <AnimationSelect value={animation} onChange={onAnimationChange} />
+                      </div>
+                    </div>
+                  </>
                 )
               }
             </div>

@@ -20,15 +20,15 @@ export default function ImgCrop({ grid, onClose }: { grid: CanvasGridConfig, onC
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<ImgTarget>(null);
   const [maskType, setMaskType] = useState<MaskType>("full")
-  const [imgUrl, setImgUrl] = useState<string>(grid?.content?.originImg.url || "");
+  const [imgUrl, setImgUrl] = useState<string>(grid?.content?.originImg?.url || "");
   const [originImgSize, setOriginImgSize] = useState({
-    width: grid?.content?.originImg.width || 0,
-    height: grid?.content?.originImg.height || 0
+    width: grid?.content?.originImg?.width || 0,
+    height: grid?.content?.originImg?.height || 0
   });
   const [dragX, dragY, zoom, resetDragZoom] = useDragZoom(containerRef, {
-    dragX: grid?.content?.originImg.dragX,
-    dragY: grid?.content?.originImg.dragY,
-    zoom: grid?.content?.originImg.zoom,
+    dragX: grid?.content?.originImg?.dragX,
+    dragY: grid?.content?.originImg?.dragY,
+    zoom: grid?.content?.originImg?.zoom,
   });
   const [, open, reset] = useFileDialog();
   const { adjustGrid } = useAdjustComic();
@@ -106,6 +106,7 @@ export default function ImgCrop({ grid, onClose }: { grid: CanvasGridConfig, onC
 
     adjustGrid(grid.id, {
       content: {
+        ...grid.content,
         url,
         originImg: {
           url: imgUrl,

@@ -779,7 +779,8 @@ export function getComicConfigFromCanvas(canvasComicConfig: CanvasComicConfig): 
             }
             if (canvasGrid.content) {
                 grid.content = {
-                    url: canvasGrid.content.url
+                    url: canvasGrid.content.url,
+                    focus: canvasGrid.content.focus,
                 }
             }
             allGrids.push(grid);

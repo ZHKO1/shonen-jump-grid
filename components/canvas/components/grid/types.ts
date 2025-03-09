@@ -10,7 +10,7 @@ interface CanvasGridShareConfig {
     splitResult?: [CanvasGridConfig, CanvasGridConfig],
     splitSpaceWidth?: number,
     content?: {
-        originImg: {
+        originImg?: {
             url: string,
             width: number,
             height: number,

@@ -39,7 +39,7 @@ export default function Preview({ config, onClose }: { config: ComicConfig | nul
         className="bg-black text-white"
       >
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="bg-slate-400" ref={comicContianerRef}
+          <div className="" ref={comicContianerRef}
             style={{
               width: Width,
               height: Height,
