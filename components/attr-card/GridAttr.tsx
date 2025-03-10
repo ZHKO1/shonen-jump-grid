@@ -35,10 +35,10 @@ export function AnimationSelect({ value, onChange }: { value: string, onChange: 
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectItem className="h-6 text-xs" value="none">None</SelectItem>
-          <SelectItem className="h-6 text-xs" value="left-to-right">Left To Right</SelectItem>
-          <SelectItem className="h-6 text-xs" value="right-to-left">Right To Left</SelectItem>
-          <SelectItem className="h-6 text-xs" value="change-background">Gray To Color</SelectItem>
+          <SelectItem className="h-6 text-xs" value="none">none</SelectItem>
+          <SelectItem className="h-6 text-xs" value="left-to-right">left to right</SelectItem>
+          <SelectItem className="h-6 text-xs" value="right-to-left">right to left</SelectItem>
+          <SelectItem className="h-6 text-xs" value="change-background">gray to color</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>
@@ -193,7 +193,7 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
                       </div>
                     </div>
                     <div className="grid col-span-4 grid-cols-5 gap-1">
-                      <Label className="col-span-2 text-xs flex items-center">Animation:</Label>
+                      <Label className="col-span-2 text-xs flex items-center">animation:</Label>
                       <div className="grid col-span-3 text-xs">
                         <AnimationSelect value={animation} onChange={onAnimationChange} />
                       </div>
