@@ -9,6 +9,7 @@ import { GridContent } from "./GridContent";
 import { Grid } from ".";
 import { useEventListener } from "@/hooks";
 import { cn } from "@/lib/utils";
+import { GridIcon, GridIconProps } from "./GridIcon";
 
 export interface PolyGridProps {
     grid: CanvasPolyGridConfig,
@@ -30,6 +31,7 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
         sizeStyleWithBorder,
         svgPath,
         svgPathWithBorder,
+        focusIconPosStyle,
     } = getGridStyle(grid);
     const svgPoints = getSvgPoints(svgPath);
     const clipPath = getClipPath(svgPathWithBorder!);
@@ -37,6 +39,19 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
     const gridStyle = {
         ...posStyleWithBorder,
         ...sizeStyleWithBorder
+    }
+
+    const { focus } = grid.content || {};
+    let animation = "" as GridIconProps["iconType"] | "";
+    switch (focus?.type) {
+        case "move":
+            animation = focus.direction;
+            break;
+        case "change-background":
+            animation = "gray-to-color";
+            break;
+        default:
+            break;
     }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -61,8 +76,13 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
                     ref={gridRef}
                     url={grid.content?.url}
                     imgStyle={imgStyle}
-                // onClick={handleClick}
-                />)
+                >
+                    {animation && <GridIcon
+                        className={focusIconPosStyle && "absolute"}
+                        iconType={animation}
+                        style={focusIconPosStyle}
+                    />}
+                </GridContent>)
             }
 
             {splitGrids?.map((grid_, index) => (

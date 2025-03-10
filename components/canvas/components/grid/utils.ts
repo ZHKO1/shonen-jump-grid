@@ -37,6 +37,26 @@ export function getPolyContainerPoint(path: [Point, Point, Point, Point], pos: P
 }
 
 /**
+ * 判断四边形四个角是否直角
+ * @param path 
+ * @returns 
+ */
+export function isPolyCornerRightAngle(path: [Point, Point, Point, Point], corner: "lt" | "rt" | "lb" | "rb"): boolean {
+    const [p0, p1, p2, p3] = path;
+    switch (corner) {
+        case "lt":
+            return (p0.x == p3.x) && (p0.y == p1.y)
+        case "rt":
+            return (p1.x == p2.x) && (p0.y == p1.y)
+        case "lb":
+            return (p0.x == p3.x) && (p2.y == p3.y)
+        case "rb":
+            return (p2.y == p3.y) && (p1.x == p2.x)
+    }
+    throw new Error("unknown corner");
+}
+
+/**
  * 判断四边形本身是水平还是垂直的
  * @param path 
  * @returns 
@@ -612,6 +632,13 @@ interface GridStyle {
     svgPath: [Point, Point, Point, Point],
     // 边框最外一圈的路径（考虑边框宽度）
     svgPathWithBorder?: [Point, Point, Point, Point],
+    // left-to-right/right-to-left/gray-to-color图标的位置（如果需要显示）
+    focusIconPosStyle?: {
+        left?: number,
+        right?: number,
+        top?: number,
+        bottom?: number,
+    }
 }
 
 export function getSvgPoints(path: [Point, Point, Point, Point]) {
@@ -648,6 +675,12 @@ const getRectGridStyle = (grid: CanvasRectGridConfig): GridStyle => {
     }
     const svgPath = ([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }])
         .map(p => ({ x: p.x - left, y: p.y - top })) as [Point, Point, Point, Point]
+
+    const focusIconPosStyle = {
+        left: 10,
+        top: 10,
+    }
+
     return {
         posStyle,
         sizeStyle,
@@ -658,7 +691,8 @@ const getRectGridStyle = (grid: CanvasRectGridConfig): GridStyle => {
             left: posStyle.left - posStyleWithBorder.left,
             top: posStyle.top - posStyleWithBorder.top,
             ...sizeStyle
-        }
+        },
+        focusIconPosStyle
     }
 }
 
@@ -697,6 +731,33 @@ const getPolyGridStyle = (grid: CanvasPolyGridConfig): GridStyle => {
     const svgPath = grid.path
         .map(p => ({ x: p.x - left, y: p.y - top })) as [Point, Point, Point, Point]
 
+    let focusIconPosStyle = undefined
+    let path = grid.path;
+
+    if (isPolyCornerRightAngle(path, "lt")) {
+        focusIconPosStyle = {
+            left: 10,
+            top: 10,
+        }
+    } else if (isPolyCornerRightAngle(path, "rt")) {
+        focusIconPosStyle = {
+            right: 10,
+            top: 10,
+        }
+    } else if (isPolyCornerRightAngle(path, "rb")) {
+        focusIconPosStyle = {
+            right: 10,
+            bottom: 10,
+        }
+    } else if (isPolyCornerRightAngle(path, "lb")) {
+        focusIconPosStyle = {
+            left: 10,
+            bottom: 10,
+        }
+    } else {
+        focusIconPosStyle = undefined
+    }
+
     return {
         posStyle,
         sizeStyle,
@@ -708,7 +769,8 @@ const getPolyGridStyle = (grid: CanvasPolyGridConfig): GridStyle => {
             left: posStyle.left - posStyleWithBorder.left,
             top: posStyle.top - posStyleWithBorder.top,
             ...sizeStyle
-        }
+        },
+        focusIconPosStyle
     }
 }
 

@@ -9,6 +9,7 @@ import { Grid } from ".";
 import { useSplit } from "./hooks/useSplit";
 import { useEventListener } from "@/hooks";
 import { cn } from "@/lib/utils";
+import { GridIcon, GridIconProps } from "./GridIcon";
 
 export interface RectGridProps {
     grid: CanvasRectGridConfig,
@@ -30,12 +31,26 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
         posStyleWithBorder,
         sizeStyleWithBorder,
         svgPath,
+        focusIconPosStyle,
     } = getGridStyle(grid);
     const svgPoints = getSvgPoints(svgPath);
 
     const gridStyle = {
         ...posStyleWithBorder,
         ...sizeStyleWithBorder
+    }
+
+    const { focus } = grid.content || {};
+    let animation = "" as GridIconProps["iconType"] | "";
+    switch (focus?.type) {
+        case "move":
+            animation = focus.direction;
+            break;
+        case "change-background":
+            animation = "gray-to-color";
+            break;
+        default:
+            break;
     }
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -57,8 +72,13 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
                     ref={gridRef}
                     url={grid.content?.url}
                     imgStyle={imgStyle}
-                    // onClick={handleClick}
-                />)
+                >
+                    {animation && <GridIcon
+                        className={focusIconPosStyle && "absolute"}
+                        iconType={animation}
+                        style={focusIconPosStyle}
+                    />}
+                </GridContent>)
             }
 
             {splitGrids?.map((grid_, index) => (
