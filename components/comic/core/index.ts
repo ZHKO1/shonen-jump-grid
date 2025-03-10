@@ -103,8 +103,8 @@ export class Comic {
     tl.pause();
     tl.clear();
 
-    tl.to(this.blackOverlay, { duration: 2.1 });
-    tl.to(this.blackOverlay, { duration: 0.5, alpha: 0 });
+    tl.to(this.blackOverlay, { duration: 0 });
+    tl.to(this.blackOverlay, { duration: 0.3, alpha: 0 });
 
     const logoPage = this.comicStage.children[0] as LogoPage;
     logoPage.initTimeLine();

@@ -4,7 +4,8 @@ import { Comic } from './core';
 
 export interface ComicProps {
   config?: ComicConfig | null,
-  autoPlay?: boolean
+  autoPlay?: boolean,
+  onLoad?: (a: any) => void
 }
 
 export interface ComicRef {
@@ -39,11 +40,10 @@ const ComicComponent = forwardRef<ComicRef, ComicProps>((props, ref) => {
   useEffect(() => {
     const comic_ = new Comic();
     const promise = new Promise(async (resolve) => {
-      let result = null;
       if (comic_ && props.config) {
-        result = await comic_.init(props.config, container.current!);
+        await comic_.init(props.config, container.current!);
       }
-      resolve(result);
+      props.onLoad && props.onLoad(resolve);
     });
     promise.then(() => {
       if (props.autoPlay && comic_) {
@@ -60,7 +60,7 @@ const ComicComponent = forwardRef<ComicRef, ComicProps>((props, ref) => {
       });
       comicRef.current = null;
     }
-  }, [props.config, props.autoPlay]);
+  }, [props.config, props.autoPlay, props.onLoad]);
 
   return <>
     <div className="comic_container" ref={container}>

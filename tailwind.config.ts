@@ -60,10 +60,19 @@ export default {
   				'50%': {
   					color: 'white'
   				}
+  			},
+				loading: {
+  				'15%, 25%': {
+  					opacity: '0'
+  				},
+  				'40%': {
+  					opacity: '1'
+  				}
   			}
   		},
   		animation: {
-  			breathe: 'focusBorderBreathe 1.2s ease-in-out infinite'
+  			breathe: 'focusBorderBreathe 1.2s ease-in-out infinite',
+  			loading: 'loading 2s linear infinite'
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
