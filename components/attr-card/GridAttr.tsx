@@ -27,7 +27,7 @@ import { getGridsBySplit, isGridSplited } from "../canvas/utils";
 import { CanvasGridConfig, Point } from "../canvas/types"
 import { BORDER_WIDTH } from "../canvas/constant"
 
-export function AnimationSelect({ value, onChange }: { value: string, onChange: (value: string) => void }) {
+function AnimationSelect({ value, onChange }: { value: string, onChange: (value: string) => void }) {
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger className="h-6 rounded-md text-xs box-border">
@@ -134,7 +134,7 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
           <div className="grid w-full items-center gap-1 text-xs">
             <div className="grid grid-cols-4 gap-1">
               <div className="grid col-span-4 grid-cols-5 gap-1">
-                <Label className="col-span-2 text-xs">Id:</Label>
+                <Label className="col-span-2 text-xs">id:</Label>
                 <Label className="col-span-3 text-xs">{id}</Label>
               </div>
               {

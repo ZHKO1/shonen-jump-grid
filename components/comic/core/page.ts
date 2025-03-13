@@ -1,5 +1,5 @@
 import { Container, Graphics } from "pixi.js";
-import { GridBackground, GridLineWidth } from './config'
+import { GridBackground, GridFocusedBackground, GridLineWidth } from './config'
 import { Grid } from "./grid";
 import { Logo } from "./logo";
 import gsap from "gsap";
@@ -35,7 +35,7 @@ export class Page extends Container {
       this.focus.grid.zIndex = 2;
       switch (this.focus.type.type) {
         case "move":
-          this.focus.grid.updateBackground(0xFFF7C8);
+          this.focus.grid.updateBackground(GridFocusedBackground);
           break;
         default:
           break;

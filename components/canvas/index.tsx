@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { useEventListener } from "@/hooks";
 import useComicStatusStore from "@/store";
 import { Grid } from "./grid";
 import { ContainerContext } from "./context/container";
 import { getPageFromComicConfig } from "./utils";
 import { LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT } from "./constant";
+import { on, off } from "@/lib";
 
 export default function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,13 +32,24 @@ export default function Canvas() {
         pages: [{
           id: "page0",
           height: LOGO_PAGE_HEIGHT,
+          readonly: true,
           grids: LOGO_PAGE_GRIDS_CONFIG
         }]
       }
     });
   }, [setCurrentPageId, addHistoryStep]);
 
-  useEventListener("click", handleDocumentClick, containerRef);
+  useEffect(() => {
+    if (containerRef.current) {
+      on(containerRef.current, "click", handleDocumentClick);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        off(containerRef.current, "click", handleDocumentClick);
+      }
+    }
+  })
 
   return (
     <div className="p-3 flex items-center justify-center text-4xl font-bold text-black">
