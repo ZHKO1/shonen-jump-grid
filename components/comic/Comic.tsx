@@ -49,6 +49,8 @@ const ComicComponent = forwardRef<ComicRef, ComicProps>((props, ref) => {
       if (props.autoPlay && comic_) {
         comic_.play();
       }
+    }).catch(e => {
+      console.log(e);
     });
     comicRef.current = comic_;
 

@@ -34,7 +34,7 @@ export function TemplateSelect({ value, onChange }: { value: string, onChange: (
             <SelectContent>
                 <SelectGroup>
                     <SelectItem value="blank">Blank</SelectItem>
-                    <SelectItem value="logo">Logo Page</SelectItem>
+                    {/* <SelectItem value="logo">Logo Page</SelectItem> */}
                 </SelectGroup>
             </SelectContent>
         </Select>

@@ -803,12 +803,11 @@ export function getComicConfigFromCanvas(canvasComicConfig: CanvasComicConfig): 
     for (let i = 0; i < canvasComicConfig.pages.length; i++) {
         const canvasPageConfig = canvasComicConfig.pages[i];
         const pageConfig = {
-            height: 0,
+            height: canvasPageConfig.height,
+            logo: canvasPageConfig.logo,
             grids: []
         } as PageConfig;
-        if (i == 0) {
-            pageConfig.logo = "/logo.jpg";
-        }
+        pageConfig.logo = canvasPageConfig.logo;
         for (let j = 0; j < canvasPageConfig.grids.length; j++) {
             const canvasGrid = canvasPageConfig.grids[j];
             getAllGridConfig(canvasGrid, pageConfig.grids);

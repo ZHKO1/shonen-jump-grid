@@ -33,6 +33,9 @@ export default function Canvas() {
           id: "page0",
           height: LOGO_PAGE_HEIGHT,
           readonly: true,
+          logo: {
+            url: "/logo.jpg"
+          },
           grids: LOGO_PAGE_GRIDS_CONFIG
         }]
       }

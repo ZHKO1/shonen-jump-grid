@@ -45,7 +45,13 @@ export type GridConfig = RectGridConfig | PolyGridConfig;
 
 export interface PageConfig {
   height?: number;
-  logo?: string;
+  logo?: {
+    url: string,
+    x?: number,
+    y?: number,
+    width?: number,
+    height?: number,
+  };
   grids: GridConfig[]
 }
 

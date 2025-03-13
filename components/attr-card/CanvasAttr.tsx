@@ -18,12 +18,16 @@ export default function CanvasAttr({ page }: { page?: CanvasPageConfig }) {
   // const currentPageId = useComicStatusStore(state => state.currentPageId);
   const pageId = page?.id || "";
   const height = page?.height || "";
-  
+
+  const isLogoPage = pageId === "page0";
+
+  const handleLogoConfig = (e: React.MouseEvent) => {
+    e.preventDefault();
+  }
+
   return (
     <Card className="w-[250px]">
       <CardHeader>
-        <CardTitle>Canvas</CardTitle>
-        <CardDescription>Canvas Attr</CardDescription>
         <CardTitle>Page</CardTitle>
         <CardDescription>Page Attr</CardDescription>
       </CardHeader>
@@ -46,7 +50,22 @@ export default function CanvasAttr({ page }: { page?: CanvasPageConfig }) {
                     </div>
                   </div>
                   {
-
+                    isLogoPage && (
+                      <>
+                        <div className="grid grid-cols-5 gap-1">
+                          <Label className="col-span-2 text-xs flex items-center">logo:</Label>
+                          <div className="grid col-span-3 text-xs">
+                            <Button variant="outline" size="sm" className="h-6" onClick={handleLogoConfig}>config</Button>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-5 gap-1">
+                          <Label className="col-span-2 text-xs flex items-center">logo positionX:</Label>
+                          <div className="grid col-span-3 text-xs">
+                            <Button variant="outline" size="sm" className="h-6" onClick={handleLogoConfig}>config</Button>
+                          </div>
+                        </div>
+                      </>
+                    )
                   }
                 </div>
               </form>
@@ -56,6 +75,6 @@ export default function CanvasAttr({ page }: { page?: CanvasPageConfig }) {
       }
       <CardFooter className="flex justify-between">
       </CardFooter>
-    </Card>
+    </Card >
   )
 }

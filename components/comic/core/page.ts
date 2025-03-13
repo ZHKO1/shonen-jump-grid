@@ -96,10 +96,10 @@ export class LogoPage extends Page {
   logo: Logo;
   constructor(pageConfig: PageConfig) {
     super(pageConfig);
-    const logo_url = pageConfig.logo!;
-    this.logo = new Logo(logo_url);
-    this.logo.x = 360;
-    this.logo.y = 270;
+    const { url, x, y } = pageConfig.logo!;
+    this.logo = new Logo(url);
+    this.logo.x = x || 360;
+    this.logo.y = y || 270;
     this.logo.alpha = 0;
     this.logo.zIndex = 2;
     this.addChild(this.logo);
@@ -113,10 +113,10 @@ export class LogoPage extends Page {
     const timeline = this.timeline;
     timeline.to(this.logo, { duration: 1.2 });
     timeline.set(this.logo, { alpha: 1 });
-    timeline.set(this.logo.scale, { x: 0.2, y: 0.2 });
-    timeline.to(this.logo.scale, { duration: 0.3, x: 0.12, y: 0.12 });
+    timeline.set(this.logo.scale, { x: 2, y: 2 });
+    timeline.to(this.logo.scale, { duration: 0.3, x: 1, y: 1 });
     timeline.to(this.logo, { duration: 1 });
-    timeline.to(this.logo.scale, { duration: 0.1, x: 0.3, y: 0.3 });
+    timeline.to(this.logo.scale, { duration: 0.1, x: 3, y: 3 });
     timeline.set(this.logo, { alpha: 0 });
   }
 }
