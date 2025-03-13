@@ -1,22 +1,23 @@
 import { MouseEventHandler, useRef } from "react";
 import useComicStatusStore from "@/store";
-import { useSplit } from "./hooks/useSplit";
-import { getClipPath, getGridStyle, getSvgPoints } from "./utils";
-import { BORDER_WIDTH } from "./constant";
-import { CanvasPolyGridConfig } from "./types";
+import { CanvasRectGridConfig } from "../types";
+import { getGridStyle, getSvgPoints } from "../utils";
+import { BORDER_WIDTH } from "../constant";
 import { GridBorder } from "./GridBorder";
 import { GridContent } from "./GridContent";
 import { Grid } from ".";
+import { useSplit } from "../hooks/useSplit";
 import { useEventListener } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { GridIcon, GridIconProps } from "./GridIcon";
 
-export interface PolyGridProps {
-    grid: CanvasPolyGridConfig,
+export interface RectGridProps {
+    grid: CanvasRectGridConfig,
     showAsFocused?: boolean,
     borderOnly?: boolean
-};
-export default function PolyGrid({ grid, showAsFocused = false, borderOnly = false }: PolyGridProps) {
+}
+
+export default function RectGrid({ grid, showAsFocused = false, borderOnly = false }: RectGridProps) {
     const gridRef = useRef<HTMLDivElement>(null);
     const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId);
     const { getCurrentGridId } = useComicStatusStore();
@@ -30,11 +31,9 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
         posStyleWithBorder,
         sizeStyleWithBorder,
         svgPath,
-        svgPathWithBorder,
         focusIconPosStyle,
     } = getGridStyle(grid);
     const svgPoints = getSvgPoints(svgPath);
-    const clipPath = getClipPath(svgPathWithBorder!);
 
     const gridStyle = {
         ...posStyleWithBorder,
@@ -56,8 +55,8 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
 
     const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
         setCurrentGridId(grid.id);
-        // e.nativeEvent.stopImmediatePropagation();
         e.stopPropagation();
+        // e.nativeEvent.stopImmediatePropagation();
     }
 
     useEventListener("click", handleClick, gridRef && gridRef.current);
@@ -69,10 +68,7 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
                     className={cn(isFocused && "z-10")}
                     disableMotion={!isFocused}
                     gridId={grid.id}
-                    style={{
-                        ...gridStyle
-                    }}
-                    clipPath={clipPath}
+                    style={gridStyle}
                     ref={gridRef}
                     url={grid.content?.url}
                     imgStyle={imgStyle}

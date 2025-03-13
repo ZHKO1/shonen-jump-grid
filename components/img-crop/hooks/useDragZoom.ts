@@ -1,7 +1,7 @@
 import React, { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import normalizeWheel from 'normalize-wheel'
 import { defaultDocument, defaultWindow, off, on } from "@/lib";
-import { Point } from "@/components/canvas/components/grid/types";
+import { Point } from "@/components/canvas/types";
 
 const ZOOMSPEED = 0.1;
 const MIN_ZOOM = 0.01

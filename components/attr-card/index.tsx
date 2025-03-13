@@ -1,7 +1,7 @@
 "use client"
 import * as React from "react"
 import useComicStatusStore from "@/store";
-import { getGridFromComicConfig } from "../canvas/components/grid/utils";
+import { getGridFromComicConfig } from "../canvas/utils";
 import GridAttr from "./GridAttr"
 import CanvasAttr from "./CanvasAttr"
 

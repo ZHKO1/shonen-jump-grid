@@ -2,10 +2,10 @@
 import { useEffect, useRef } from "react";
 import { useEventListener } from "@/hooks";
 import useComicStatusStore from "@/store";
-import { Grid } from "./components/grid";
+import { Grid } from "./grid";
 import { ContainerContext } from "./context/container";
-import { getPageFromComicConfig } from "./components/grid/utils";
-import { LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT } from "./components/grid/constant";
+import { getPageFromComicConfig } from "./utils";
+import { LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT } from "./constant";
 
 export default function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);

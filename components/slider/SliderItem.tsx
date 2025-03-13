@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { Plus, X } from "lucide-react";
-import { CanvasPageConfig } from "../canvas/components/grid/types";
+import { CanvasPageConfig } from "../canvas/types";
 import { cn } from "@/lib/utils";
 
 export default function SliderItem({ page, add = false, focused = false, onClick, onDelete }: { page?: CanvasPageConfig, add?: boolean, focused?: boolean, onClick?: React.MouseEventHandler<HTMLDivElement>, onDelete?: React.MouseEventHandler<HTMLDivElement> }) {

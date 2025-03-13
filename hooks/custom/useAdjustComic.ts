@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import useComicStatusStore from "@/store";
-import { getGridFromComicConfig } from "../../components/canvas/components/grid/utils";
-import { CanvasComicConfig, GridId, CanvasPageConfig, PageId } from "../../components/canvas/components/grid/types";
+import { getGridFromComicConfig } from "../../components/canvas/utils";
+import { CanvasComicConfig, GridId, CanvasPageConfig, PageId } from "../../components/canvas/types";
 
 export function useAdjustComic() {
     const addHistoryStep = useComicStatusStore(state => state.addHistoryStep);

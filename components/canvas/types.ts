@@ -36,6 +36,7 @@ export type PageId = string | number
 export interface CanvasPageConfig extends PageConfig {
     id: PageId,
     height: number,
+    readonly?: boolean,
     grids: CanvasGridConfig[],
 }
 

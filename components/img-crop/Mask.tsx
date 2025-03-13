@@ -1,8 +1,8 @@
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import { motion } from "framer-motion";
 import { useWindowSize } from "@/hooks";
-import { GridId, Point } from "../canvas/components/grid/types";
-import { getSvgPoints } from "../canvas/components/grid/utils";
+import { GridId, Point } from "../canvas/types";
+import { getSvgPoints } from "../canvas/utils";
 
 export type MaskType = "full" | "grid"
 export interface MaskRef {

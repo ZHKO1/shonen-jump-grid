@@ -2,7 +2,7 @@
 import React, { useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 import useComicStatusStore from "@/store";
-import { getGridFromComicConfig } from "../canvas/components/grid/utils";
+import { getGridFromComicConfig } from "../canvas/utils";
 import ImgCrop from "./ImgCrop";
 import { defaultDocument } from "@/lib";
 

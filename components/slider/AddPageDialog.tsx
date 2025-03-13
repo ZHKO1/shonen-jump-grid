@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { CanvasGridConfig, CanvasPageConfig } from "../canvas/components/grid/types"
-import { BLANK_GRID_MARGIN, LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT, NEW_PAGE_GRID_CONFIG } from "../canvas/components/grid/constant"
+import { CanvasGridConfig, CanvasPageConfig } from "../canvas/types"
+import { BLANK_GRID_MARGIN, LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT, NEW_PAGE_GRID_CONFIG } from "../canvas/constant"
 
 let GlobalPageId = 1;
 

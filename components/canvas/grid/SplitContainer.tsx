@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 import { useDraggable } from "@/hooks";
 import { useAdjustComic } from "@/hooks/custom/useAdjustComic";
 import useComicStatusStore from "@/store";
-import { CanvasGridConfig, Point } from "./types";
-import { ContainerContext } from "../../context/container";
-import { getAdjustedPoint, getGridsBySplit } from "./utils";
+import { CanvasGridConfig, Point } from "../types";
+import { ContainerContext } from "../context/container";
+import { getAdjustedPoint, getGridsBySplit } from "../utils";
 import { Grid } from ".";
 
 function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, isDrawing: boolean) => void }) {

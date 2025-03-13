@@ -1,5 +1,5 @@
 import { create, StateCreator } from 'zustand';
-import { CanvasComicConfig, GridId, PageId } from '@/components/canvas/components/grid/types';
+import { CanvasComicConfig, GridId, PageId } from '@/components/canvas/types';
 
 interface CurrentStatusSlice {
   // 焦点页

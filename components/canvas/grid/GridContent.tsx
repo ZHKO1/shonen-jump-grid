@@ -1,7 +1,7 @@
 import { CSSProperties, forwardRef, ReactNode } from "react";
 import { HTMLMotionProps, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { CanvasGridConfig } from "./types";
+import { CanvasGridConfig } from "../types";
 
 export interface GridContentProps
     extends HTMLMotionProps<"div"> {

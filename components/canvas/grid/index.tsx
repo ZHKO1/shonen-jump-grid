@@ -1,6 +1,6 @@
 'use client';
-import { isGridSplited } from './utils';
-import { CanvasGridConfig } from './types';
+import { isGridSplited } from '../utils';
+import { CanvasGridConfig } from '../types';
 import SplitContainer from './SplitContainer';
 import RectGrid, { RectGridProps } from './RectGrid';
 import PolyGrid, { PolyGridProps } from './PolyGrid';

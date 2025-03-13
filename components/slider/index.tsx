@@ -2,7 +2,7 @@
 import React from "react";
 import useComicStatusStore from "@/store";
 import SliderItem from "./SliderItem";
-import { CanvasPageConfig, PageId } from "../canvas/components/grid/types";
+import { CanvasPageConfig, PageId } from "../canvas/types";
 import { useAdjustComic } from "@/hooks/custom/useAdjustComic";
 import AddPageDialog from "./AddPageDialog";
 
