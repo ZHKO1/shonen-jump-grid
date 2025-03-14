@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { Lock, Plus, X } from "lucide-react";
-import { CanvasPageConfig } from "../canvas/types";
+import { CanvasPageConfig } from "@/components/canvas/types";
 import { cn } from "@/lib/utils";
 
 interface SliderItemProps {

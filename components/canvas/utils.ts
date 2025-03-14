@@ -848,3 +848,12 @@ export function getComicConfigFromCanvas(canvasComicConfig: CanvasComicConfig): 
         }
     }
 }
+
+/**
+ * 判断是否logo-page
+ * @param CanvasPageConfig
+ * @returns boolean
+ */
+export function getIsLogoPage(page: CanvasPageConfig) {
+    return page.id === "page0" && page?.logo;
+}

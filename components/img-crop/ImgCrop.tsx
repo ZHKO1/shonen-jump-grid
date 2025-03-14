@@ -3,15 +3,15 @@ import React, { useRef, useState } from "react";
 import { useFileDialog } from "@/hooks";
 import { useAdjustComic } from "@/hooks/custom/useAdjustComic";
 import { cn } from "@/lib/utils";
-import { getClipPath, getSvgPoints, getGridStyle } from "../canvas/utils";
-import { GridBorder } from "../canvas/grid/GridBorder";
-import { GridContent } from "../canvas/grid/GridContent";
+import { getClipPath, getSvgPoints, getGridStyle } from "@/components/canvas/utils";
+import { GridBorder } from "@/components/canvas/grid/GridBorder";
+import { GridContent } from "@/components/canvas/grid/GridContent";
 import Background from "@/components/background";
 import ActionBar, { ActionType } from "@/components/action-bar";
 import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "@/components/action-bar/Icons";
 import Mask, { MaskRef, MaskType } from "./Mask";
 import { useDragZoom } from "./hooks/useDragZoom";
-import { CanvasGridConfig } from "../canvas/types";
+import { CanvasGridConfig } from "@/components/canvas/types";
 import Img, { ImgTarget } from "./Img";
 
 export default function ImgCrop({ grid, onClose }: { grid: CanvasGridConfig, onClose: () => void }) {

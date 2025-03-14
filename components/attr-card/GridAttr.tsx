@@ -23,9 +23,9 @@ import {
 } from "@/components/ui/select"
 import { useAdjustComic } from "@/hooks/custom/useAdjustComic"
 import useComicStatusStore from "@/store"
-import { getGridsBySplit, isGridSplited } from "../canvas/utils";
-import { CanvasGridConfig, Point } from "../canvas/types"
-import { BORDER_WIDTH } from "../canvas/constant"
+import { getGridsBySplit, isGridSplited } from "@/components/canvas/utils";
+import { CanvasGridConfig, Point } from "@/components/canvas/types"
+import { BORDER_WIDTH } from "@/components/canvas/constant"
 
 function AnimationSelect({ value, onChange }: { value: string, onChange: (value: string) => void }) {
   return (

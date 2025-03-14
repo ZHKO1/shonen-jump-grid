@@ -4,7 +4,7 @@ import { AnimatePresence } from "framer-motion";
 import useComicStatusStore from "@/store";
 import { defaultDocument } from "@/lib";
 import Preview from "./Preview";
-import { getComicConfigFromCanvas } from "../canvas/utils";
+import { getComicConfigFromCanvas } from "@/components/canvas/utils";
 
 export default function ComicContainer() {
   const showComic = useComicStatusStore(state => state.showComic);

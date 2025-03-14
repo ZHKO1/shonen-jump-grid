@@ -11,15 +11,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { CanvasPageConfig } from "../canvas/types"
+import { CanvasPageConfig } from "@/components/canvas/types"
+import { getIsLogoPage } from "@/components/canvas/utils"
+import Layer from "./Layer"
 // import useComicStatusStore from "@/store";
 
-export default function CanvasAttr({ page }: { page?: CanvasPageConfig }) {
+export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
   // const currentPageId = useComicStatusStore(state => state.currentPageId);
   const pageId = page?.id || "";
   const height = page?.height || "";
 
-  const isLogoPage = pageId === "page0";
+  const isLogoPage = page && getIsLogoPage(page) || false;
 
   const handleLogoConfig = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -49,8 +51,14 @@ export default function CanvasAttr({ page }: { page?: CanvasPageConfig }) {
                       <Label className="col-span-3 text-xs">{height}</Label>
                     </div>
                   </div>
+                  <div className="grid gap-1">
+                    <Label className="text-xs flex items-center">layer:</Label>
+                    <div className="text-xs">
+                      <Layer />
+                    </div>
+                  </div>
                   {
-                    isLogoPage && (
+                    false && (
                       <>
                         <div className="grid grid-cols-5 gap-1">
                           <Label className="col-span-2 text-xs flex items-center">logo:</Label>

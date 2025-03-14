@@ -1,9 +1,9 @@
 "use client"
 import * as React from "react"
 import useComicStatusStore from "@/store";
-import { getGridFromComicConfig, getPageFromComicConfig } from "../canvas/utils";
+import { getGridFromComicConfig, getPageFromComicConfig } from "@/components/canvas/utils";
 import GridAttr from "./GridAttr"
-import CanvasAttr from "./CanvasAttr"
+import PageAttr from "./PageAttr"
 
 export default function AttrCard() {
   const showAttrCard = useComicStatusStore(state => state.showAttrCard);
@@ -23,7 +23,7 @@ export default function AttrCard() {
   return (
     <div>
       {
-        (currentGridId !== "") && grid ? <GridAttr grid={grid} /> : <CanvasAttr page={page} />
+        (currentGridId !== "") && grid ? <GridAttr grid={grid} /> : <PageAttr page={page} />
       }
     </div>
   )
