@@ -1,15 +1,18 @@
 "use client";
 import { useEffect, useRef } from "react";
-import useComicStatusStore from "@/store";
-import { Grid } from "./grid";
+import useComicStatusStore, { LogoPageStatus } from "@/store";
+import { cn } from "@/lib/utils";
 import { ContainerContext } from "./context/container";
 import { getPageFromComicConfig } from "./utils";
 import { LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT } from "./constant";
 import { on, off } from "@/lib";
+import { Grid } from "./grid";
+import Logo from "./logo";
 
 export default function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);
   const pageId = useComicStatusStore(state => state.currentPageStatus.id);
+  const layerType = useComicStatusStore(state => (state.currentPageStatus as LogoPageStatus)?.layerType || "grids");
   const setCurrentPageId = useComicStatusStore(state => state.setCurrentPageId);
   const resetCurrentGridId = useComicStatusStore(state => state.resetCurrentGridId);
   const addHistoryStep = useComicStatusStore(state => state.addHistoryStep);
@@ -17,6 +20,7 @@ export default function Canvas() {
   const step = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex]);
   const comicConfig = step?.comicConfig;
   const page = comicConfig && getPageFromComicConfig(comicConfig, pageId);
+  const logo = page?.logo;
   const grids = page && page.grids;
   const height = page && page.height;
   const extraProp = height ? { style: { height } } : {};
@@ -71,7 +75,10 @@ export default function Canvas() {
         grids && <div ref={containerRef} className="canvas-content w-[720px] bg-gray-100 relative overflow-hidden border-2 border-gray-400"
           {...extraProp}>
           <ContainerContext.Provider value={{ container: containerRef }}>
-            {grids.map((grid) => (<Grid grid={grid} key={grid.id} />))}
+            <div className={cn(layerType !== "grids" && "pointer-events-none opacity-30")}>
+              {grids.map((grid) => (<Grid grid={grid} key={grid.id} />))}
+            </div>
+            {logo && <Logo className={cn(layerType !== "logo" && "pointer-events-none opacity-30")} logo={logo} disableMotion={true}/>}
           </ContainerContext.Provider>
         </div>
       }

@@ -8,14 +8,14 @@ interface PageShareStatus {
   type: 'custom-page' | 'logo-page',
 }
 
-interface PageStatus extends PageShareStatus {
+export interface PageStatus extends PageShareStatus {
   id: PageId,
   gridId: GridId
   type: 'custom-page',
 }
 
-type LayerType = 'logo' | 'grids';
-interface LogoPageStatus extends PageShareStatus {
+export type LayerType = 'logo' | 'grids';
+export interface LogoPageStatus extends PageShareStatus {
   id: PageId,
   gridId: GridId
   type: 'logo-page',

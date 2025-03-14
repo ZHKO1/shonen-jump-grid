@@ -175,7 +175,7 @@ export default function ImgCrop({ grid, onClose }: { grid: CanvasGridConfig, onC
         />}
       </Background>
       <div
-        className="fixed inset-0  grid place-items-center z-[100] pointer-events-none">
+        className="fixed inset-0 grid place-items-center z-[100] pointer-events-none">
         <GridContent
           className={
             cn(maskType === "grid" ? "bg-transparent" : "")
@@ -196,7 +196,6 @@ export default function ImgCrop({ grid, onClose }: { grid: CanvasGridConfig, onC
       </div>
       <Mask
         ref={maskRef}
-        gridId={grid.id}
         gridSize={sizeStyle}
         svgPath={svgPath}
         maskType={maskType}

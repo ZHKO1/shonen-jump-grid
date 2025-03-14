@@ -31,7 +31,6 @@ export interface CanvasRectGridConfig extends RectGridConfig, Omit<CanvasGridSha
 
 export type CanvasGridConfig = (CanvasPolyGridConfig | CanvasRectGridConfig);
 
-
 export type PageId = string | number
 export interface CanvasPageConfig extends PageConfig {
     id: PageId,

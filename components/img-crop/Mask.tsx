@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import { motion } from "framer-motion";
 import { useWindowSize } from "@/hooks";
-import { GridId, Point } from "@/components/canvas/types";
+import { Point } from "@/components/canvas/types";
 import { getSvgPoints } from "@/components/canvas/utils";
 
 export type MaskType = "full" | "grid"
@@ -9,8 +9,7 @@ export interface MaskRef {
   getMaskPosStyle: () => { left: number; top: number };
 }
 
-const Mask = forwardRef(({ gridId, gridSize, svgPath, maskType }: {
-  gridId: GridId,
+const Mask = forwardRef(({ gridSize, svgPath, maskType }: {
   gridSize: { width: number, height: number },
   svgPath: [Point, Point, Point, Point],
   maskType: MaskType,
@@ -58,7 +57,7 @@ const Mask = forwardRef(({ gridId, gridSize, svgPath, maskType }: {
         (<svg
           className="absolute top-0 right-0 bottom-0 left-0" width="100%" height="100%">
           <defs>
-            <mask id={`hole-${gridId}`}>
+            <mask id={`hole-mask`}>
               <rect width="100%" height="100%" fill="white" />
               <polygon
                 points={maskSvgPoints}
@@ -66,7 +65,7 @@ const Mask = forwardRef(({ gridId, gridSize, svgPath, maskType }: {
               />
             </mask>
           </defs>
-          <rect fill="black" fillOpacity={0.2} width="100%" height="100%" mask={`url(#hole-${gridId})`} />
+          <rect fill="black" fillOpacity={0.2} width="100%" height="100%" mask={`url(#hole-mask)`} />
         </svg>) :
         (<div
           className="fixed inset-0 flex items-center justify-center h-full w-full z-10 bg-black/20"

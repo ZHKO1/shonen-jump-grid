@@ -47,8 +47,8 @@ export interface PageConfig {
   height?: number;
   logo?: {
     url: string,
-    x?: number,
-    y?: number,
+    centerX?: number,
+    centerY?: number,
     width?: number,
     height?: number,
   };

@@ -6,3 +6,8 @@ export const GridBackground = 0xFFCEC6;
 export const GridFocusedBackground = 0xFFF7C8;
 export const GridLineWidth = 6;
 export const GridLineColor = "black";
+
+export const LogoDefaultCenterX = 360;
+export const LogoDefaultCenterY = 270;
+export const LogoDefaultWidth = 500;
+export const LogoDefaultHeight = 200;

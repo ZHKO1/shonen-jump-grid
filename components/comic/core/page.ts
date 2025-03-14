@@ -1,5 +1,5 @@
 import { Container, Graphics } from "pixi.js";
-import { GridBackground, GridFocusedBackground, GridLineWidth } from './config'
+import { GridBackground, GridFocusedBackground, GridLineWidth, LogoDefaultCenterX, LogoDefaultCenterY, LogoDefaultHeight, LogoDefaultWidth } from './config'
 import { Grid } from "./grid";
 import { Logo } from "./logo";
 import gsap from "gsap";
@@ -96,10 +96,10 @@ export class LogoPage extends Page {
   logo: Logo;
   constructor(pageConfig: PageConfig) {
     super(pageConfig);
-    const { url, x, y } = pageConfig.logo!;
-    this.logo = new Logo(url);
-    this.logo.x = x || 360;
-    this.logo.y = y || 270;
+    const { url, centerX = LogoDefaultCenterX, centerY = LogoDefaultCenterY, width = LogoDefaultWidth, height = LogoDefaultHeight } = pageConfig.logo!;
+    this.logo = new Logo(url, width, height);
+    this.logo.x = centerX;
+    this.logo.y = centerY;
     this.logo.alpha = 0;
     this.logo.zIndex = 2;
     this.addChild(this.logo);
