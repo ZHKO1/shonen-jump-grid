@@ -11,7 +11,7 @@ export default function Slider() {
     const comicConfig = step?.comicConfig;
     const pages = comicConfig?.pages || [];
     const { addPage, deletePage } = useAdjustComic();
-    const currentPageId = useComicStatusStore(state => state.currentPageId);
+    const currentPageId = useComicStatusStore(state => state.currentPageStatus.id);
     const setCurrentPageId = useComicStatusStore(state => state.setCurrentPageId);
     const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId);
 

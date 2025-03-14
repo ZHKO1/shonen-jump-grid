@@ -1,16 +1,36 @@
 import { create, StateCreator } from 'zustand';
 import { CanvasComicConfig, GridId, PageId } from '@/components/canvas/types';
+import { getIsLogoPage, getPageFromComicConfig } from '@/components/canvas/utils';
+
+interface PageShareStatus {
+  id: PageId,
+  gridId: GridId
+  type: 'custom-page' | 'logo-page',
+}
+
+interface PageStatus extends PageShareStatus {
+  id: PageId,
+  gridId: GridId
+  type: 'custom-page',
+}
+
+type LayerType = 'logo' | 'grids';
+interface LogoPageStatus extends PageShareStatus {
+  id: PageId,
+  gridId: GridId
+  type: 'logo-page',
+  layerType: LayerType
+}
 
 interface CurrentStatusSlice {
-  // 焦点页
-  currentPageId: PageId
-  // 焦点Grid
-  currentGridId: GridId
+  currentPageStatus: PageStatus | LogoPageStatus
   setCurrentPageId: (pageId: PageId) => void
   getCurrentPageId: () => PageId
   setCurrentGridId: (id: GridId) => void
   resetCurrentGridId: () => void
   getCurrentGridId: () => GridId
+  setCurrentLayerType: (layerType: LayerType) => void
+  getCurrentLayerType: () => LayerType
 }
 
 interface ShowComponentSlice {
@@ -55,28 +75,68 @@ const createCurrentStatusSlice: StateCreator<
   [],
   CurrentStatusSlice
 > = (set, get) => ({
-  currentPageId: "",
-  currentGridId: "",
+  currentPageStatus: {
+    id: "",
+    gridId: "",
+    type: "custom-page",
+  },
   setCurrentPageId: (pageId: PageId) => {
+    const currentStep = get().historySteps[get().currentHistoryStepIndex];
+    const comicConfig = currentStep?.comicConfig;
+    const page = comicConfig && getPageFromComicConfig(comicConfig, pageId) || void 0;
+    const isLogoPage = page && getIsLogoPage(page) || false;
     set(() => ({
-      currentPageId: pageId,
+      currentPageStatus: {
+        id: pageId,
+        gridId: "",
+        type: isLogoPage ? "logo-page" : "custom-page",
+        ...(isLogoPage ? { layerType: "grids" } : {})
+      } as PageStatus | LogoPageStatus
     }))
   },
   getCurrentPageId: () => {
-    return get().currentPageId;
+    return get().currentPageStatus.id;
   },
   setCurrentGridId: (id: GridId) => {
-    set(() => ({
-      currentGridId: id,
-    }))
+    set(state => {
+      return {
+        currentPageStatus: {
+          ...state.currentPageStatus,
+          gridId: id,
+          ...(state.currentPageStatus.type === 'logo-page' ? {
+            layerType: "grids",
+          } : {})
+        },
+      };
+    })
   },
   resetCurrentGridId: () => {
-    set(() => ({
-      currentGridId: "",
+    set(state => ({
+      currentPageStatus: {
+        ...state.currentPageStatus,
+        gridId: "",
+      },
     }))
   },
   getCurrentGridId: () => {
-    return get().currentGridId;
+    return get().currentPageStatus.gridId;
+  },
+  setCurrentLayerType: (layerType: LayerType) => {
+    if (get().currentPageStatus.type === 'logo-page') {
+      set(state => ({
+        currentPageStatus: {
+          ...state.currentPageStatus,
+          layerType,
+        },
+      }))
+    }
+  },
+  getCurrentLayerType: () => {
+    let status = get().currentPageStatus;
+    if (status.type === 'logo-page') {
+      return status.layerType;
+    }
+    return "grids";
   },
 })
 

@@ -7,8 +7,8 @@ import PageAttr from "./PageAttr"
 
 export default function AttrCard() {
   const showAttrCard = useComicStatusStore(state => state.showAttrCard);
-  const currentGridId = useComicStatusStore(state => state.currentGridId);
-  const currentPageId = useComicStatusStore(state => state.currentPageId);
+  const currentPageId = useComicStatusStore(state => state.currentPageStatus.id);
+  const currentGridId = useComicStatusStore(state => state.currentPageStatus.gridId);
 
   const currentStep = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex]);
   const comicConfig = currentStep?.comicConfig;

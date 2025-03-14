@@ -17,7 +17,6 @@ import Layer from "./Layer"
 // import useComicStatusStore from "@/store";
 
 export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
-  // const currentPageId = useComicStatusStore(state => state.currentPageId);
   const pageId = page?.id || "";
   const height = page?.height || "";
 

@@ -7,7 +7,7 @@ import ImgCrop from "./ImgCrop";
 import { defaultDocument } from "@/lib";
 
 export default function ImgCropContainer() {
-  const focusId = useComicStatusStore(state => state.currentGridId);
+  const focusId = useComicStatusStore(state => state.currentPageStatus.gridId);
   const showImgCrop = useComicStatusStore(state => state.showImgCrop);
   const setShowImgCrop = useComicStatusStore(state => state.setShowImgCrop);
   const currentStep = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex]);

@@ -50,7 +50,7 @@ export class Comic {
     for (let i = 0; i < pageConfigs.length; i++) {
       const pageConfig = pageConfigs[i];
       if (pageConfig.logo) {
-        await Assets.load(pageConfig.logo);
+        await Assets.load(pageConfig.logo.url);
       }
       const gridConfigs = pageConfig.grids;
       for (let j = 0; j < gridConfigs.length; j++) {

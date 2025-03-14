@@ -9,7 +9,7 @@ import { on, off } from "@/lib";
 
 export default function Canvas() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const pageId = useComicStatusStore(state => state.currentPageId);
+  const pageId = useComicStatusStore(state => state.currentPageStatus.id);
   const setCurrentPageId = useComicStatusStore(state => state.setCurrentPageId);
   const resetCurrentGridId = useComicStatusStore(state => state.resetCurrentGridId);
   const addHistoryStep = useComicStatusStore(state => state.addHistoryStep);

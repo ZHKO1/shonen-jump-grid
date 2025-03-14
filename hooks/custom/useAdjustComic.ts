@@ -32,7 +32,6 @@ export function useAdjustComic() {
 
     const addPage = useCallback((page: CanvasPageConfig) => {
         const currentStep = getCurrentHistoryStep();
-        const currentPageId = getCurrentPageId();
         if (currentStep) {
             const comicConfig = currentStep.comicConfig;
             const comicConfigCopy = JSON.parse(JSON.stringify(comicConfig)) as CanvasComicConfig;
