@@ -13,6 +13,7 @@ export default function Canvas() {
   const setCurrentPageId = useComicStatusStore(state => state.setCurrentPageId);
   const resetCurrentGridId = useComicStatusStore(state => state.resetCurrentGridId);
   const addHistoryStep = useComicStatusStore(state => state.addHistoryStep);
+  const setCurrentLayerType = useComicStatusStore(state => state.setCurrentLayerType);
   const step = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex]);
   const comicConfig = step?.comicConfig;
   const page = comicConfig && getPageFromComicConfig(comicConfig, pageId);
@@ -20,12 +21,7 @@ export default function Canvas() {
   const height = page && page.height;
   const extraProp = height ? { style: { height } } : {};
 
-  const handleDocumentClick = () => {
-    resetCurrentGridId();
-  }
-
   useEffect(() => {
-    setCurrentPageId("page0");
     addHistoryStep({
       type: "init",
       comicConfig: {
@@ -40,19 +36,34 @@ export default function Canvas() {
         }]
       }
     });
+    setCurrentPageId("page0");
+    setCurrentLayerType("logo");
   }, [setCurrentPageId, addHistoryStep]);
 
   useEffect(() => {
-    if (containerRef.current) {
-      on(containerRef.current, "click", handleDocumentClick);
+    if (!(grids && grids.length)) {
+      return;
+    }
+    if (!containerRef.current) {
+      return;
     }
 
-    return () => {
-      if (containerRef.current) {
-        off(containerRef.current, "click", handleDocumentClick);
-      }
+    const handleDocumentClick = () => {
+      resetCurrentGridId();
     }
-  })
+    on(containerRef.current, "click", handleDocumentClick);
+
+    return () => {
+      if (!(grids && grids.length)) {
+        return;
+      }
+      if (!containerRef.current) {
+        return;
+      }
+
+      off(containerRef.current, "click", handleDocumentClick);
+    }
+  }, [grids && grids.length, containerRef.current])
 
   return (
     <div className="p-3 flex items-center justify-center text-4xl font-bold text-black">
