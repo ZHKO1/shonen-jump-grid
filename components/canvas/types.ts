@@ -4,20 +4,22 @@ export type { Point, PolyGridPoint, RectGridPoint };
 
 export type GridId = string | number
 
+export interface CanvasOriginImgConfig {
+    url: string,
+    width: number,
+    height: number,
+    dragX: number,
+    dragY: number,
+    zoom: number,
+}
+
 interface CanvasGridShareConfig {
     id: GridId,
     splitLine?: [Point, Point],
     splitResult?: [CanvasGridConfig, CanvasGridConfig],
     splitSpaceWidth?: number,
     content?: {
-        originImg?: {
-            url: string,
-            width: number,
-            height: number,
-            dragX: number,
-            dragY: number,
-            zoom: number,
-        }
+        originImg?: CanvasOriginImgConfig
     }
 }
 
@@ -37,6 +39,9 @@ export interface CanvasPageConfig extends PageConfig {
     height: number,
     readonly?: boolean,
     grids: CanvasGridConfig[],
+    logo?: PageConfig["logo"] & {
+        originImg?: CanvasOriginImgConfig
+    }
 }
 
 export interface CanvasComicConfig {

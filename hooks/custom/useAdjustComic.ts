@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import useComicStatusStore from "@/store";
-import { getGridFromComicConfig } from "../../components/canvas/utils";
+import { getGridFromComicConfig, getPageFromComicConfig } from "../../components/canvas/utils";
 import { CanvasComicConfig, GridId, CanvasPageConfig, PageId } from "../../components/canvas/types";
 
 export function useAdjustComic() {
@@ -22,6 +22,26 @@ export function useAdjustComic() {
                 Object.assign(targetGrid, params);
                 addHistoryStep({
                     type: "adjust-grid",
+                    comicConfig: comicConfigCopy,
+                }, {
+                    tmp,
+                });
+            }
+        }
+    }, []);
+
+    const adjustPage = useCallback((id: PageId, params: any, { tmp } = {
+        tmp: false,
+    }) => {
+        const currentStep = getCurrentHistoryStep();
+        if (currentStep) {
+            const comicConfig = currentStep.comicConfig;
+            const comicConfigCopy = JSON.parse(JSON.stringify(comicConfig));
+            const targetGrid = getPageFromComicConfig(comicConfigCopy, id);
+            if (targetGrid) {
+                Object.assign(targetGrid, params);
+                addHistoryStep({
+                    type: "adjust-page",
                     comicConfig: comicConfigCopy,
                 }, {
                     tmp,
@@ -68,5 +88,5 @@ export function useAdjustComic() {
         }
     }, [setCurrentPageId, setCurrentGridId, getCurrentPageId, getCurrentHistoryStep]);
 
-    return { adjustGrid, addPage, deletePage };
+    return { adjustGrid, adjustPage, addPage, deletePage };
 }

@@ -8,12 +8,10 @@ import PageAttr from "./PageAttr"
 export default function AttrCard() {
   const showAttrCard = useComicStatusStore(state => state.showAttrCard);
   const currentPageId = useComicStatusStore(state => state.currentPageStatus.id);
-  const currentGridId = useComicStatusStore(state => state.currentPageStatus.gridId);
-
+  
   const currentStep = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex]);
   const comicConfig = currentStep?.comicConfig;
 
-  const grid = comicConfig && getGridFromComicConfig(comicConfig, currentGridId);
   const page = comicConfig && getPageFromComicConfig(comicConfig, currentPageId) || void 0;
 
   if (!showAttrCard) {
@@ -21,10 +19,6 @@ export default function AttrCard() {
   }
 
   return (
-    <div>
-      {
-        (currentGridId !== "") && grid ? <GridAttr grid={grid} /> : <PageAttr page={page} />
-      }
-    </div>
+    <PageAttr page={page} />
   )
 }

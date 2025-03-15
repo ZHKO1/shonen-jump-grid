@@ -1,48 +1,49 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { ReactNode, useRef, useState } from "react";
 import { useFileDialog } from "@/hooks";
-import { useAdjustComic } from "@/hooks/custom/useAdjustComic";
-import { cn } from "@/lib/utils";
-import { getClipPath, getSvgPoints, getGridStyle } from "@/components/canvas/utils";
-import { GridBorder } from "@/components/canvas/grid/GridBorder";
-import { GridContent } from "@/components/canvas/grid/GridContent";
+import { getPolyContainerPoint } from "@/components/canvas/utils";
+import { CanvasOriginImgConfig, Point } from "@/components/canvas/types";
+
 import Background from "@/components/background";
 import ActionBar, { ActionType } from "@/components/action-bar";
 import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "@/components/action-bar/Icons";
 import Mask, { MaskRef, MaskType } from "./Mask";
 import { useDragZoom } from "./hooks/useDragZoom";
-import { CanvasGridConfig } from "@/components/canvas/types";
 import Img, { ImgTarget } from "./Img";
+import { defaultDocument } from "@/lib";
 
-export default function ImgCrop({ grid, onClose }: { grid: CanvasGridConfig, onClose: () => void }) {
+export interface ImgCropProps {
+  originImg: CanvasOriginImgConfig,
+  maskCropPath: [Point, Point, Point, Point],
+  renderContent: (mask: MaskType, onAnimationComplete: () => void) => ReactNode,
+  onClean: () => void,
+  onSubmit: (url: string, originImg: CanvasOriginImgConfig) => void,
+  onClose: () => void,
+};
+
+const ImgCrop: React.FC<ImgCropProps> = ({ originImg, maskCropPath, renderContent, onClean, onSubmit, onClose }) => {
   const maskRef = useRef<MaskRef>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<ImgTarget>(null);
   const [maskType, setMaskType] = useState<MaskType>("full")
-  const [imgUrl, setImgUrl] = useState<string>(grid?.content?.originImg?.url || "");
+  const [imgUrl, setImgUrl] = useState<string>(originImg?.url || "");
   const [originImgSize, setOriginImgSize] = useState({
-    width: grid?.content?.originImg?.width || 0,
-    height: grid?.content?.originImg?.height || 0
+    width: originImg?.width || 0,
+    height: originImg?.height || 0
   });
   const [dragX, dragY, zoom, resetDragZoom] = useDragZoom(containerRef, {
-    dragX: grid?.content?.originImg?.dragX,
-    dragY: grid?.content?.originImg?.dragY,
-    zoom: grid?.content?.originImg?.zoom,
+    dragX: originImg?.dragX,
+    dragY: originImg?.dragY,
+    zoom: originImg?.zoom,
   });
   const [, open, reset] = useFileDialog();
-  const { adjustGrid } = useAdjustComic();
 
-  const {
-    imgStyle,
-    sizeStyle,
-    sizeStyleWithBorder,
-    svgPath,
-    svgPathWithBorder,
-  } = getGridStyle(grid);
-  const svgPoints = getSvgPoints(svgPath);
-  const clipPath = svgPathWithBorder && getClipPath(svgPathWithBorder) || "";
-
+  const lt = getPolyContainerPoint(maskCropPath, "lt");
+  const rb = getPolyContainerPoint(maskCropPath, "rb");
+  const sizeStyle = {
+    width: rb.x - lt.x,
+    height: rb.y - lt.y,
+  }
 
   const onAnimationComplete = () => {
     setMaskType("grid");
@@ -55,21 +56,19 @@ export default function ImgCrop({ grid, onClose }: { grid: CanvasGridConfig, onC
   }
 
   const handleSubmit = () => {
-    const canvas = canvasRef.current;
     const mask = maskRef.current;
-    if (!canvas || !mask) {
+    if (!mask || !defaultDocument) {
       console.error("handleSubmit canvas and mask is undefined?");
       return;
     }
 
     if (!imgUrl) {
-      adjustGrid(grid.id, {
-        content: undefined
-      });
+      onClean()
       handleClose();
       return;
     }
 
+    const canvas = defaultDocument.createElement('canvas');
     const image = imageRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx || !image) {
@@ -104,20 +103,14 @@ export default function ImgCrop({ grid, onClose }: { grid: CanvasGridConfig, onC
 
     const url = canvas.toDataURL('image/png');
 
-    adjustGrid(grid.id, {
-      content: {
-        ...grid.content,
-        url,
-        originImg: {
-          url: imgUrl,
-          width: image.getImgStyle().width,
-          height: image.getImgStyle().height,
-          dragX,
-          dragY,
-          zoom,
-        }
-      }
-    });
+    onSubmit(url, {
+      url: imgUrl,
+      width: image.getImgStyle().width,
+      height: image.getImgStyle().height,
+      dragX,
+      dragY,
+      zoom,
+    })
     handleClose();
   }
 
@@ -176,44 +169,24 @@ export default function ImgCrop({ grid, onClose }: { grid: CanvasGridConfig, onC
       </Background>
       <div
         className="fixed inset-0 grid place-items-center z-[100] pointer-events-none">
-        <GridContent
-          className={
-            cn(maskType === "grid" ? "bg-transparent" : "")
-          }
-          gridId={grid.id}
-          style={sizeStyleWithBorder}
-          clipPath={clipPath}
-          url={maskType === "grid" ? "" : grid.content?.url}
-          imgStyle={imgStyle}
-        />
-        <GridBorder
-          gridId={grid.id}
-          svgPoints={svgPoints}
-          containerStyle={sizeStyleWithBorder}
-          svgStyle={sizeStyleWithBorder}
-          onLayoutAnimationComplete={onAnimationComplete}
-        />
+        {
+          renderContent(maskType, onAnimationComplete)
+        }
       </div>
       <Mask
         ref={maskRef}
         gridSize={sizeStyle}
-        svgPath={svgPath}
+        svgPath={maskCropPath}
         maskType={maskType}
       />
       <ActionBar
         className="fixed top-4 right-4 z-[101]"
         actions={actions}
       />
-      <canvas
-        key="canvas"
-        className="fixed left-0 bottom-0 z-10 invisible"
-        ref={canvasRef}
-        style={{
-          border: '1px solid black',
-          ...sizeStyle,
-        }}
-      />
     </>
   );
 }
 
+ImgCrop.displayName = "ImgCrop"
+
+export default ImgCrop;

@@ -9,5 +9,5 @@ export const GridLineColor = "black";
 
 export const LogoDefaultCenterX = 360;
 export const LogoDefaultCenterY = 270;
-export const LogoDefaultWidth = 500;
-export const LogoDefaultHeight = 200;
+export const LogoDefaultWidth = 680;
+export const LogoDefaultHeight = 322;

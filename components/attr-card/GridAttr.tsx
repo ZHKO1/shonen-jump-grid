@@ -5,10 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import {
-  Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -124,7 +122,7 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
   }
 
   return (
-    <Card className="w-[250px]">
+    <>
       <CardHeader>
         <CardTitle>Grid Attr</CardTitle>
         <CardDescription>type: {type}</CardDescription>
@@ -205,9 +203,6 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
           </div>
         </form>
       </CardContent>
-      <CardFooter className="flex items-center justify-center">
-        {/* <Button variant="outline" >Cancel</Button> */}
-      </CardFooter>
-    </Card >
+    </>
   )
 }

@@ -33,10 +33,10 @@ export class Comic {
         resolution: 1,
         background: PageBackGround,
       });
+    this.app.stage.addChild(this.blackOverlay);
     this.container.appendChild(this.app.canvas);
     this.app.stage.addChild(this.comicStage);
 
-    this.app.stage.addChild(this.blackOverlay);
     this.app.stage.addChild(this.whiteOverlay);
 
     this.blackOverlay.alpha = 1;
