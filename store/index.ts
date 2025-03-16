@@ -63,6 +63,7 @@ interface HistoryStepSlice {
   addHistoryStep: (step: HistoryStep, options?: { tmp?: boolean }) => void
   getCurrentHistoryStep: () => HistoryStep | null
   setCurrentHistoryStep: (val: HistoryStep) => void
+  cleanAllHistoryStep: () => void
   nextHistoryStep: () => void
   prevHistoryStep: () => void
 }
@@ -217,6 +218,13 @@ const createHistoryStepSlice: StateCreator<
         }
       }
     })
+  },
+  cleanAllHistoryStep: () => {
+    set(() => ({
+      currentHistoryStepIndex: -1,
+      isCurrentHistoryStepTmp: false,
+      historySteps: [],
+    }))
   },
   getCurrentHistoryStep: () => {
     const currentHistoryStepIndex = get().currentHistoryStepIndex;

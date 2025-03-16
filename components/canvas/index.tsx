@@ -17,6 +17,7 @@ export default function Canvas() {
   const setCurrentPageId = useComicStatusStore(state => state.setCurrentPageId);
   const resetCurrentGridId = useComicStatusStore(state => state.resetCurrentGridId);
   const addHistoryStep = useComicStatusStore(state => state.addHistoryStep);
+  const cleanAllHistoryStep = useComicStatusStore(state => state.cleanAllHistoryStep);
   const setCurrentLayerType = useComicStatusStore(state => state.setCurrentLayerType);
   const step = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex]);
   const comicConfig = step?.comicConfig;
@@ -44,7 +45,10 @@ export default function Canvas() {
     });
     setCurrentPageId("page0");
     setCurrentLayerType("logo");
-  }, [setCurrentPageId, addHistoryStep]);
+    return () => {
+      cleanAllHistoryStep();
+    }
+  }, [setCurrentPageId, setCurrentLayerType, addHistoryStep, cleanAllHistoryStep]);
 
   useEffect(() => {
     if (!(grids && grids.length)) {

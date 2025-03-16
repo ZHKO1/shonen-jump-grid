@@ -6,6 +6,8 @@ import { Toggle } from "@/components/ui/toggle";
 import useComicStatusStore from "@/store";
 
 export default function HeaderBar() {
+  const historyIndex = useComicStatusStore(state => state.currentHistoryStepIndex);
+  const historyLength = useComicStatusStore(state => state.historySteps.length);
   const nextHistoryStep = useComicStatusStore(state => state.nextHistoryStep);
   const prevHistoryStep = useComicStatusStore(state => state.prevHistoryStep);
   const showAttrCard = useComicStatusStore(state => state.showAttrCard);
@@ -18,7 +20,7 @@ export default function HeaderBar() {
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={prevHistoryStep}>
+              <Button disabled={historyIndex <= 0} variant="ghost" size="icon" onClick={prevHistoryStep}>
                 <Reply className="h-4 w-4" />
                 <span className="sr-only">Previous</span>
               </Button>
@@ -27,7 +29,7 @@ export default function HeaderBar() {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={nextHistoryStep}>
+              <Button disabled={historyIndex >= historyLength - 1} variant="ghost" size="icon" onClick={nextHistoryStep}>
                 <Forward className="h-4 w-4" />
                 <span className="sr-only">Next</span>
               </Button>
