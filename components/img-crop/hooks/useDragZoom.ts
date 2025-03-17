@@ -1,6 +1,6 @@
 import React, { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import normalizeWheel from 'normalize-wheel'
-import { defaultDocument, defaultWindow, off, on } from "@/lib";
+import { defaultDocument, defaultWindow, off, on } from "@/lib/utils";
 import { Point } from "@/components/canvas/types";
 
 const ZOOMSPEED = 0.1;

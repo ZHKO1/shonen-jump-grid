@@ -1,11 +1,10 @@
 "use client";
 import { useEffect, useRef } from "react";
-import useComicStatusStore, { LogoPageStatus } from "@/store";
-import { cn } from "@/lib/utils";
+import useComicStatusStore from "@/store";
+import { cn, on, off } from "@/lib/utils";
 import { ContainerContext } from "./context/container";
 import { getIsLogoPage, getPageFromComicConfig } from "./utils";
 import { LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT } from "./constant";
-import { on, off } from "@/lib";
 import { Grid } from "./grid";
 import Logo from "./logo";
 

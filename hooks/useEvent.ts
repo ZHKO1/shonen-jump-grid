@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react'
-import type { Fn } from '../lib/types'
+import type { Fn } from '../lib/utils'
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect'
 
 type UseEvent = <T extends Fn>(

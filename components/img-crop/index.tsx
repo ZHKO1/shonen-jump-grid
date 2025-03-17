@@ -3,7 +3,7 @@ import React, { useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 import useComicStatusStore, { LogoPageStatus } from "@/store";
 import { getGridFromComicConfig, getPageFromComicConfig } from "@/components/canvas/utils";
-import { defaultDocument } from "@/lib";
+import { defaultDocument } from "@/lib/utils";
 import GridImgCrop from "./GridImgCrop";
 import LogoImgCrop from "./LogoImgCrop";
 

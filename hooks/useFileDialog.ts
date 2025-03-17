@@ -1,4 +1,4 @@
-import { defaultDocument } from "@/lib";
+import { defaultDocument } from "@/lib/utils";
 import { useCallback, useRef, useState } from "react";
 
 export type UseFileDialog = (options?: UseFileDialogOptions) => readonly [

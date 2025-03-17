@@ -7,7 +7,7 @@ import { CloseIcon } from "@/components/action-bar/Icons";
 import { Height, Width } from "./core/config";
 import Comic from "./Comic";
 import { ComicConfig } from "./core/type";
-import { resizeScale } from "./util";
+import { resizeScale } from "@/lib/utils";
 
 export default function Preview({ config, onClose }: { config: ComicConfig | null, onClose: () => void }) {
   const comicContianerRef = useRef(null);
@@ -66,7 +66,7 @@ export default function Preview({ config, onClose }: { config: ComicConfig | nul
                     })
                   }
                 </div>
-                <span className="col-span-3 text-3xl pl-1">Loading...</span>
+                <span className="col-span-3 text-2xl pl-1">Loading...</span>
               </div>
             }
             <Comic config={config} autoPlay={true} onLoad={onLoad} />

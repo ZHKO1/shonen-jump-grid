@@ -2,7 +2,7 @@
 import React, { useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 import useComicStatusStore from "@/store";
-import { defaultDocument } from "@/lib";
+import { defaultDocument } from "@/lib/utils";
 import Preview from "./Preview";
 import { getComicConfigFromCanvas } from "@/components/canvas/utils";
 

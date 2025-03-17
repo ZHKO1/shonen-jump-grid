@@ -4,7 +4,7 @@ import type { Point } from '../types';
 import { useLatest } from "@/hooks/useLatest";
 import { getAdjustedPoint } from "../utils";
 import { ContainerContext } from "@/components/canvas/context/container";
-import { defaultDocument, off, on } from "@/lib";
+import { defaultDocument, off, on } from "@/lib/utils";
 
 
 type DrawState = {

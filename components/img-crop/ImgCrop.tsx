@@ -10,7 +10,7 @@ import { CloseIcon, UploadImgIcon, ClearImgIcon, SubmitIcon } from "@/components
 import Mask, { MaskRef, MaskType } from "./Mask";
 import { useDragZoom } from "./hooks/useDragZoom";
 import Img, { ImgTarget } from "./Img";
-import { defaultDocument } from "@/lib";
+import { defaultDocument } from "@/lib/utils";
 
 export interface ImgCropProps {
   originImg: CanvasOriginImgConfig,

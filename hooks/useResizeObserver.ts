@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react'
 import { useLatest } from './useLatest'
 import { useDeepCompareEffect } from './useDeepCompareEffect'
-import { BasicTarget, getTargetElement } from '../lib/domTarget'
+import { BasicTarget, getTargetElement } from '../lib/utils'
 
 type UseResizeObserver = (
     target: BasicTarget<Element>,

@@ -2,7 +2,7 @@
 import { useRef, useContext, useCallback } from "react";
 import { ContainerContext } from "@/components/canvas/context/container";
 import { useEventListener } from "@/hooks";
-import { defaultDocument } from "@/lib";
+import { defaultDocument } from "@/lib/utils";
 
 export type MouseState = {
   x: number,
