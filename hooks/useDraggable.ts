@@ -112,11 +112,13 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
     if (!pressedDelta) {
       return false
     }
-    const container = getTargetElement(containerElement)
-    const targetRect = element.getBoundingClientRect()
+    // const container = getTargetElement(containerElement)
+    // const targetRect = element.getBoundingClientRect()
     let { x, y } = position
     x = e.clientX - pressedDelta.x
     y = e.clientY - pressedDelta.y
+    let result = { x, y };
+    /*
     if (container) {
       const containerWidth = isScrollX(container)
         ? container.scrollWidth
@@ -127,28 +129,28 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
       x = Math.min(Math.max(0, x), containerWidth - targetRect.width)
       y = Math.min(Math.max(0, y), containerHeight - targetRect.height)
     }
+    */
 
-    setPositon({
-      x,
-      y,
-    })
-    return true;
+    setPositon(result)
+    return result;
   }
 
   const move = (e: PointerEvent) => {
-    if (!updatePosition(e)) {
+    let pos = updatePosition(e);
+    if (!pos) {
       return
     }
-    options.onMove?.(position, e)
+    options.onMove?.(pos, e)
     handleEvent(e)
   }
 
   const end = (e: PointerEvent) => {
-    if (!updatePosition(e)) {
+    let pos = updatePosition(e);
+    if (!pos) {
       return
     }
     setPressedDelta(undefined)
-    options.onEnd?.(position, e)
+    options.onEnd?.(pos, e)
     handleEvent(e)
   }
 

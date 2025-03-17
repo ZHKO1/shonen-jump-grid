@@ -14,8 +14,8 @@ export type MouseState = {
 };
 
 export function useMouse() {
-  const gridRef = useContext(ContainerContext).container;
-  const scale = useContext(ContainerContext).scale;
+  const context = useContext(ContainerContext);
+  const gridRef = context.container;
 
   const stateRef = useRef<MouseState>({
     x: 0,
@@ -42,8 +42,8 @@ export function useMouse() {
       const { left, top } = grid.getBoundingClientRect();
       const elementPositionX = left + window.scrollX;
       const elementPositionY = top + window.scrollY;
-      const elementX = (event.pageX - elementPositionX) / scale;
-      const elementY = (event.pageY - elementPositionY) / scale;
+      const elementX = (event.pageX - elementPositionX) / context.scale;
+      const elementY = (event.pageY - elementPositionY) / context.scale;
 
       newState.elementX = elementX;
       newState.elementY = elementY;
@@ -52,7 +52,7 @@ export function useMouse() {
     }
 
     stateRef.current = newState;
-  }, [grid]);
+  }, [grid, context.scale]);
 
   useEventListener("mousemove", handleMouseMove, defaultDocument);
 

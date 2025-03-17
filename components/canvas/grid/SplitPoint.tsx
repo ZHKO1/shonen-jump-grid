@@ -13,7 +13,8 @@ export default function SplitPoint({
     draggable?: boolean
 }) {
     const pointRef = useRef<HTMLDivElement>(null);
-    const gridRef = useContext(ContainerContext).container;
+    const context = useContext(ContainerContext);
+    const gridRef = context.container;
 
     const [, ,] = useDraggable(pointRef, {
         initialValue: { x: point.x - 5, y: point.y - 5 },
@@ -23,16 +24,16 @@ export default function SplitPoint({
         onMove(position) {
             if (onChange) {
                 onChange({
-                    x: position.x + 5,
-                    y: position.y + 5,
+                    x: position.x / context.scale + 5,
+                    y: position.y / context.scale + 5,
                 }, true);
             }
         },
         onEnd(position) {
             if (onChange) {
                 onChange({
-                    x: position.x + 5,
-                    y: position.y + 5,
+                    x: position.x / context.scale + 5,
+                    y: position.y / context.scale + 5,
                 }, false);
             }
         },
