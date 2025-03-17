@@ -16,7 +16,7 @@ export default function Home() {
         <section className="w-[150px] ">
           <Slider />
         </section>
-        <section className="bg-blue-100 flex-1 overflow-auto">
+        <section className="bg-blue-100 flex-1 overflow-hidden">
           <Canvas />
         </section>
       </main>

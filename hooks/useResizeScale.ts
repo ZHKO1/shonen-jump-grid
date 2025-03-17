@@ -14,8 +14,8 @@ export type useResizeScale = (
 
 export const useResizeScale: useResizeScale = (width, height, scaleDom) => {
     const {
-        height: contianerHeight,
-        width: contianerWidth,
+        height: containerHeight,
+        width: containerWidth,
     } = useElementBounding(scaleDom, {
         windowResize: true,
         immediate: true,
@@ -30,27 +30,27 @@ export const useResizeScale: useResizeScale = (width, height, scaleDom) => {
         scaleY: 1
     })
 
-    console.log(scaleRef.current, contianerHeight, contianerWidth);
     const baseProportion = parseFloat((baseWidth / baseHeight).toFixed(5))
     const currentRate = parseFloat(
-        (contianerWidth / contianerHeight).toFixed(5)
+        (containerWidth / containerHeight).toFixed(5)
     )
     if (scaleDom) {
         if (currentRate > baseProportion) {
             // 表示更宽
             scaleRef.current.scaleX = parseFloat(
-                ((contianerHeight * baseProportion) / baseWidth).toFixed(5)
+                ((containerHeight * baseProportion) / baseWidth).toFixed(5)
             )
-            scaleRef.current.scaleY = parseFloat((contianerHeight / baseHeight).toFixed(5))
+            scaleRef.current.scaleY = parseFloat((containerHeight / baseHeight).toFixed(5))
             // scaleDom.style.transform = `scale(${scaleRef.current.width}, ${scaleRef.current.height})`
         } else {
             // 表示更高
             scaleRef.current.scaleY = parseFloat(
-                (contianerWidth / baseProportion / baseHeight).toFixed(5)
+                (containerWidth / baseProportion / baseHeight).toFixed(5)
             )
-            scaleRef.current.scaleX = parseFloat((contianerWidth / baseWidth).toFixed(5))
+            scaleRef.current.scaleX = parseFloat((containerWidth / baseWidth).toFixed(5))
             // scaleDom.style.transform = `scale(${scaleRef.current.width}, ${scaleRef.current.height})`
         }
     }
+
     return scaleRef.current
 }
