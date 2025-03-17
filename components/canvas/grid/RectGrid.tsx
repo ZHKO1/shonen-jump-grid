@@ -22,7 +22,7 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
     const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId);
     const { getCurrentGridId } = useComicStatusStore();
     const isFocused = getCurrentGridId() === grid.id;
-    const splitGrids = useSplit(grid, isFocused, BORDER_WIDTH * 2);
+    const { grids: splitGrids } = useSplit(grid, isFocused, BORDER_WIDTH * 2);
     const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;
     const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
 

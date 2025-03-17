@@ -22,5 +22,5 @@ export function useSplit(grid: CanvasGridConfig, isGridFocused: boolean, spaceWi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDrawing]);
 
-  return grids;
+  return { grids, startPoint, endPoint };
 }

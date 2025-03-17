@@ -17,7 +17,7 @@ export default function CanvasPreview() {
               height: Height,
               transform: `scale(${scaleX}, ${scaleY})`
             }}>
-            <Canvas />
+            <Canvas scale={scaleX}/>
           </div>
         </div>
       </div >

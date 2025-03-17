@@ -8,7 +8,7 @@ import { LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT } from "./constant";
 import { Grid } from "./grid";
 import Logo from "./logo";
 
-const Canvas = () => {
+const Canvas = ({ scale }: { scale: number }) => {
   const containerRef = useRef(null);
   const pageId = useComicStatusStore(state => state.currentPageStatus.id);
   const { getCurrentLayerType } = useComicStatusStore();
@@ -73,7 +73,7 @@ const Canvas = () => {
   return (
     <div ref={containerRef} className="canvas-content w-[720px] bg-gray-100 relative overflow-hidden border-2 border-gray-400 text-4xl font-bold text-black"
       {...extraProp}>
-      <ContainerContext.Provider value={{ container: containerRef }}>
+      <ContainerContext.Provider value={{ container: containerRef, scale }}>
         <div className={cn(layerType !== "grids" && "pointer-events-none opacity-30")}>
           {grids && grids.map((grid) => (<Grid grid={grid} key={grid.id} />))}
         </div>
