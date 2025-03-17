@@ -13,7 +13,7 @@ export default function SplitLine({
     endPoint: Point,
     splitSpaceWidth?: number,
     showed: boolean,
-    onClick: React.MouseEventHandler<SVGLineElement> | undefined
+    onClick?: React.MouseEventHandler<SVGLineElement> | undefined
 }) {
     return (
         <svg

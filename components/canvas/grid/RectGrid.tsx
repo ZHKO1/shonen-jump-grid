@@ -10,6 +10,8 @@ import { useSplit } from "../hooks/useSplit";
 import { useEventListener } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { GridIcon, GridIconProps } from "./GridIcon";
+import SplitLine from "./SplitLine";
+import SplitPoint from "./SplitPoint";
 
 export interface RectGridProps {
     grid: CanvasRectGridConfig,
@@ -22,7 +24,7 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
     const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId);
     const { getCurrentGridId } = useComicStatusStore();
     const isFocused = getCurrentGridId() === grid.id;
-    const { grids: splitGrids } = useSplit(grid, isFocused, BORDER_WIDTH * 2);
+    const { grids: splitGrids, startPoint, endPoint } = useSplit(grid, isFocused, BORDER_WIDTH * 2);
     const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused;
     const getSplitGridId = (index: number) => `${grid.id}_split_${index}`;
 
@@ -64,6 +66,14 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
     return (
         <div>
             {
+                splitGrids && startPoint && endPoint && <SplitLine
+                    startPoint={startPoint}
+                    endPoint={endPoint}
+                    showed={true}
+                    splitSpaceWidth={grid.splitSpaceWidth}
+                />
+            }
+            {
                 !(splitGrids || borderOnly) && (<GridContent
                     className={cn(isFocused && "z-10")}
                     disableMotion={!isFocused}
@@ -100,6 +110,14 @@ export default function RectGrid({ grid, showAsFocused = false, borderOnly = fal
                         svgStyle={sizeStyleWithBorder}
                         focused={shouldShowBorder}
                     />
+                )
+            }
+            {
+                splitGrids && startPoint && endPoint && (
+                    <>
+                        <SplitPoint point={startPoint} />
+                        <SplitPoint point={endPoint} />
+                    </>
                 )
             }
         </div>
