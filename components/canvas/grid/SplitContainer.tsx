@@ -1,38 +1,11 @@
-import { MouseEventHandler, useContext, useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
-import { useDraggable } from "@/hooks";
+import { MouseEventHandler, useEffect, useState } from "react";
 import { useAdjustComic } from "@/hooks/custom/useAdjustComic";
 import useComicStatusStore from "@/store";
 import { CanvasGridConfig, Point } from "../types";
-import { ContainerContext } from "../context/container";
 import { getAdjustedPoint, getGridsBySplit } from "../utils";
 import { Grid } from ".";
-
-function SplitPoint({ point, onChange }: { point: Point, onChange: (val: Point, isDrawing: boolean) => void }) {
-    const pointRef = useRef<HTMLDivElement>(null);
-    const gridRef = useContext(ContainerContext).container;
-    const [, ,] = useDraggable(pointRef, {
-        initialValue: { x: point.x - 5, y: point.y - 5 },
-        containerElement: gridRef,
-        preventDefault: true,
-        stopPropagation: true,
-        onMove(position/*, event*/) {
-            onChange({
-                x: position.x + 5,
-                y: position.y + 5,
-            }, true);
-        },
-        onEnd(position/*, event*/) {
-            onChange({
-                x: position.x + 5,
-                y: position.y + 5,
-            }, false);
-        },
-    });
-    return (
-        <div ref={pointRef} className='absolute size-[10px] rounded-full bg-black cursor-pointer' style={{ left: point.x - 5, top: point.y - 5 }}></div>
-    )
-}
+import SplitPoint from "./SplitPoint";
+import SplitLine from "./SplitLine";
 
 export type SplitContainerProps = { grid: CanvasGridConfig, showAsFocused?: boolean, borderOnly?: boolean };
 export default function SplitContainer({ grid }: SplitContainerProps) {
@@ -117,36 +90,13 @@ export default function SplitContainer({ grid }: SplitContainerProps) {
 
     return (<div>
         {
-            startPoint && endPoint && (
-                <svg
-                    className={cn(
-                        "absolute top-0 left-0 w-full h-full",
-                        isFocused ? "opacity-100" : "opacity-0"
-                    )}
-                    style={{ pointerEvents: "none" }}
-                >
-                    <line
-                        x1={startPoint.x}
-                        y1={startPoint.y}
-                        x2={endPoint.x}
-                        y2={endPoint.y}
-                        stroke="transparent"
-                        strokeWidth={grid.splitSpaceWidth}
-                        pointerEvents="all"
-                        onClick={handleClickLine}
-                    />
-                    <line
-                        x1={startPoint.x}
-                        y1={startPoint.y}
-                        x2={endPoint.x}
-                        y2={endPoint.y}
-                        stroke="gray"
-                        strokeWidth="4"
-                        strokeDasharray={5}
-                        pointerEvents="none"
-                    />
-                </svg>
-            )
+            startPoint && endPoint && <SplitLine
+                startPoint={startPoint}
+                endPoint={endPoint}
+                showed={isFocused}
+                splitSpaceWidth={grid.splitSpaceWidth}
+                onClick={handleClickLine}
+            />
         }
         {
             splitGrids && (splitGrids.map(grid_ => (<Grid grid={grid_} key={grid_.id} />)))
@@ -157,9 +107,9 @@ export default function SplitContainer({ grid }: SplitContainerProps) {
         {
             isFocused && startPoint && endPoint && (
                 <>
-                    <SplitPoint point={startPoint} onChange={handleDragglePoint("start")} />
-                    <SplitPoint point={middlePoint} onChange={handleDragglePoint("middle")} />
-                    <SplitPoint point={endPoint} onChange={handleDragglePoint("end")} />
+                    <SplitPoint point={startPoint} onChange={handleDragglePoint("start")} draggable />
+                    <SplitPoint point={middlePoint} onChange={handleDragglePoint("middle")} draggable />
+                    <SplitPoint point={endPoint} onChange={handleDragglePoint("end")} draggable />
                 </>
             )
         }

@@ -11,7 +11,8 @@ interface useDraggableOptions {
   initialValue?: Position,
   onStart?: (position: Position, event: PointerEvent) => void | false,
   onMove?: (position: Position, event: PointerEvent) => void,
-  onEnd?: (position: Position, event: PointerEvent) => void
+  onEnd?: (position: Position, event: PointerEvent) => void,
+  enabled?: boolean
 }
 
 function isScrollX(node: Element | null) {
@@ -38,7 +39,7 @@ function isScrollY(node: Element | null) {
 
 export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, options: useDraggableOptions = {})
   : readonly [number, number, boolean, Dispatch<SetStateAction<Position>>] => {
-  const { draggingElement = defaultDocument, containerElement } = options;
+  const { draggingElement = defaultDocument, containerElement, enabled = true } = options;
   const draggingHandle = options.handle ?? target
 
   const [position, setPositon] = useState<Position>(
@@ -54,6 +55,7 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
   const [pressedDelta, setPressedDelta] = useState<Position>();
 
   const handleEvent = (e: PointerEvent) => {
+    if (!enabled) return;
     if (options.preventDefault) {
       e.preventDefault()
     }
@@ -73,6 +75,7 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
   }
 
   const start = (e: PointerEvent) => {
+    if (!enabled) return;
     const element = getTargetElement(target)
     if (!element) {
       return
@@ -101,6 +104,7 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
   }
 
   const updatePosition = (e: PointerEvent) => {
+    if (!enabled) return false;
     const element = getTargetElement(target)
     if (!element) {
       return false
