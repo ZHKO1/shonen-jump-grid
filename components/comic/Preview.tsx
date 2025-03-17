@@ -1,28 +1,28 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-
+import React, { useCallback, useRef, useState } from "react";
+import { useResizeScale } from "@/hooks";
 import Background from "@/components/background";
 import ActionBar, { ActionType } from "@/components/action-bar";
 import { CloseIcon } from "@/components/action-bar/Icons";
 import { Height, Width } from "./core/config";
 import Comic from "./Comic";
 import { ComicConfig } from "./core/type";
-import { resizeScale } from "@/lib/utils";
 
 export default function Preview({ config, onClose }: { config: ComicConfig | null, onClose: () => void }) {
   const comicContianerRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const { scaleX, scaleY } = useResizeScale(Width, Height, comicContianerRef);
 
   const handleClose = () => {
     onClose();
   }
 
-  const onLoad = (resolve: () => {}) => {
+  const onLoad = useCallback((resolve: () => {}) => {
     setTimeout(() => {
       setLoading(false);
       resolve();
     }, 1500);
-  }
+  }, [setLoading])
 
   const actions = [
     {
@@ -30,16 +30,6 @@ export default function Preview({ config, onClose }: { config: ComicConfig | nul
       onClick: handleClose,
     }
   ].filter(action => action) as ActionType[];
-
-  useEffect(() => {
-    const { calcRate, windowResize, unWindowResize } = resizeScale(Width, Height, comicContianerRef.current!);
-    calcRate();
-    windowResize();
-
-    return () => {
-      unWindowResize();
-    }
-  }, []);
 
   return (
     <>
@@ -51,6 +41,7 @@ export default function Preview({ config, onClose }: { config: ComicConfig | nul
             style={{
               width: Width,
               height: Height,
+              transform: `scale(${scaleX}, ${scaleY})`
             }}>
             {
               loading && <div className="absolute w-26 right-10 bottom-10 grid grid-cols-4">
