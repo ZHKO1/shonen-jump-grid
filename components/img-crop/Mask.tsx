@@ -49,7 +49,7 @@ const Mask = forwardRef(({ gridSize, svgPath, maskType }: {
         duration: 0,
       },
     }}
-    className="fixed inset-0 h-full w-full z-10 pointer-events-none"
+    className="fixed inset-0 h-full w-full z-[100] pointer-events-none"
     ref={containerRef}
   >
     {
