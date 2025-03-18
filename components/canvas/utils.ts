@@ -733,7 +733,7 @@ const getPolyGridStyle = (grid: CanvasPolyGridConfig): GridStyle => {
         .map(p => ({ x: p.x - left, y: p.y - top })) as [Point, Point, Point, Point]
 
     let focusIconPosStyle = undefined
-    let path = grid.path;
+    const path = grid.path;
 
     if (isPolyCornerRightAngle(path, "lt")) {
         focusIconPosStyle = {
@@ -822,10 +822,10 @@ export function getLogoStyle(logo: CanvasPageConfig["logo"]): LogoStyle {
         height: config.height,
     }
 
-    let left = posStyle.left;
-    let top = posStyle.top;
-    let lt = { x: posStyle.left, y: posStyle.top };
-    let rb = { x: posStyle.left + sizeStyle.width, y: posStyle.top + sizeStyle.height };
+    const left = posStyle.left;
+    const top = posStyle.top;
+    const lt = { x: posStyle.left, y: posStyle.top };
+    const rb = { x: posStyle.left + sizeStyle.width, y: posStyle.top + sizeStyle.height };
 
     const svgPath = ([{ x: lt.x, y: lt.y }, { x: rb.x, y: lt.y }, { x: rb.x, y: rb.y }, { x: lt.x, y: rb.y }])
         .map(p => ({ x: p.x - left, y: p.y - top })) as [Point, Point, Point, Point]

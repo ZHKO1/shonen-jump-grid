@@ -15,6 +15,7 @@ interface useDraggableOptions {
   enabled?: boolean
 }
 
+/*
 function isScrollX(node: Element | null) {
   if (!node) {
     return false
@@ -36,6 +37,7 @@ function isScrollY(node: Element | null) {
     || getComputedStyle(node).overflowY === 'scroll'
   )
 }
+*/
 
 export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, options: useDraggableOptions = {})
   : readonly [number, number, boolean, Dispatch<SetStateAction<Position>>] => {
@@ -117,7 +119,7 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
     let { x, y } = position
     x = e.clientX - pressedDelta.x
     y = e.clientY - pressedDelta.y
-    let result = { x, y };
+    const result = { x, y };
     /*
     if (container) {
       const containerWidth = isScrollX(container)
@@ -136,7 +138,7 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
   }
 
   const move = (e: PointerEvent) => {
-    let pos = updatePosition(e);
+    const pos = updatePosition(e);
     if (!pos) {
       return
     }
@@ -145,7 +147,7 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
   }
 
   const end = (e: PointerEvent) => {
-    let pos = updatePosition(e);
+    const pos = updatePosition(e);
     if (!pos) {
       return
     }

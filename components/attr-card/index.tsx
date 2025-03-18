@@ -1,14 +1,13 @@
 "use client"
 import * as React from "react"
 import useComicStatusStore from "@/store";
-import { getGridFromComicConfig, getPageFromComicConfig } from "@/components/canvas/utils";
-import GridAttr from "./GridAttr"
+import { getPageFromComicConfig } from "@/components/canvas/utils";
 import PageAttr from "./PageAttr"
 
 export default function AttrCard() {
   const showAttrCard = useComicStatusStore(state => state.showAttrCard);
   const currentPageId = useComicStatusStore(state => state.currentPageStatus.id);
-  
+
   const currentStep = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex]);
   const comicConfig = currentStep?.comicConfig;
 

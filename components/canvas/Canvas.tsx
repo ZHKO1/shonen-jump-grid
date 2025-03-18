@@ -1,5 +1,5 @@
 "use client";
-import { RefObject, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import useComicStatusStore from "@/store";
 import { on, off, cn } from "@/lib/utils";
 import { ContainerContext } from "./context/container";
@@ -12,7 +12,7 @@ const Canvas = ({ scale }: { scale: number }) => {
   const containerRef = useRef(null);
   const pageId = useComicStatusStore(state => state.currentPageStatus.id);
   const { getCurrentLayerType } = useComicStatusStore();
-  let layerType = getCurrentLayerType();
+  const layerType = getCurrentLayerType();
   const setCurrentPageId = useComicStatusStore(state => state.setCurrentPageId);
   const resetCurrentGridId = useComicStatusStore(state => state.resetCurrentGridId);
   const addHistoryStep = useComicStatusStore(state => state.addHistoryStep);
@@ -49,8 +49,9 @@ const Canvas = ({ scale }: { scale: number }) => {
     }
   }, [setCurrentPageId, setCurrentLayerType, addHistoryStep, cleanAllHistoryStep]);
 
+  const container = containerRef.current;
   useEffect(() => {
-    if (!grids?.length || !containerRef || !("current" in containerRef) || !containerRef.current) {
+    if (!grids?.length || !container) {
       return;
     }
 
@@ -63,12 +64,12 @@ const Canvas = ({ scale }: { scale: number }) => {
     on(containerElement, "click", handleDocumentClick);
 
     return () => {
-      if (!grids?.length || !containerRef || !("current" in containerRef) || !containerRef.current) {
+      if (!grids?.length || !container) {
         return;
       }
       off(containerElement, "click", handleDocumentClick);
     };
-  }, [grids?.length, containerRef, resetCurrentGridId]);
+  }, [grids?.length, container, resetCurrentGridId]);
 
   return (
     <div ref={containerRef} className="canvas-content w-[720px] bg-gray-100 relative overflow-hidden border-2 border-gray-400 text-4xl font-bold text-black"

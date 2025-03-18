@@ -14,7 +14,7 @@ export interface ComicRef {
   setCurrentTime: (time: number) => void
 }
 
-const ComicComponent = forwardRef<ComicRef, ComicProps>((props, ref) => {
+const ComicComponent = forwardRef<ComicRef, ComicProps>(({ config, autoPlay, onLoad }, ref) => {
   const container = useRef<HTMLDivElement>(null);
   const comicRef = useRef<Comic>(null);
   const comic = comicRef.current;
@@ -40,13 +40,15 @@ const ComicComponent = forwardRef<ComicRef, ComicProps>((props, ref) => {
   useEffect(() => {
     const comic_ = new Comic();
     const promise = new Promise(async (resolve) => {
-      if (comic_ && props.config) {
-        await comic_.init(props.config, container.current!);
+      if (comic_ && config) {
+        await comic_.init(config, container.current!);
       }
-      props.onLoad && props.onLoad(resolve);
+      if (onLoad) {
+        onLoad(resolve);
+      }
     });
     promise.then(() => {
-      if (props.autoPlay && comic_) {
+      if (autoPlay && comic_) {
         comic_.play();
       }
     }).catch(e => {
@@ -62,7 +64,7 @@ const ComicComponent = forwardRef<ComicRef, ComicProps>((props, ref) => {
       });
       comicRef.current = null;
     }
-  }, [props.config, props.autoPlay, props.onLoad]);
+  }, [config, autoPlay, onLoad]);
 
   return <>
     <div className="comic_container" ref={container}>

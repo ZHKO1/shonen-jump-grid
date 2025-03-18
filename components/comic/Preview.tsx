@@ -17,7 +17,7 @@ export default function Preview({ config, onClose }: { config: ComicConfig | nul
     onClose();
   }
 
-  const onLoad = useCallback((resolve: () => {}) => {
+  const onLoad = useCallback((resolve: () => void) => {
     setTimeout(() => {
       setLoading(false);
       resolve();
@@ -37,7 +37,7 @@ export default function Preview({ config, onClose }: { config: ComicConfig | nul
         className="bg-black text-white" ref={comicContianerRef}
       >
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="relative" 
+          <div className="relative"
             style={{
               width: Width,
               height: Height,
@@ -49,6 +49,7 @@ export default function Preview({ config, onClose }: { config: ComicConfig | nul
                   {
                     [0, 1, 2, 3].map((i) => {
                       return (<div
+                        key={i}
                         className="flex items-center justify-center size-4 m-0.5 bg-yellow-600 animate-loading"
                         style={{
                           animationDelay: `calc(150ms * ${i + 1})`

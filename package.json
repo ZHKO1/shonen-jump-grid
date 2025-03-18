@@ -6,7 +6,8 @@
   "scripts": {
     "build": "rsbuild build",
     "dev": "rsbuild dev --open",
-    "preview": "rsbuild preview"
+    "preview": "rsbuild preview",
+    "lint": "eslint src components hooks lib"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.6",
@@ -33,16 +34,17 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@types/lodash-es": "^4.17.12",
-    "@types/node": "^20",
-    "eslint": "^9",
-    "eslint-config-next": "15.1.5",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
     "@rsbuild/core": "^1.2.14",
     "@rsbuild/plugin-react": "^1.1.1",
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^20",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "15.1.5",
+    "eslint-config-react-app": "^7.0.1",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
     "typescript": "^5.8.2"
   }
 }

@@ -28,7 +28,7 @@ export function useAdjustComic() {
                 });
             }
         }
-    }, []);
+    }, [addHistoryStep, getCurrentHistoryStep]);
 
     const adjustPage = useCallback((id: PageId, params: any, { tmp } = {
         tmp: false,
@@ -48,7 +48,7 @@ export function useAdjustComic() {
                 });
             }
         }
-    }, []);
+    }, [getCurrentHistoryStep, addHistoryStep]);
 
     const addPage = useCallback((page: CanvasPageConfig) => {
         const currentStep = getCurrentHistoryStep();
@@ -86,7 +86,7 @@ export function useAdjustComic() {
                 comicConfig: comicConfigCopy,
             });
         }
-    }, [setCurrentPageId, setCurrentGridId, getCurrentPageId, getCurrentHistoryStep]);
+    }, [setCurrentPageId, setCurrentGridId, getCurrentPageId, getCurrentHistoryStep, addHistoryStep]);
 
     return { adjustGrid, adjustPage, addPage, deletePage };
 }

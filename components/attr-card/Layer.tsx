@@ -25,7 +25,7 @@ export default function Layer({ onClick }: { onClick: (val: LayerType) => void }
             {
                 layers.map(layer => (
                     <div key={layer.name} role="group" aria-labelledby="radix-:r4kg:" onClick={() => handleClick(layer.name)}>
-                        <div className="relative flex cursor-default gap-2 select-none items-center rounded-sm px-2 py-1.5 text-xs outline-none hover:bg-accent hover:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0" id="radix-:r4kh:" role="option">
+                        <div className="relative flex cursor-default gap-2 select-none items-center rounded-sm px-2 py-1.5 text-xs outline-none hover:bg-accent hover:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0" id="radix-:r4kh:">
                             {
                                 currentLayerType === layer.name ? <Check className="" /> : <span className="w-4 h-4"></span>
                             }
