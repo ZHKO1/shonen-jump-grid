@@ -38,20 +38,7 @@ export class Grid extends Container {
     if (!config.content) {
       return;
     }
-    const container = new Container();
-    this.addChild(container);
-    const image = Sprite.from(config.content.url);
-    const gridWidth = this.getWidth();
-    image.scale = (gridWidth / image.width);
-    image.x = 0;
-    image.y = 0;
-    container.addChild(image);
-    image.anchor.set(0);
-    const mask = new Graphics();
-    this.drawGraphics(mask).fill();
-    container.addChild(mask);
-    container.mask = mask;
-    this.content = container;
+    this.updateContent(config.content.url);
   }
   updateContent(url: string) {
     const config = this.config;
@@ -66,6 +53,10 @@ export class Grid extends Container {
     image.scale = (gridWidth / image.width);
     image.x = 0;
     image.y = 0;
+    if (config.type == 'poly') {
+      image.x = Math.min.apply(null, config.path.map((item) => item.x - this.x));
+      image.y = Math.min.apply(null, config.path.map((item) => item.y - this.y));
+    }
     container.addChild(image);
     image.anchor.set(0);
     const mask = new Graphics();
