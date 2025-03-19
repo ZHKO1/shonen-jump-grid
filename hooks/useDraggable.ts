@@ -1,17 +1,19 @@
-import { Dispatch, RefObject, SetStateAction, useEffect, useState } from "react";
-import { BasicTarget, defaultDocument, getTargetElement, Position } from "@/lib/utils";
-import { useEventListener } from "./useEventListener";
+import type { Dispatch, RefObject, SetStateAction } from 'react'
+import type { BasicTarget, Position } from '@/lib/utils'
+import { useEffect, useState } from 'react'
+import { defaultDocument, getTargetElement } from '@/lib/utils'
+import { useEventListener } from './useEventListener'
 
 interface useDraggableOptions {
-  preventDefault?: boolean,
-  stopPropagation?: boolean,
-  draggingElement?: BasicTarget<HTMLElement | SVGElement>,
-  containerElement?: BasicTarget<HTMLElement | SVGAElement>,
-  handle?: RefObject<HTMLElement | SVGElement>,
-  initialValue?: Position,
-  onStart?: (position: Position, event: PointerEvent) => void | false,
-  onMove?: (position: Position, event: PointerEvent) => void,
-  onEnd?: (position: Position, event: PointerEvent) => void,
+  preventDefault?: boolean
+  stopPropagation?: boolean
+  draggingElement?: BasicTarget<HTMLElement | SVGElement>
+  containerElement?: BasicTarget<HTMLElement | SVGAElement>
+  handle?: RefObject<HTMLElement | SVGElement>
+  initialValue?: Position
+  onStart?: (position: Position, event: PointerEvent) => void | false
+  onMove?: (position: Position, event: PointerEvent) => void
+  onEnd?: (position: Position, event: PointerEvent) => void
   enabled?: boolean
 }
 
@@ -39,25 +41,25 @@ function isScrollY(node: Element | null) {
 }
 */
 
-export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, options: useDraggableOptions = {})
-  : readonly [number, number, boolean, Dispatch<SetStateAction<Position>>] => {
-  const { draggingElement = defaultDocument, containerElement, enabled = true } = options;
+export function useDraggable(target: BasicTarget<HTMLDivElement | SVGElement>, options: useDraggableOptions = {}): readonly [number, number, boolean, Dispatch<SetStateAction<Position>>] {
+  const { draggingElement = defaultDocument, containerElement, enabled = true } = options
   const draggingHandle = options.handle ?? target
 
   const [position, setPositon] = useState<Position>(
     options.initialValue ?? { x: 0, y: 0 },
   )
 
-  const { x = 0, y = 0 } = options.initialValue || {};
+  const { x = 0, y = 0 } = options.initialValue || {}
 
   useEffect(() => {
     setPositon({ x, y })
   }, [x, y])
 
-  const [pressedDelta, setPressedDelta] = useState<Position>();
+  const [pressedDelta, setPressedDelta] = useState<Position>()
 
   const handleEvent = (e: PointerEvent) => {
-    if (!enabled) return;
+    if (!enabled)
+      return
     if (options.preventDefault) {
       e.preventDefault()
     }
@@ -68,16 +70,17 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
       // TODO 感觉就很不优雅，但没什么好的办法
       if (e.type === 'pointerup') {
         const clickHandler = (ev: MouseEvent) => {
-          ev.stopPropagation();
-          document.removeEventListener('click', clickHandler, true);
-        };
-        document.addEventListener('click', clickHandler, { capture: true, once: true });
+          ev.stopPropagation()
+          document.removeEventListener('click', clickHandler, true)
+        }
+        document.addEventListener('click', clickHandler, { capture: true, once: true })
       }
     }
   }
 
   const start = (e: PointerEvent) => {
-    if (!enabled) return;
+    if (!enabled)
+      return
     const element = getTargetElement(target)
     if (!element) {
       return
@@ -106,7 +109,8 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
   }
 
   const updatePosition = (e: PointerEvent) => {
-    if (!enabled) return false;
+    if (!enabled)
+      return false
     const element = getTargetElement(target)
     if (!element) {
       return false
@@ -119,7 +123,7 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
     let { x, y } = position
     x = e.clientX - pressedDelta.x
     y = e.clientY - pressedDelta.y
-    const result = { x, y };
+    const result = { x, y }
     /*
     if (container) {
       const containerWidth = isScrollX(container)
@@ -134,11 +138,11 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
     */
 
     setPositon(result)
-    return result;
+    return result
   }
 
   const move = (e: PointerEvent) => {
-    const pos = updatePosition(e);
+    const pos = updatePosition(e)
     if (!pos) {
       return
     }
@@ -147,7 +151,7 @@ export const useDraggable = (target: BasicTarget<HTMLDivElement | SVGElement>, o
   }
 
   const end = (e: PointerEvent) => {
-    const pos = updatePosition(e);
+    const pos = updatePosition(e)
     if (!pos) {
       return
     }

@@ -1,15 +1,17 @@
-"use client"
-import * as React from "react"
+'use client'
+import type { CanvasGridConfig, Point } from '@/components/canvas/types'
 
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
+import * as React from 'react'
+import { BORDER_WIDTH } from '@/components/canvas/constant'
+import { getGridsBySplit, isGridSplited } from '@/components/canvas/utils'
+import { Button } from '@/components/ui/button'
 import {
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -18,12 +20,10 @@ import {
   // SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { useAdjustComic } from "@/hooks/custom/useAdjustComic"
-import useComicStatusStore from "@/store"
-import { getGridsBySplit, isGridSplited } from "@/components/canvas/utils";
-import { CanvasGridConfig, Point } from "@/components/canvas/types"
-import { BORDER_WIDTH } from "@/components/canvas/constant"
+} from '@/components/ui/select'
+import { Slider } from '@/components/ui/slider'
+import { useAdjustComic } from '@/hooks/custom/useAdjustComic'
+import useComicStatusStore from '@/store'
 
 function AnimationSelect({ value, onChange }: { value: string, onChange: (value: string) => void }) {
   return (
@@ -49,24 +49,24 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
     type,
     splitLine = [{ x: 0, y: 0 }, { x: 0, y: 0 }],
     splitSpaceWidth = 0,
-  } = grid;
-  const { adjustGrid } = useAdjustComic();
-  const isSplit = isGridSplited(grid);
-  const splitLineStart = splitLine[0];
-  const splitLineEnd = splitLine[1];
-  const setShowImgCrop = useComicStatusStore(state => state.setShowImgCrop);
+  } = grid
+  const { adjustGrid } = useAdjustComic()
+  const isSplit = isGridSplited(grid)
+  const splitLineStart = splitLine[0]
+  const splitLineEnd = splitLine[1]
+  const setShowImgCrop = useComicStatusStore(state => state.setShowImgCrop)
 
-  const { focus } = grid.content || {};
-  let animation = "none";
+  const { focus } = grid.content || {}
+  let animation = 'none'
   switch (focus?.type) {
-    case "move":
-      animation = focus.direction;
-      break;
-    case "change-background":
-      animation = "change-background";
-      break;
+    case 'move':
+      animation = focus.direction
+      break
+    case 'change-background':
+      animation = 'change-background'
+      break
     default:
-      break;
+      break
   }
 
   // const onRectChange = (key: keyof RectGridPoint): React.ChangeEventHandler<HTMLInputElement> => (e) => {
@@ -77,46 +77,46 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
 
   const onSplitSpaceWidthChange = (isCommit: boolean) => (number: number[]) => {
     if (isGridSplited(grid)) {
-      const splitSpaceWidth = Number(number[0]);
-      const result = getGridsBySplit(grid, grid.splitLine!, { spaceWidth: splitSpaceWidth, recursion: true });
+      const splitSpaceWidth = Number(number[0])
+      const result = getGridsBySplit(grid, grid.splitLine!, { spaceWidth: splitSpaceWidth, recursion: true })
       if (result && result.grids) {
         adjustGrid(id, {
           splitSpaceWidth,
           splitResult: result.grids,
         }, {
-          tmp: isCommit ? false : true
+          tmp: !isCommit,
         })
       }
     }
   }
 
   const handleImgConfig = (e: React.MouseEvent) => {
-    setShowImgCrop(true);
-    e.preventDefault();
+    setShowImgCrop(true)
+    e.preventDefault()
   }
 
   const onAnimationChange = (val: string) => {
-    let focus = undefined;
+    let focus
     switch (val) {
-      case "left-to-right":
-      case "right-to-left":
+      case 'left-to-right':
+      case 'right-to-left':
         focus = {
-          type: "move",
+          type: 'move',
           direction: val,
         }
-        break;
-      case "change-background":
+        break
+      case 'change-background':
         focus = {
-          type: "change-background",
+          type: 'change-background',
         }
-        break;
+        break
       default:
-        break;
+        break
     }
     adjustGrid(id, {
       content: {
         ...grid.content,
-        focus
+        focus,
       },
     })
   }
@@ -125,7 +125,10 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
     <>
       <CardHeader>
         <CardTitle>Grid Attr</CardTitle>
-        <CardDescription>type: {type}</CardDescription>
+        <CardDescription>
+          type:
+          {type}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form>
@@ -136,68 +139,101 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
                 <Label className="col-span-3 text-xs">{id}</Label>
               </div>
               {
-                type === "rect" && (
+                type === 'rect' && (
                   <>
                     <div className="grid col-span-4 grid-cols-5 gap-1">
                       <Label className="col-span-2 text-xs">upper-left:</Label>
-                      <Label className="col-span-3 text-xs">({grid.lt_x.toFixed(1) + "," + grid.lt_y.toFixed(1)})</Label>
+                      <Label className="col-span-3 text-xs">
+                        (
+                        {`${grid.lt_x.toFixed(1)},${grid.lt_y.toFixed(1)}`}
+                        )
+                      </Label>
                     </div>
                     <div className="grid col-span-4 grid-cols-5 gap-1">
                       <Label className="col-span-2 text-xs">lower-right:</Label>
-                      <Label className="col-span-3 text-xs">({grid.rb_x.toFixed(1) + "," + grid.rb_y.toFixed(1)})</Label>
+                      <Label className="col-span-3 text-xs">
+                        (
+                        {`${grid.rb_x.toFixed(1)},${grid.rb_y.toFixed(1)}`}
+                        )
+                      </Label>
                     </div>
                   </>
                 )
               }
               {
-                type === "poly" && (
+                type === 'poly' && (
                   (grid.path as Point[]).map((point, index) => (
-                    <div key={"path" + index} className="grid col-span-4 grid-cols-5 gap-1">
-                      <Label className="col-span-2 text-xs">point{index}:</Label>
-                      <Label className="col-span-3 text-xs">({point.x.toFixed(1) + "," + point.y.toFixed(1)})</Label>
+                    <div key={`path${index}`} className="grid col-span-4 grid-cols-5 gap-1">
+                      <Label className="col-span-2 text-xs">
+                        point
+                        {index}
+                        :
+                      </Label>
+                      <Label className="col-span-3 text-xs">
+                        (
+                        {`${point.x.toFixed(1)},${point.y.toFixed(1)}`}
+                        )
+                      </Label>
                     </div>
                   ))
                 )
               }
               {
-                isSplit ? (
-                  <>
-                    <div className="grid col-span-4 grid-cols-5 gap-1">
-                      <Label className="col-span-2 text-xs">split line:</Label>
-                      <Label className="col-span-3 text-xs">({splitLineStart.x.toFixed(1)}, {splitLineStart.y.toFixed(1)})</Label>
-                    </div>
-                    <div className="grid col-span-4 grid-cols-5 gap-1">
-                      <Label className="col-span-2 text-xs"></Label>
-                      <Label className="col-span-3 text-xs">({splitLineEnd.x.toFixed(1)}, {splitLineEnd.y.toFixed(1)})</Label>
-                    </div>
-                    <div className="col-span-4 flex flex-col gap-2 my-1 pr-1">
-                      <Label className="text-xs">split space width: {splitSpaceWidth}</Label>
-                      <Slider
-                        value={[splitSpaceWidth]}
-                        min={BORDER_WIDTH * 2}
-                        max={100}
-                        step={1}
-                        onValueChange={onSplitSpaceWidthChange(false)}
-                        onValueCommit={onSplitSpaceWidthChange(true)}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="grid col-span-4 grid-cols-5 gap-1">
-                      <Label className="col-span-2 text-xs flex items-center">image:</Label>
-                      <div className="grid col-span-3 text-xs">
-                        <Button variant="outline" size="sm" className="h-6" onClick={handleImgConfig}>config</Button>
-                      </div>
-                    </div>
-                    <div className="grid col-span-4 grid-cols-5 gap-1">
-                      <Label className="col-span-2 text-xs flex items-center">animation:</Label>
-                      <div className="grid col-span-3 text-xs">
-                        <AnimationSelect value={animation} onChange={onAnimationChange} />
-                      </div>
-                    </div>
-                  </>
-                )
+                isSplit
+                  ? (
+                      <>
+                        <div className="grid col-span-4 grid-cols-5 gap-1">
+                          <Label className="col-span-2 text-xs">split line:</Label>
+                          <Label className="col-span-3 text-xs">
+                            (
+                            {splitLineStart.x.toFixed(1)}
+                            ,
+                            {splitLineStart.y.toFixed(1)}
+                            )
+                          </Label>
+                        </div>
+                        <div className="grid col-span-4 grid-cols-5 gap-1">
+                          <Label className="col-span-2 text-xs"></Label>
+                          <Label className="col-span-3 text-xs">
+                            (
+                            {splitLineEnd.x.toFixed(1)}
+                            ,
+                            {splitLineEnd.y.toFixed(1)}
+                            )
+                          </Label>
+                        </div>
+                        <div className="col-span-4 flex flex-col gap-2 my-1 pr-1">
+                          <Label className="text-xs">
+                            split space width:
+                            {splitSpaceWidth}
+                          </Label>
+                          <Slider
+                            value={[splitSpaceWidth]}
+                            min={BORDER_WIDTH * 2}
+                            max={100}
+                            step={1}
+                            onValueChange={onSplitSpaceWidthChange(false)}
+                            onValueCommit={onSplitSpaceWidthChange(true)}
+                          />
+                        </div>
+                      </>
+                    )
+                  : (
+                      <>
+                        <div className="grid col-span-4 grid-cols-5 gap-1">
+                          <Label className="col-span-2 text-xs flex items-center">image:</Label>
+                          <div className="grid col-span-3 text-xs">
+                            <Button variant="outline" size="sm" className="h-6" onClick={handleImgConfig}>config</Button>
+                          </div>
+                        </div>
+                        <div className="grid col-span-4 grid-cols-5 gap-1">
+                          <Label className="col-span-2 text-xs flex items-center">animation:</Label>
+                          <div className="grid col-span-3 text-xs">
+                            <AnimationSelect value={animation} onChange={onAnimationChange} />
+                          </div>
+                        </div>
+                      </>
+                    )
               }
             </div>
           </div>

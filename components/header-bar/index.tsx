@@ -1,18 +1,18 @@
-"use client"
-import { Button } from "@/components/ui/button";
-import { Forward, LayoutDashboard, Play, Reply } from "lucide-react";
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
-import { Toggle } from "@/components/ui/toggle";
-import useComicStatusStore from "@/store";
+'use client'
+import { Forward, LayoutDashboard, Play, Reply } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Toggle } from '@/components/ui/toggle'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import useComicStatusStore from '@/store'
 
 export default function HeaderBar() {
-  const historyIndex = useComicStatusStore(state => state.currentHistoryStepIndex);
-  const historyLength = useComicStatusStore(state => state.historySteps.length);
-  const nextHistoryStep = useComicStatusStore(state => state.nextHistoryStep);
-  const prevHistoryStep = useComicStatusStore(state => state.prevHistoryStep);
-  const showAttrCard = useComicStatusStore(state => state.showAttrCard);
-  const setShowAttrCard = useComicStatusStore(state => state.setShowAttrCard);
-  const setShowComic = useComicStatusStore(state => state.setShowComic);
+  const historyIndex = useComicStatusStore(state => state.currentHistoryStepIndex)
+  const historyLength = useComicStatusStore(state => state.historySteps.length)
+  const nextHistoryStep = useComicStatusStore(state => state.nextHistoryStep)
+  const prevHistoryStep = useComicStatusStore(state => state.prevHistoryStep)
+  const showAttrCard = useComicStatusStore(state => state.showAttrCard)
+  const setShowAttrCard = useComicStatusStore(state => state.setShowAttrCard)
+  const setShowComic = useComicStatusStore(state => state.setShowComic)
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -41,7 +41,7 @@ export default function HeaderBar() {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon" onClick={() => setShowComic(true)}>
-                <Play className="h-4 w-4"/>
+                <Play className="h-4 w-4" />
                 <span className="sr-only">Play</span>
               </Button>
             </TooltipTrigger>
@@ -49,12 +49,12 @@ export default function HeaderBar() {
           </Tooltip>
         </div>
         <div className="flex items-center gap-2">
-          <Toggle aria-label="Toggle italic" pressed={showAttrCard} onPressedChange={(pressed) => setShowAttrCard(pressed)}>
+          <Toggle aria-label="Toggle italic" pressed={showAttrCard} onPressedChange={pressed => setShowAttrCard(pressed)}>
             <LayoutDashboard className="h-4 w-4" />
             <span className="sr-only">Detail</span>
           </Toggle>
         </div>
       </div>
     </TooltipProvider>
-  );
+  )
 }

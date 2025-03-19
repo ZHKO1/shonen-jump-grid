@@ -1,6 +1,7 @@
-import { BasicTarget, getTargetElement, off, on } from "@/lib/utils";
-import { useDeepCompareEffect } from "./useDeepCompareEffect";
-import { useLatest } from "./useLatest";
+import type { BasicTarget } from '@/lib/utils'
+import { getTargetElement, off, on } from '@/lib/utils'
+import { useDeepCompareEffect } from './useDeepCompareEffect'
+import { useLatest } from './useLatest'
 
 export type Target = BasicTarget<HTMLElement | Element | Window | Document | EventTarget>
 
@@ -54,14 +55,14 @@ export function useEventListener(
   eventName: string,
   handler: (...p: any) => void,
   element: Target,
-  options: boolean | AddEventListenerOptions = {}
+  options: boolean | AddEventListenerOptions = {},
 ): void {
-  const savedHandler = useLatest(handler);
+  const savedHandler = useLatest(handler)
 
   useDeepCompareEffect(() => {
-    const targetElement = getTargetElement(element);
+    const targetElement = getTargetElement(element)
     if (!(targetElement && targetElement.addEventListener)) {
-      return;
+      return
     }
 
     const eventListener: typeof handler = event =>
@@ -75,6 +76,5 @@ export function useEventListener(
       }
       off(targetElement, eventName, eventListener, options)
     }
-
-  }, [eventName, element, options]);
+  }, [eventName, element, options])
 }

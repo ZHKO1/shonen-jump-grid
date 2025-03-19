@@ -1,8 +1,9 @@
-"use client"
-import * as React from "react"
+'use client'
+import type { CanvasPageConfig } from '@/components/canvas/types'
 
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
+import type { LayerType, LogoPageStatus } from '@/store'
+import * as React from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -10,35 +11,35 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { CanvasPageConfig } from "@/components/canvas/types"
-import Layer from "./Layer"
-import useComicStatusStore, { LayerType, LogoPageStatus } from "@/store"
-import { getGridFromComicConfig } from "../canvas/utils"
-import GridAttr from "./GridAttr"
+} from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import useComicStatusStore from '@/store'
+import { getGridFromComicConfig } from '../canvas/utils'
+import GridAttr from './GridAttr'
+import Layer from './Layer'
 
 export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
-  const pageId = page?.id || "";
-  const height = page?.height || "";
-  const isLogoPage = useComicStatusStore(state => state.currentPageStatus.type === "logo-page");
-  const setShowImgCrop = useComicStatusStore(state => state.setShowImgCrop);
-  const setCurrentLayerType = useComicStatusStore(state => state.setCurrentLayerType);
-  const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId);
-  const layerType = useComicStatusStore(state => (state.currentPageStatus as LogoPageStatus).layerType || "grids");
+  const pageId = page?.id || ''
+  const height = page?.height || ''
+  const isLogoPage = useComicStatusStore(state => state.currentPageStatus.type === 'logo-page')
+  const setShowImgCrop = useComicStatusStore(state => state.setShowImgCrop)
+  const setCurrentLayerType = useComicStatusStore(state => state.setCurrentLayerType)
+  const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId)
+  const layerType = useComicStatusStore(state => (state.currentPageStatus as LogoPageStatus).layerType || 'grids')
 
-  const currentStep = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex]);
-  const comicConfig = currentStep?.comicConfig;
-  const currentGridId = useComicStatusStore(state => state.currentPageStatus.gridId);
-  const grid = comicConfig && getGridFromComicConfig(comicConfig, currentGridId);
+  const currentStep = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex])
+  const comicConfig = currentStep?.comicConfig
+  const currentGridId = useComicStatusStore(state => state.currentPageStatus.gridId)
+  const grid = comicConfig && getGridFromComicConfig(comicConfig, currentGridId)
 
   const handleLogoConfig = (e: React.MouseEvent) => {
-    setShowImgCrop(true);
-    e.preventDefault();
+    setShowImgCrop(true)
+    e.preventDefault()
   }
 
   const handleLayerClick = (val: LayerType) => {
-    setCurrentGridId("");
-    setCurrentLayerType(val);
+    setCurrentGridId('')
+    setCurrentLayerType(val)
   }
 
   return (
@@ -75,7 +76,7 @@ export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
                           </div>
                         </div>
                         {
-                          layerType === "logo" && (
+                          layerType === 'logo' && (
                             <>
                               <div className="grid grid-cols-5 gap-1">
                                 <Label className="col-span-2 text-xs flex items-center">logo:</Label>
@@ -96,10 +97,10 @@ export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
         )
       }
       {
-        (currentGridId !== "") && grid && <GridAttr grid={grid} />
+        (currentGridId !== '') && grid && <GridAttr grid={grid} />
       }
       <CardFooter className="flex justify-between">
       </CardFooter>
-    </Card >
+    </Card>
   )
 }

@@ -13,7 +13,7 @@ interface StateDependencies {
 export type UseWindowSize = () => {
   readonly width: number
   readonly height: number
-}  
+}
 
 function subscribe(callback: () => void) {
   window.addEventListener('resize', callback)

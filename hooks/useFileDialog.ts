@@ -1,5 +1,5 @@
-import { defaultDocument } from "@/lib/utils";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from 'react'
+import { defaultDocument } from '@/lib/utils'
 
 export type UseFileDialog = (options?: UseFileDialogOptions) => readonly [
   FileList | null,
@@ -8,44 +8,44 @@ export type UseFileDialog = (options?: UseFileDialogOptions) => readonly [
 ]
 
 export interface UseFileDialogOptions {
-  accept?: string,
-  multiple?: boolean,
-  capture?: string,
+  accept?: string
+  multiple?: boolean
+  capture?: string
 }
 
 const DEFAULT_OPTIONS: UseFileDialogOptions = {
   multiple: true,
-  accept: "*",
+  accept: '*',
 }
 
 export const useFileDialog: UseFileDialog = (
-  options: UseFileDialogOptions = {}
+  options: UseFileDialogOptions = {},
 ) => {
-  const [files, setFiles] = useState<FileList | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const fileOpenPromiseRef = useRef<Promise<FileList | null> | null>(null);
-  const resolveFileOpenPromiseRef = useRef<(value: FileList | null) => void>(() => { });
+  const [files, setFiles] = useState<FileList | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const fileOpenPromiseRef = useRef<Promise<FileList | null> | null>(null)
+  const resolveFileOpenPromiseRef = useRef<(value: FileList | null) => void>(() => { })
   const initFn = useCallback(() => {
     if (!defaultDocument) {
-      return null;
+      return null
     }
 
-    const input = defaultDocument.createElement('input');
+    const input = defaultDocument.createElement('input')
     input.type = 'file'
 
     input.onchange = (event: Event) => {
-      const result = event.target as HTMLInputElement;
-      setFiles(result.files);
-      resolveFileOpenPromiseRef.current?.(result.files);
+      const result = event.target as HTMLInputElement
+      setFiles(result.files)
+      resolveFileOpenPromiseRef.current?.(result.files)
     }
-    return input;
-  }, []);
+    return input
+  }, [])
 
   inputRef.current = initFn()
 
   const open = async (localOptions?: Partial<UseFileDialogOptions>) => {
     if (!inputRef.current) {
-      return;
+      return
     }
     const _options = {
       ...DEFAULT_OPTIONS,
@@ -58,18 +58,18 @@ export const useFileDialog: UseFileDialog = (
     inputRef.current.capture = _options.capture!
 
     fileOpenPromiseRef.current = new Promise((resolve) => {
-      resolveFileOpenPromiseRef.current = resolve;
-    });
+      resolveFileOpenPromiseRef.current = resolve
+    })
 
-    inputRef.current.click();
-    return fileOpenPromiseRef.current;
+    inputRef.current.click()
+    return fileOpenPromiseRef.current
   }
 
   const reset = () => {
-    setFiles(null);
+    setFiles(null)
     resolveFileOpenPromiseRef.current?.(null)
     if (inputRef.current) {
-      inputRef.current.value = "";
+      inputRef.current.value = ''
     }
   }
 

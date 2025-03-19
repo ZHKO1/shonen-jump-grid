@@ -1,10 +1,10 @@
-import './App.css';
-import Canvas from "@/components/canvas";
-import HeaderBar from "@/components/header-bar";
-import AttrCard from "@/components/attr-card";
-import ImgCrop from "@/components/img-crop";
-import Slider from "@/components/slider";
-import Comic from "@/components/comic";
+import AttrCard from '@/components/attr-card'
+import Canvas from '@/components/canvas'
+import Comic from '@/components/comic'
+import HeaderBar from '@/components/header-bar'
+import ImgCrop from '@/components/img-crop'
+import Slider from '@/components/slider'
+import './App.css'
 
 export default function Home() {
   return (
@@ -30,5 +30,5 @@ export default function Home() {
         <Comic />
       </section>
     </div>
-  );
+  )
 }

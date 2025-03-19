@@ -1,7 +1,8 @@
+import type { BasicTarget } from '@/lib/utils'
 import { useEffect, useState } from 'react'
-import { useResizeObserver } from './useResizeObserver'
+import { getTargetElement } from '@/lib/utils'
 import { useEvent } from './useEvent'
-import { BasicTarget, getTargetElement } from '@/lib/utils'
+import { useResizeObserver } from './useResizeObserver'
 
 export type UseElementBounding = (
   target: BasicTarget<Element>,

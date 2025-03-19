@@ -1,24 +1,25 @@
-import { create, StateCreator } from 'zustand';
-import { CanvasComicConfig, GridId, PageId } from '@/components/canvas/types';
-import { getIsLogoPage, getPageFromComicConfig } from '@/components/canvas/utils';
+import type { StateCreator } from 'zustand'
+import type { CanvasComicConfig, GridId, PageId } from '@/components/canvas/types'
+import { create } from 'zustand'
+import { getIsLogoPage, getPageFromComicConfig } from '@/components/canvas/utils'
 
 interface PageShareStatus {
-  id: PageId,
+  id: PageId
   gridId: GridId
-  type: 'custom-page' | 'logo-page',
+  type: 'custom-page' | 'logo-page'
 }
 
 export interface PageStatus extends PageShareStatus {
-  id: PageId,
+  id: PageId
   gridId: GridId
-  type: 'custom-page',
+  type: 'custom-page'
 }
 
-export type LayerType = 'logo' | 'grids';
+export type LayerType = 'logo' | 'grids'
 export interface LogoPageStatus extends PageShareStatus {
-  id: PageId,
+  id: PageId
   gridId: GridId
-  type: 'logo-page',
+  type: 'logo-page'
   layerType: LayerType
 }
 
@@ -35,11 +36,11 @@ interface CurrentStatusSlice {
 
 interface ShowComponentSlice {
   // AttrCard组件是否显示
-  showAttrCard: boolean,
+  showAttrCard: boolean
   // ImgCrop组件是否显示
-  showImgCrop: boolean,
+  showImgCrop: boolean
   // Comic组件是否显示
-  showComic: boolean,
+  showComic: boolean
   setShowAttrCard: (val: boolean) => void
   getShowAttrCard: () => boolean
   setShowImgCrop: (val: boolean) => void
@@ -48,18 +49,18 @@ interface ShowComponentSlice {
   getShowComic: () => boolean
 }
 
-type HistoryStep = {
-  type: "init" | "split" | "adjust-grid" | "adjust-page",
-  comicConfig: CanvasComicConfig,
+interface HistoryStep {
+  type: 'init' | 'split' | 'adjust-grid' | 'adjust-page'
+  comicConfig: CanvasComicConfig
 }
 
 interface HistoryStepSlice {
   // 记录用户操作历史
-  historySteps: HistoryStep[],
+  historySteps: HistoryStep[]
   // 当前用户操作历史条目索引
-  currentHistoryStepIndex: number,
+  currentHistoryStepIndex: number
   // 用户当前操作是否暂缓状态
-  isCurrentHistoryStepTmp: boolean,
+  isCurrentHistoryStepTmp: boolean
   addHistoryStep: (step: HistoryStep, options?: { tmp?: boolean }) => void
   getCurrentHistoryStep: () => HistoryStep | null
   setCurrentHistoryStep: (val: HistoryStep) => void
@@ -77,50 +78,52 @@ const createCurrentStatusSlice: StateCreator<
   CurrentStatusSlice
 > = (set, get) => ({
   currentPageStatus: {
-    id: "",
-    gridId: "",
-    type: "custom-page",
+    id: '',
+    gridId: '',
+    type: 'custom-page',
   },
   setCurrentPageId: (pageId: PageId) => {
-    const currentStep = get().historySteps[get().currentHistoryStepIndex];
-    const comicConfig = currentStep?.comicConfig;
-    const page = comicConfig && getPageFromComicConfig(comicConfig, pageId) || void 0;
-    const isLogoPage = page && getIsLogoPage(page) || false;
+    const currentStep = get().historySteps[get().currentHistoryStepIndex]
+    const comicConfig = currentStep?.comicConfig
+    const page = comicConfig && getPageFromComicConfig(comicConfig, pageId) || void 0
+    const isLogoPage = page && getIsLogoPage(page) || false
     set(() => ({
       currentPageStatus: {
         id: pageId,
-        gridId: "",
-        type: isLogoPage ? "logo-page" : "custom-page",
-        ...(isLogoPage ? { layerType: "grids" } : {})
-      } as PageStatus | LogoPageStatus
+        gridId: '',
+        type: isLogoPage ? 'logo-page' : 'custom-page',
+        ...(isLogoPage ? { layerType: 'grids' } : {}),
+      } as PageStatus | LogoPageStatus,
     }))
   },
   getCurrentPageId: () => {
-    return get().currentPageStatus.id;
+    return get().currentPageStatus.id
   },
   setCurrentGridId: (id: GridId) => {
-    set(state => {
+    set((state) => {
       return {
         currentPageStatus: {
           ...state.currentPageStatus,
           gridId: id,
-          ...(state.currentPageStatus.type === 'logo-page' ? {
-            layerType: "grids",
-          } : {})
+          ...(state.currentPageStatus.type === 'logo-page'
+            ? {
+                layerType: 'grids',
+              }
+            : {}),
         },
-      };
+      }
     })
   },
   resetCurrentGridId: () => {
     set(state => ({
       currentPageStatus: {
         ...state.currentPageStatus,
-        gridId: "",
+        gridId: '',
       },
     }))
   },
   getCurrentGridId: () => {
-    return get().currentPageStatus.gridId;
+    return get().currentPageStatus.gridId
   },
   setCurrentLayerType: (layerType: LayerType) => {
     if (get().currentPageStatus.type === 'logo-page') {
@@ -133,11 +136,11 @@ const createCurrentStatusSlice: StateCreator<
     }
   },
   getCurrentLayerType: () => {
-    let status = get().currentPageStatus;
+    const status = get().currentPageStatus
     if (status.type === 'logo-page') {
-      return status.layerType;
+      return status.layerType
     }
-    return "grids";
+    return 'grids'
   },
 })
 
@@ -156,7 +159,7 @@ const createShowComponentSlice: StateCreator<
     }))
   },
   getShowAttrCard: () => {
-    return get().showAttrCard;
+    return get().showAttrCard
   },
   setShowImgCrop: (val: boolean) => {
     set(() => ({
@@ -164,7 +167,7 @@ const createShowComponentSlice: StateCreator<
     }))
   },
   getShowImgCrop: () => {
-    return get().showImgCrop;
+    return get().showImgCrop
   },
   setShowComic: (val: boolean) => {
     set(() => ({
@@ -172,7 +175,7 @@ const createShowComponentSlice: StateCreator<
     }))
   },
   getShowComic: () => {
-    return get().showComic;
+    return get().showComic
   },
 })
 
@@ -196,20 +199,23 @@ const createHistoryStepSlice: StateCreator<
             currentHistoryStepIndex: state.currentHistoryStepIndex + 1,
             isCurrentHistoryStepTmp: true,
           }
-        } else {
+        }
+        else {
           // 替换currentStep（tmp）
           return {
             historySteps: [...state.historySteps.slice(0, state.currentHistoryStepIndex), step],
           }
         }
-      } else {
+      }
+      else {
         if (!state.isCurrentHistoryStepTmp) {
           // 正常添加step
           return {
             historySteps: [...state.historySteps.slice(0, state.currentHistoryStepIndex + 1), step],
             currentHistoryStepIndex: state.currentHistoryStepIndex + 1,
           }
-        } else {
+        }
+        else {
           // 替换currentStep（tmp），isCurrentTmp赋予false
           return {
             historySteps: [...state.historySteps.slice(0, state.currentHistoryStepIndex), step],
@@ -227,25 +233,27 @@ const createHistoryStepSlice: StateCreator<
     }))
   },
   getCurrentHistoryStep: () => {
-    const currentHistoryStepIndex = get().currentHistoryStepIndex;
-    if (currentHistoryStepIndex < 0) return null;
-    const step = get().historySteps[currentHistoryStepIndex];
-    return step;
+    const currentHistoryStepIndex = get().currentHistoryStepIndex
+    if (currentHistoryStepIndex < 0)
+      return null
+    const step = get().historySteps[currentHistoryStepIndex]
+    return step
   },
   setCurrentHistoryStep: (step: HistoryStep) => {
-    const currentHistoryStepIndex = get().currentHistoryStepIndex;
-    if (currentHistoryStepIndex < 0) return null;
-    set((state) => ({
+    const currentHistoryStepIndex = get().currentHistoryStepIndex
+    if (currentHistoryStepIndex < 0)
+      return null
+    set(state => ({
       historySteps: [...state.historySteps.slice(0, state.currentHistoryStepIndex), step],
     }))
   },
   nextHistoryStep: () => {
-    set((state) => ({
+    set(state => ({
       currentHistoryStepIndex: Math.min(state.currentHistoryStepIndex + 1, state.historySteps.length - 1),
     }))
   },
   prevHistoryStep: () => {
-    set((state) => ({
+    set(state => ({
       currentHistoryStepIndex: Math.max(state.currentHistoryStepIndex - 1, 0),
     }))
   },
@@ -263,4 +271,4 @@ const useComicStatusStore = create<ALLStore>()((...arg) => ({
 //   console.log(prevstate)
 // })
 
-export default useComicStatusStore;
+export default useComicStatusStore

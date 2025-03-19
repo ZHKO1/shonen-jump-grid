@@ -1,77 +1,83 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
-import { ComicConfig } from './core/type';
-import { Comic } from './core';
+import type { ComicConfig } from './core/type'
+import { useEffect, useImperativeHandle, useRef } from 'react'
+import { Comic } from './core'
 
 export interface ComicProps {
-  config?: ComicConfig | null,
-  autoPlay?: boolean,
+  config?: ComicConfig | null
+  autoPlay?: boolean
   onLoad?: (a: any) => void
 }
 
 export interface ComicRef {
-  play: () => void;
-  pause: () => void;
+  play: () => void
+  pause: () => void
   setCurrentTime: (time: number) => void
 }
 
-const ComicComponent = forwardRef<ComicRef, ComicProps>(({ config, autoPlay, onLoad }, ref) => {
-  const container = useRef<HTMLDivElement>(null);
-  const comicRef = useRef<Comic>(null);
-  const comic = comicRef.current;
+function ComicComponent({ ref, config, autoPlay, onLoad }: ComicProps & { ref?: React.RefObject<ComicRef | null> }) {
+  const container = useRef<HTMLDivElement>(null)
+  const comicRef = useRef<Comic>(null)
+  const comic = comicRef.current
 
   useImperativeHandle(ref, () => ({
-    play: function () {
+    play() {
       if (comic) {
-        comic.play();
+        comic.play()
       }
     },
-    pause: function () {
+    pause() {
       if (comic) {
-        comic.pause();
+        comic.pause()
       }
     },
-    setCurrentTime: function (time: number) {
+    setCurrentTime(time: number) {
       if (comic) {
-        comic.setCurrentTime(time);
+        comic.setCurrentTime(time)
       }
-    }
+    },
   }))
 
   useEffect(() => {
-    const comic_ = new Comic();
-    const promise = new Promise(async (resolve) => {
+    const comic_ = new Comic()
+    const promise = new Promise<void>((resolve) => {
       if (comic_ && config) {
-        await comic_.init(config, container.current!);
+        comic_.init(config, container.current!).then(() => {
+          if (onLoad) {
+            onLoad(resolve)
+          }
+          else {
+            resolve()
+          }
+        })
       }
-      if (onLoad) {
-        onLoad(resolve);
-      }
-    });
+    })
     promise.then(() => {
       if (autoPlay && comic_) {
-        comic_.play();
+        comic_.play()
       }
-    }).catch(e => {
-      console.log(e);
-    });
-    comicRef.current = comic_;
+    }).catch((e) => {
+      console.error(e)
+    })
+    comicRef.current = comic_
 
     return () => {
       promise.then(() => {
         if (comic_) {
           comic_.destory()
         }
-      });
-      comicRef.current = null;
+      })
+      comicRef.current = null
     }
-  }, [config, autoPlay, onLoad]);
+  }, [config, autoPlay, onLoad])
 
-  return <>
-    <div className="comic_container" ref={container}>
-    </div>
-  </>
-});
+  return (
+    <>
+      <div className="comic_container" ref={container}>
+      </div>
+    </>
+  )
+}
 
-ComicComponent.displayName = "ComicComponent";
+ComicComponent.displayName = 'ComicComponent'
 
-export default ComicComponent;
+export default ComicComponent

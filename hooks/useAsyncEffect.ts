@@ -1,7 +1,7 @@
 import type { DependencyList } from 'react'
 import { useEffect } from 'react'
-import { useMountedState } from './useMountedState'
 import { noop } from '@/lib/utils'
+import { useMountedState } from './useMountedState'
 
 type UseAsyncEffect = <T>(
   effect: () => Promise<T> | T,

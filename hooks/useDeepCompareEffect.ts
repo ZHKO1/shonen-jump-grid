@@ -1,10 +1,10 @@
+import type { DependencyList, EffectCallback } from 'react'
 import { isEqual } from 'lodash-es'
-import { DependencyList, EffectCallback } from "react";
-import { useCustomCompareEffect } from "./useCustomCompareEffect";
+import { useCustomCompareEffect } from './useCustomCompareEffect'
 
 export function useDeepCompareEffect(
   effect: EffectCallback,
   deps: DependencyList,
 ): void {
-  useCustomCompareEffect(effect, deps, isEqual);
+  useCustomCompareEffect(effect, deps, isEqual)
 }
