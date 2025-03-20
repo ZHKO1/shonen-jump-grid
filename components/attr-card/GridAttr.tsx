@@ -77,6 +77,16 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
   //   })
   // }
 
+  const onClickUnsplit = () => {
+    if (isSplit) {
+      adjustGrid(id, {
+        splitLine: void 0,
+        splitResult: void 0,
+        splitSpaceWidth: void 0,
+      })
+    }
+  }
+
   const onSplitSpaceWidthChange = (isCommit: boolean) => (number: number[]) => {
     if (isSplit) {
       const splitSpaceWidth = Number(number[0])
@@ -225,6 +235,11 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
                             onValueChange={onSplitSpaceWidthChange(false)}
                             onValueCommit={onSplitSpaceWidthChange(true)}
                           />
+                        </div>
+                        <div className="grid col-span-4 grid-cols-5 gap-1">
+                          <div className="grid col-span-3 text-xs col-start-2">
+                            <Button variant="outline" size="sm" className="h-6" onClick={onClickUnsplit}>unsplit</Button>
+                          </div>
                         </div>
                       </>
                     )
