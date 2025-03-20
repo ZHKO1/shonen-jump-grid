@@ -3,7 +3,7 @@ import type { CanvasGridConfig, Point } from '@/components/canvas/types'
 
 import * as React from 'react'
 import { BORDER_WIDTH } from '@/components/canvas/constant'
-import { getGridsBySplit, isGridSplited } from '@/components/canvas/utils'
+import { getGridsBySplit, isGridFlushable, isGridSplited } from '@/components/canvas/utils'
 import { Button } from '@/components/ui/button'
 import {
   CardContent,
@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
+import { Switch } from '@/components/ui/switch'
 import { useAdjustComic } from '@/hooks/custom/useAdjustComic'
 import useComicStatusStore from '@/store'
 
@@ -52,6 +53,7 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
   } = grid
   const { adjustGrid } = useAdjustComic()
   const isSplit = isGridSplited(grid)
+  const isFlushable = isGridFlushable(grid)
   const splitLineStart = splitLine[0]
   const splitLineEnd = splitLine[1]
   const setShowImgCrop = useComicStatusStore(state => state.setShowImgCrop)
@@ -76,7 +78,7 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
   // }
 
   const onSplitSpaceWidthChange = (isCommit: boolean) => (number: number[]) => {
-    if (isGridSplited(grid)) {
+    if (isSplit) {
       const splitSpaceWidth = Number(number[0])
       const result = getGridsBySplit(grid, grid.splitLine!, { spaceWidth: splitSpaceWidth, recursion: true })
       if (result && result.grids) {
@@ -87,6 +89,14 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
           tmp: !isCommit,
         })
       }
+    }
+  }
+
+  const onIsFlushChange = (checked: boolean) => {
+    if (!isSplit) {
+      adjustGrid(id, {
+        isFlush: checked,
+      })
     }
   }
 
@@ -220,6 +230,14 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
                     )
                   : (
                       <>
+                        {isFlushable && (
+                          <div className="grid col-span-4 grid-cols-5 gap-1">
+                            <Label className="col-span-2 text-xs flex items-center">flush:</Label>
+                            <div className="grid col-span-3 text-xs">
+                              <Switch checked={!!grid.isFlush} onCheckedChange={onIsFlushChange} />
+                            </div>
+                          </div>
+                        )}
                         <div className="grid col-span-4 grid-cols-5 gap-1">
                           <Label className="col-span-2 text-xs flex items-center">image:</Label>
                           <div className="grid col-span-3 text-xs">

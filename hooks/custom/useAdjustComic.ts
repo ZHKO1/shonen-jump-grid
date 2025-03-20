@@ -1,5 +1,6 @@
 import type { CanvasComicConfig, CanvasPageConfig, GridId, PageId } from '../../components/canvas/types'
 import { useCallback } from 'react'
+import { deepCopy } from '@/lib/utils'
 import useComicStatusStore from '@/store'
 import { getGridFromComicConfig, getPageFromComicConfig } from '../../components/canvas/utils'
 
@@ -16,7 +17,7 @@ export function useAdjustComic() {
     const currentStep = getCurrentHistoryStep()
     if (currentStep) {
       const comicConfig = currentStep.comicConfig
-      const comicConfigCopy = JSON.parse(JSON.stringify(comicConfig))
+      const comicConfigCopy = deepCopy(comicConfig)
       const targetGrid = getGridFromComicConfig(comicConfigCopy, id)
       if (targetGrid) {
         Object.assign(targetGrid, params)
@@ -36,7 +37,7 @@ export function useAdjustComic() {
     const currentStep = getCurrentHistoryStep()
     if (currentStep) {
       const comicConfig = currentStep.comicConfig
-      const comicConfigCopy = JSON.parse(JSON.stringify(comicConfig))
+      const comicConfigCopy = deepCopy(comicConfig)
       const targetGrid = getPageFromComicConfig(comicConfigCopy, id)
       if (targetGrid) {
         Object.assign(targetGrid, params)
@@ -54,7 +55,7 @@ export function useAdjustComic() {
     const currentStep = getCurrentHistoryStep()
     if (currentStep) {
       const comicConfig = currentStep.comicConfig
-      const comicConfigCopy = JSON.parse(JSON.stringify(comicConfig)) as CanvasComicConfig
+      const comicConfigCopy = deepCopy(comicConfig) as CanvasComicConfig
       comicConfigCopy.pages.push(page)
       addHistoryStep({
         type: 'adjust-page',
@@ -68,7 +69,7 @@ export function useAdjustComic() {
     const currentPageId = getCurrentPageId()
     if (currentStep) {
       const comicConfig = currentStep.comicConfig
-      const comicConfigCopy = JSON.parse(JSON.stringify(comicConfig)) as CanvasComicConfig
+      const comicConfigCopy = deepCopy(comicConfig) as CanvasComicConfig
       if (pageId === currentPageId) {
         const index = comicConfigCopy.pages.findIndex(page => page.id === pageId)
         let nextPageId: PageId = ''

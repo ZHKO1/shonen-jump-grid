@@ -18,6 +18,7 @@ interface CanvasGridShareConfig {
   splitLine?: [Point, Point]
   splitResult?: [CanvasGridConfig, CanvasGridConfig]
   splitSpaceWidth?: number
+  isFlush?: boolean
   content?: {
     originImg?: CanvasOriginImgConfig
   }

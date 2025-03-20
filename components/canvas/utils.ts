@@ -1,7 +1,8 @@
 import type { CanvasComicConfig, CanvasGridConfig, CanvasPageConfig, CanvasPolyGridConfig, CanvasRectGridConfig, GridId, PageId, Point, PolyGridPoint, RectGridPoint } from './types'
 import type { ComicConfig, GridConfig, PageConfig, PolyGridConfig, RectGridConfig } from '@/components/comic/core/type'
+import { deepCopy } from '@/lib/utils'
 import { LogoDefaultCenterX, LogoDefaultCenterY, LogoDefaultHeight, LogoDefaultWidth } from '../comic/core/config'
-import { BORDER_WIDTH } from './constant'
+import { BLANK_GRID_MARGIN, BORDER_WIDTH, CANVAS_WIDTH } from './constant'
 
 type Pos = 'lt' | 'rt' | 'lb' | 'rb'
 type PolyType = 'horizon' | 'vertical'
@@ -657,21 +658,87 @@ export function getClipPath(path: [Point, Point, Point, Point]) {
   return `polygon(${path.map(p => `${p.x}px ${p.y}px`).join(',')})`
 }
 
+/**
+ * 根据isFlush来返回处理过的RectGrid
+ * @param {CanvasRectGridConfig} grid
+ * @returns {CanvasRectGridConfig}
+ */
+export function getAutoFlushedRectGridConfig(grid: CanvasRectGridConfig) {
+  const config = deepCopy(grid)
+  if (isGridLeftAligned(grid)) {
+    config.lt_x = -BORDER_WIDTH
+  }
+  if (isGridRightAligned(grid)) {
+    config.rb_x = CANVAS_WIDTH + BORDER_WIDTH
+  }
+  return config
+}
+
+/**
+ * 根据isFlush来返回处理过的PolyGrid
+ * @param {CanvasPolyGridConfig} grid
+ * @returns {CanvasPolyGridConfig}
+ */
+export function getAutoFlushedPolyGridConfig(grid: CanvasPolyGridConfig) {
+  const config = deepCopy(grid)
+  const [p0, p1, p2, p3] = config.path
+  if (isGridLeftAligned(grid)) {
+    config.path = [
+      { ...p0, x: -BORDER_WIDTH },
+      p1,
+      p2,
+      { ...p3, x: -BORDER_WIDTH },
+    ]
+  }
+  if (isGridRightAligned(grid)) {
+    config.path = [
+      p0,
+      { ...p1, x: CANVAS_WIDTH + BORDER_WIDTH },
+      { ...p2, x: CANVAS_WIDTH + BORDER_WIDTH },
+      p3,
+    ]
+  }
+  return config
+}
+
+/**
+ * 根据isFlush来返回处理过的grid
+ * @param {CanvasGridConfig} grid
+ * @returns {CanvasGridConfig}
+ */
+export function getAutoFlushedGridConfig(grid: CanvasGridConfig) {
+  const config = deepCopy(grid)
+  if (!isGridFlushable(grid)) {
+    return config
+  }
+  if (config.isFlush) {
+    if (config.type === 'rect') {
+      return getAutoFlushedRectGridConfig(config)
+    }
+    if (config.type === 'poly') {
+      return getAutoFlushedPolyGridConfig(config)
+    }
+  }
+  return config
+}
+
 function getRectGridStyle(grid: CanvasRectGridConfig): GridStyle {
+  const config = grid?.isFlush ? getAutoFlushedGridConfig(grid) as CanvasRectGridConfig : deepCopy(grid)
+  const { lt_x, lt_y, rb_x, rb_y } = config
   const { outside } = getRectGridPoint({
-    ...grid,
+    ...config,
   }, BORDER_WIDTH)
   const left = outside.lt_x
   const top = outside.lt_y
   const width = outside.rb_x - outside.lt_x
   const height = outside.rb_y - outside.lt_y
   const posStyle = {
-    left: grid.lt_x,
-    top: grid.lt_y,
+    left: lt_x,
+    top: lt_y,
   }
   const sizeStyle = {
-    width: grid.rb_x - grid.lt_x,
-    height: grid.rb_y - grid.lt_y,
+    width: rb_x - lt_x,
+    height: rb_y - lt_y,
   }
   const posStyleWithBorder = {
     left,
@@ -681,7 +748,7 @@ function getRectGridStyle(grid: CanvasRectGridConfig): GridStyle {
     width,
     height,
   }
-  const svgPath = ([{ x: grid.lt_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.lt_y }, { x: grid.rb_x, y: grid.rb_y }, { x: grid.lt_x, y: grid.rb_y }])
+  const svgPath = ([{ x: lt_x, y: lt_y }, { x: rb_x, y: lt_y }, { x: rb_x, y: rb_y }, { x: lt_x, y: rb_y }])
     .map(p => ({ x: p.x - left, y: p.y - top })) as [Point, Point, Point, Point]
 
   const focusIconPosStyle = {
@@ -705,9 +772,11 @@ function getRectGridStyle(grid: CanvasRectGridConfig): GridStyle {
 }
 
 function getPolyGridStyle(grid: CanvasPolyGridConfig): GridStyle {
-  const lt = getPolyContainerPoint(grid.path, 'lt')
-  const rb = getPolyContainerPoint(grid.path, 'rb')
-  const { outside } = getPolyGridPoint(grid.path, BORDER_WIDTH)
+  const config = grid?.isFlush ? getAutoFlushedGridConfig(grid) as CanvasPolyGridConfig : deepCopy(grid)
+  const path = config.path
+  const lt = getPolyContainerPoint(path, 'lt')
+  const rb = getPolyContainerPoint(path, 'rb')
+  const { outside } = getPolyGridPoint(path, BORDER_WIDTH)
   const lt_outside = getPolyContainerPoint(outside, 'lt')
   const rb_outside = getPolyContainerPoint(outside, 'rb')
   const left = lt_outside.x
@@ -736,11 +805,10 @@ function getPolyGridStyle(grid: CanvasPolyGridConfig): GridStyle {
     height,
   }
 
-  const svgPath = grid.path
+  const svgPath = path
     .map(p => ({ x: p.x - left, y: p.y - top })) as [Point, Point, Point, Point]
 
   let focusIconPosStyle
-  const path = grid.path
 
   if (isPolyCornerRightAngle(path, 'lt')) {
     focusIconPosStyle = {
@@ -886,25 +954,26 @@ export function getComicConfigFromCanvas(canvasComicConfig: CanvasComicConfig): 
     }
     else {
       let grid = {} as GridConfig
-      if (canvasGrid.type === 'rect') {
+      const config = getAutoFlushedGridConfig(canvasGrid)
+      if (config.type === 'rect') {
         grid = {
           type: 'rect',
-          lt_x: canvasGrid.lt_x,
-          lt_y: canvasGrid.lt_y,
-          rb_x: canvasGrid.rb_x,
-          rb_y: canvasGrid.rb_y,
+          lt_x: config.lt_x,
+          lt_y: config.lt_y,
+          rb_x: config.rb_x,
+          rb_y: config.rb_y,
         } as RectGridConfig
       }
       else {
         grid = {
           type: 'poly',
-          path: canvasGrid.path,
+          path: config.path,
         } as PolyGridConfig
       }
-      if (canvasGrid.content) {
+      if (config.content) {
         grid.content = {
-          url: canvasGrid.content.url,
-          focus: canvasGrid.content.focus,
+          url: config.content.url,
+          focus: config.content.focus,
         }
       }
       allGrids.push(grid)
@@ -919,4 +988,74 @@ export function getComicConfigFromCanvas(canvasComicConfig: CanvasComicConfig): 
  */
 export function getIsLogoPage(page: CanvasPageConfig) {
   return page.id === 'page0' && page?.logo
+}
+
+/**
+ * 判断该grid是否靠左边
+ * @param {CanvasGridConfig} grid
+ * @returns {boolean}
+ */
+export function isGridLeftAligned(grid: CanvasGridConfig) {
+  if (grid.type === 'rect') {
+    const lt_x = grid.lt_x
+    const leftAlign = lt_x === BLANK_GRID_MARGIN
+    return leftAlign
+  }
+  if (grid.type === 'poly') {
+    const polyType = getPolyType(grid.path)
+    if (polyType === 'vertical') {
+      return false
+    }
+    else {
+      const [p0, _, __, p3] = grid.path
+      const leftAlign = (p0.x === BLANK_GRID_MARGIN) && (p3.x === BLANK_GRID_MARGIN)
+      return leftAlign
+    }
+  }
+  return false
+}
+
+/**
+ * 判断该grid是否靠右边
+ * @param {CanvasGridConfig} grid
+ * @returns {boolean}
+ */
+export function isGridRightAligned(grid: CanvasGridConfig) {
+  if (grid.type === 'rect') {
+    const rb_x = grid.rb_x
+    const rightAlign = rb_x === (CANVAS_WIDTH - BLANK_GRID_MARGIN)
+    return rightAlign
+  }
+  if (grid.type === 'poly') {
+    const polyType = getPolyType(grid.path)
+    if (polyType === 'vertical') {
+      return false
+    }
+    else {
+      const [_, p1, p2, __] = grid.path
+      const rightAlign = (p1.x === (CANVAS_WIDTH - BLANK_GRID_MARGIN)) && (p2.x === (CANVAS_WIDTH - BLANK_GRID_MARGIN))
+      return rightAlign
+    }
+  }
+  return false
+}
+
+/**
+ * 判断该grid是否可靠边
+ * @param {CanvasGridConfig} grid
+ * @returns {boolean}
+ */
+export function isGridFlushable(grid: CanvasGridConfig) {
+  if (isGridSplited(grid)) {
+    return false
+  }
+  const leftAlign = isGridLeftAligned(grid)
+  const rightAlign = isGridRightAligned(grid)
+  if (leftAlign && rightAlign) {
+    return false
+  }
+  if (leftAlign || rightAlign) {
+    return true
+  }
+  return false
 }

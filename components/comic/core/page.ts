@@ -1,7 +1,7 @@
 import type { FocusChangeBackgroundType, FocusMoveType, GridConfig, PageConfig } from './type'
 import gsap from 'gsap'
 import { Container, Graphics } from 'pixi.js'
-import { GridBackground, GridFocusedBackground, GridLineWidth, LogoDefaultCenterX, LogoDefaultCenterY, LogoDefaultHeight, LogoDefaultWidth } from './config'
+import { GridBackground, GridFocusedBackground, GridLineWidth, LogoDefaultCenterX, LogoDefaultCenterY, LogoDefaultHeight, LogoDefaultWidth, Width } from './config'
 import { Grid } from './grid'
 import { Logo } from './logo'
 
@@ -59,7 +59,7 @@ export class Page extends Container {
           x = -1 * (this.focus.grid.getWidth() + GridLineWidth)
         }
         else if (this.focus.type.direction === 'right-to-left') {
-          x = 720
+          x = Width
         }
         timeline.from(this.focus.grid, { duration: 0.2, x }, 'pagestart')
       }

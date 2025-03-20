@@ -2,6 +2,7 @@ import type { MouseEventHandler } from 'react'
 import type { CanvasGridConfig, Point } from '../types'
 import { useEffect, useState } from 'react'
 import { useAdjustComic } from '@/hooks/custom/useAdjustComic'
+import { deepCopy } from '@/lib/utils'
 import useComicStatusStore from '@/store'
 import { Grid } from '.'
 import { getAdjustedPoint, getGridsBySplit } from '../utils'
@@ -82,8 +83,8 @@ export default function SplitContainer({ grid }: SplitContainerProps) {
       if (!newIsDrawing) {
         if (splitGrids) {
           adjustGrid(grid.id, {
-            splitLine: JSON.parse(JSON.stringify(line)),
-            splitResult: JSON.parse(JSON.stringify(splitGrids)),
+            splitLine: deepCopy(line),
+            splitResult: deepCopy(splitGrids),
             splitSpaceWidth: grid.splitSpaceWidth,
           })
         }

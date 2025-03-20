@@ -1,8 +1,12 @@
 import type { CanvasGridConfig } from './types'
+import { GridLineWidth, Height, PageMargin, Width } from '../comic/core/config'
 
-export const BORDER_WIDTH = 6
+export const CANVAS_WIDTH = Width
+export const CANVAS_Height = Height
 
-export const LOGO_PAGE_HEIGHT = 1080
+export const BORDER_WIDTH = GridLineWidth
+
+export const LOGO_PAGE_HEIGHT = CANVAS_Height
 
 export const LOGO_PAGE_GRIDS_CONFIG: CanvasGridConfig[] = [
   {
@@ -17,7 +21,7 @@ export const LOGO_PAGE_GRIDS_CONFIG: CanvasGridConfig[] = [
     type: 'rect',
     lt_x: 539,
     lt_y: 555,
-    rb_x: 703,
+    rb_x: 702,
     rb_y: 1062,
     id: 1,
   },
@@ -63,8 +67,8 @@ export const LOGO_PAGE_GRIDS_CONFIG: CanvasGridConfig[] = [
     type: 'poly',
     path: [
       { x: 456, y: 397 },
-      { x: 703, y: 397 },
-      { x: 703, y: 523 },
+      { x: 702, y: 397 },
+      { x: 702, y: 523 },
       { x: 497, y: 523 },
     ],
     id: 6,
@@ -73,7 +77,7 @@ export const LOGO_PAGE_GRIDS_CONFIG: CanvasGridConfig[] = [
     type: 'rect',
     lt_x: 18,
     lt_y: 158,
-    rb_x: 703,
+    rb_x: 702,
     rb_y: 380,
     id: 7,
   },
@@ -97,19 +101,19 @@ export const LOGO_PAGE_GRIDS_CONFIG: CanvasGridConfig[] = [
     type: 'rect',
     lt_x: 556,
     lt_y: 18,
-    rb_x: 703,
+    rb_x: 702,
     rb_y: 141,
     id: 10,
   },
 ]
 
-export const BLANK_GRID_MARGIN: number = 18
+export const BLANK_GRID_MARGIN: number = PageMargin
 
 export const NEW_PAGE_GRID_CONFIG: CanvasGridConfig = {
   type: 'rect',
   lt_x: BLANK_GRID_MARGIN,
   lt_y: BLANK_GRID_MARGIN,
-  rb_x: 720 - BLANK_GRID_MARGIN,
-  rb_y: 1063,
+  rb_x: CANVAS_WIDTH - BLANK_GRID_MARGIN,
+  rb_y: LOGO_PAGE_HEIGHT - BLANK_GRID_MARGIN,
   id: 0,
 }

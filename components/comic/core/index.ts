@@ -4,7 +4,8 @@ import gsap from 'gsap'
 import CustomEase from 'gsap/CustomEase'
 import PixiPlugin from 'gsap/PixiPlugin'
 import { Application, Assets, Container } from 'pixi.js'
-import { Height, PageBackGround, Width } from './config'
+import { deepCopy } from '@/lib/utils'
+import { Height, PageBackGround, PageMargin, Width } from './config'
 import { getOverlay } from './overlay'
 import { LogoPage, Page } from './page'
 import { getComicGridImage } from './util'
@@ -22,7 +23,7 @@ export class Comic {
   private app: Application = new Application()
   private container: HTMLElement = document.createElement('div')
   public async init(comicConfig: ComicConfig, container: HTMLElement) {
-    this.comicConfig = JSON.parse(JSON.stringify(comicConfig))
+    this.comicConfig = deepCopy(comicConfig)
     this.container = container
     await this.app.init(
       {
@@ -59,7 +60,7 @@ export class Comic {
       for (let j = 0; j < gridConfigs.length; j++) {
         const gridConfig = gridConfigs[j]
         if (gridConfig.content) {
-          const contentCopy = JSON.parse(JSON.stringify(gridConfig.content))
+          const contentCopy = deepCopy(gridConfig.content)
           gridConfig.content.url = await getComicGridImage(gridConfig.content)
           await Assets.load(gridConfig.content.url)
 
@@ -98,7 +99,7 @@ export class Comic {
         page.y = prePageY - pageConfig.height
       }
       else {
-        page.y = prePageY - page.pageHeight - 18
+        page.y = prePageY - page.pageHeight - PageMargin
       }
       prePageY = page.y
       this.comicStage.addChild(page)

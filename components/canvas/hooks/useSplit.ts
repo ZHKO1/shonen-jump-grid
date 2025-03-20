@@ -1,6 +1,7 @@
 import type { CanvasGridConfig } from '../types'
 import { useEffect } from 'react'
 import { useAdjustComic } from '@/hooks/custom/useAdjustComic'
+import { deepCopy } from '@/lib/utils'
 import { getGridsBySplit } from '../utils'
 import { useDrawLine } from './useDrawLine'
 
@@ -13,8 +14,8 @@ export function useSplit(grid: CanvasGridConfig, isGridFocused: boolean, spaceWi
     if (!isDrawing && startPoint && endPoint) {
       if (grids) {
         adjustGrid(grid.id, {
-          splitLine: JSON.parse(JSON.stringify(line)),
-          splitResult: JSON.parse(JSON.stringify(grids)),
+          splitLine: deepCopy(line),
+          splitResult: deepCopy(grids),
           splitSpaceWidth: spaceWidth,
         })
       }
