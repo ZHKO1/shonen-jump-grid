@@ -1,5 +1,4 @@
 'use client'
-import * as React from 'react'
 import { getPageFromComicConfig } from '@/components/canvas/utils'
 import useComicStatusStore from '@/store'
 import PageAttr from './PageAttr'

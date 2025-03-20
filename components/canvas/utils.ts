@@ -105,11 +105,11 @@ export function getPolyPointBySort(path: [Point, Point, Point, Point]): [Point, 
 /**
  * 返回计算x的函数
  * 斜率公式: y = kx + b
- * @param point1
- * @param point2
- * @param borderWidth
- * @param direct 如果是true，则向右平行调整，否则向左平行调整
- * @returns
+ * @param {Point} point1
+ * @param {Point} point2
+ * @param {number} borderWidth
+ * @param {boolean} direct 如果是true，则向右平行调整，否则向左平行调整
+ * @returns {(y: number) => number}
  */
 function getXFromConentLineFunc(point1: Point, point2: Point, borderWidth: number, direct: boolean = false): (y: number) => number {
   return (y: number) => {
@@ -127,11 +127,11 @@ function getXFromConentLineFunc(point1: Point, point2: Point, borderWidth: numbe
 /**
  * 返回计算y的函数
  * 斜率公式: y = kx + b
- * @param point1
- * @param point2
- * @param borderWidth
- * @param direct 如果是true，则向上平行调整，否则向下平行调整
- * @returns
+ * @param {Point} point1
+ * @param {Point} point2
+ * @param {number} borderWidth
+ * @param {boolean} direct 如果是true，则向上平行调整，否则向下平行调整
+ * @returns {(y: number) => number}
  */
 function getYFromConentLineFunc(point1: Point, point2: Point, borderWidth: number, direct: boolean = false): (y: number) => number {
   return (x: number) => {
@@ -148,9 +148,9 @@ function getYFromConentLineFunc(point1: Point, point2: Point, borderWidth: numbe
 
 /**
  * 返回rect的绘制点
- * @param path
- * @param borderWidth
- * @returns
+ * @param {RectGridPoint} rectGridPoint
+ * @param {number} borderWidth
+ * @returns {{ outside: RectGridPoint, inside: RectGridPoint }}
  */
 export function getRectGridPoint({ lt_x, lt_y, rb_x, rb_y }: RectGridPoint, borderWidth: number): { outside: RectGridPoint, inside: RectGridPoint } {
   const adjust = Math.floor(borderWidth / 2)
@@ -172,9 +172,9 @@ export function getRectGridPoint({ lt_x, lt_y, rb_x, rb_y }: RectGridPoint, bord
 
 /**
  * 返回poly的绘制点
- * @param path
- * @param borderWidth
- * @returns
+ * @param {PolyGridPoint['path']} path
+ * @param {number} borderWidth
+ * @returns {{ outside: PolyGridPoint['path'], inside: PolyGridPoint['path'] }}
  */
 export function getPolyGridPoint(path: PolyGridPoint['path'], borderWidth: number): { outside: PolyGridPoint['path'], inside: PolyGridPoint['path'] } {
   const adjust = Math.floor(borderWidth / 2)
@@ -225,8 +225,8 @@ export function getPolyGridPoint(path: PolyGridPoint['path'], borderWidth: numbe
 
 /**
  * 如果grid是正长方形，那么修改type为Rect，否则原样返回
- * @param grid
- * @returns CanvasGridConfig
+ * @param {CanvasGridConfig} grid
+ * @returns {CanvasGridConfig}
  */
 export function makePolyToRect(grid: CanvasGridConfig): CanvasGridConfig {
   if (grid.type === 'poly') {
@@ -249,9 +249,9 @@ export function makePolyToRect(grid: CanvasGridConfig): CanvasGridConfig {
 
 /**
  * 更新了子Grid后，根据recursion配置选择是否递归处理旧子Grid的分割线
- * @param grid
- * @param newSubGrids
- * @param recursion
+ * @param {CanvasGridConfig} grid
+ * @param {[CanvasGridConfig, CanvasGridConfig]} newSubGrids
+ * @param {boolean} recursion
  * @returns {[CanvasGridConfig, CanvasGridConfig]}
  */
 export function updateSubGridsBySplit(grid: CanvasGridConfig, newSubGrids: [CanvasGridConfig, CanvasGridConfig], recursion: boolean): [CanvasGridConfig, CanvasGridConfig] {
@@ -291,11 +291,9 @@ export function updateSubGridsBySplit(grid: CanvasGridConfig, newSubGrids: [Canv
 
 /**
  * 从RectGrid返回被分割的两个grid，以及分割线
- * @param path
- * @param line
- * @param options
- * @param options.spaceWidth
- * @param options.recursion
+ * @param {CanvasRectGridConfig} grid
+ * @param {[Point, Point]} line
+ * @param {SplitOptions} options
  * @returns {{ grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null}
  */
 export function getGridsBySplitRect(grid: CanvasRectGridConfig, line: [Point, Point], { spaceWidth, recursion = true }: SplitOptions): { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null {
@@ -380,11 +378,9 @@ export function getGridsBySplitRect(grid: CanvasRectGridConfig, line: [Point, Po
 
 /**
  * 从PolyGrid返回被分割的两个grid，以及分割线
- * @param path
- * @param line
- * @param options
- * @param options.spaceWidth
- * @param options.recursion
+ * @param {CanvasPolyGridConfig} grid
+ * @param {[Point, Point]} line
+ * @param {SplitOptions} options
  * @returns { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null
  */
 export function getGridsBySplitPoly(grid: CanvasPolyGridConfig, line: [Point, Point], { spaceWidth, recursion = true }: SplitOptions): { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null {
@@ -508,12 +504,10 @@ export function getGridsBySplitPoly(grid: CanvasPolyGridConfig, line: [Point, Po
 
 /**
  * 从grid返回被分割的两个grid，以及分割线
- * @param path
- * @param line
- * @param options
- * @param options.spaceWidth
- * @param options.recursion
- * @returns { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null
+ * @param {CanvasGridConfig} grid
+ * @param {[Point, Point]} line
+ * @param {SplitOptions} options
+ * @returns {{ grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null}
  */
 export function getGridsBySplit(grid: CanvasGridConfig, line: [Point, Point], options: SplitOptions): { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null {
   if (grid.type === 'rect') {
@@ -527,9 +521,9 @@ export function getGridsBySplit(grid: CanvasGridConfig, line: [Point, Point], op
 
 /**
  * 从配置里获取指定的page
- * @param comicConfig
- * @param targetId
- * @returns CanvasPageConfig | null
+ * @param {CanvasComicConfig} comicConfig
+ * @param {PageId} targetId
+ * @returns {CanvasPageConfig | null}
  */
 export function getPageFromComicConfig(comicConfig: CanvasComicConfig, targetId: PageId): CanvasPageConfig | null {
   if (!comicConfig || !comicConfig.pages) {
@@ -546,9 +540,9 @@ export function getPageFromComicConfig(comicConfig: CanvasComicConfig, targetId:
 
 /**
  * 从配置里获取指定的grid
- * @param comicConfig
- * @param targetId
- * @returns CanvasGridConfig | null
+ * @param {CanvasComicConfig} comicConfig
+ * @param {GridId} targetId
+ * @returns {CanvasGridConfig | null}
  */
 export function getGridFromComicConfig(comicConfig: CanvasComicConfig, targetId: GridId): CanvasGridConfig | null {
   for (let i = 0; i < comicConfig.pages.length; i++) {
@@ -580,8 +574,8 @@ export function getGridFromComicConfig(comicConfig: CanvasComicConfig, targetId:
 
 /**
  * 判断该grid是否被分割
- * @param path
- * @returns boolean
+ * @param {CanvasGridConfig} grid
+ * @returns {boolean}
  */
 export function isGridSplited(grid: CanvasGridConfig) {
   if (grid.splitLine && grid.splitResult && grid.splitResult.length > 0 && grid.splitSpaceWidth) {
@@ -592,10 +586,10 @@ export function isGridSplited(grid: CanvasGridConfig) {
 
 /**
  * 根据两个点，微调某个点，保持水平或垂直
- * @param start
- * @param end
- * @param options.direction 'start' | 'end'
- * @returns Point
+ * @param {Point} start
+ * @param {Point} end
+ * @param {{direction:'start' | 'end'}} options
+ * @returns {Point}
  */
 export function getAdjustedPoint(start: Point, end: Point, options: { direction: 'start' | 'end' }): Point {
   const deltaX = end.x - start.x

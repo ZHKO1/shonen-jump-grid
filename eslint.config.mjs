@@ -11,6 +11,7 @@ export default antfu(
   {
     rules: {
       "style/no-mixed-operators": "off",
+      "jsdoc/require-returns-description": "off",
       "perfectionist/sort-imports": ["error", {
         groups: [
           'type',

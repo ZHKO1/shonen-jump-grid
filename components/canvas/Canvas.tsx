@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { cn, off, on } from '@/lib/utils'
 import useComicStatusStore from '@/store'
 import { LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT } from './constant'
@@ -10,6 +10,7 @@ import { getIsLogoPage, getPageFromComicConfig } from './utils'
 
 function Canvas({ scale }: { scale: number }) {
   const containerRef = useRef(null)
+  const ContainerContextValue = useMemo(() => ({ container: containerRef, scale }), [containerRef, scale])
   const pageId = useComicStatusStore(state => state.currentPageStatus.id)
   const { getCurrentLayerType } = useComicStatusStore()
   const layerType = getCurrentLayerType()
@@ -77,7 +78,7 @@ function Canvas({ scale }: { scale: number }) {
       className="canvas-content w-[720px] bg-gray-100 relative overflow-hidden border-2 border-gray-400 text-4xl font-bold text-black"
       {...extraProp}
     >
-      <ContainerContext value={{ container: containerRef, scale }}>
+      <ContainerContext value={ContainerContextValue}>
         <div className={cn(layerType !== 'grids' && 'pointer-events-none opacity-30')}>
           {grids && grids.map(grid => (<Grid grid={grid} key={grid.id} />))}
         </div>

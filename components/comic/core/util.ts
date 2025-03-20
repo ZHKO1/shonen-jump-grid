@@ -11,8 +11,9 @@ interface options {
 /**
  * 对图片进行裁剪，默认进行白色背景透明化工作
  * TODO 这里需要思考优化，看看能不能跳过裁剪
- * @param options
- * @returns
+ * @param {{url: string, x: number, y: number, width: number, height: number}} options
+ * @param {HandleType[]} handles
+ * @returns {Promise<string>}
  */
 export function getComicGridImage({ url, x = 0, y = 0, width = 0, height = 0 }: options, handles: HandleType[] = ['white-transparent']): Promise<string> {
   return new Promise((resolve) => {

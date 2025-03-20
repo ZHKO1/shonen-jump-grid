@@ -2,7 +2,7 @@ import type { HTMLMotionProps } from 'framer-motion'
 import type { CSSProperties } from 'react'
 import type { CanvasGridConfig } from '../types'
 import { motion } from 'framer-motion'
-import { cn } from '@/lib/utils'
+import { cn, emptyObject } from '@/lib/utils'
 import { BORDER_WIDTH } from '../constant'
 
 export interface GridBorderProps
@@ -15,7 +15,7 @@ export interface GridBorderProps
   svgStyle?: CSSProperties
 }
 
-export function GridBorder({ ref, className, gridId, svgPoints, disableMotion = false, focused = false, containerStyle = {}, svgStyle = {}, ...props }: GridBorderProps & { ref?: React.RefObject<HTMLDivElement | null> }) {
+export function GridBorder({ ref, className, gridId, svgPoints, disableMotion = false, focused = false, containerStyle = emptyObject, svgStyle = emptyObject, ...props }: GridBorderProps & { ref?: React.RefObject<HTMLDivElement | null> }) {
   const Comp = (disableMotion ? 'div' : motion.div) as (typeof motion.div)
   const extraProps = (disableMotion ? {} : { layoutId: `grid-border-${gridId}` })
   return (

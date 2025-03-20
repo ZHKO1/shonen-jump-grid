@@ -1,6 +1,6 @@
 'use client'
 import { AnimatePresence } from 'framer-motion'
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import { getComicConfigFromCanvas } from '@/components/canvas/utils'
 import { defaultDocument } from '@/lib/utils'
 import useComicStatusStore from '@/store'

@@ -163,7 +163,7 @@ export default function GridAttr({ grid }: { grid: CanvasGridConfig }) {
               {
                 type === 'poly' && (
                   (grid.path as Point[]).map((point, index) => (
-                    <div key={`path${index}`} className="grid col-span-4 grid-cols-5 gap-1">
+                    <div key={`path_${point.x}_${point.y}`} className="grid col-span-4 grid-cols-5 gap-1">
                       <Label className="col-span-2 text-xs">
                         point
                         {index}

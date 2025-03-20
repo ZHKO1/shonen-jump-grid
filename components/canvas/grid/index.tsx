@@ -9,13 +9,14 @@ import SplitContainer from './SplitContainer'
 
 export interface GridProps { grid: CanvasGridConfig, showAsFocused?: boolean, borderOnly?: boolean }
 export function Grid(props: GridProps) {
-  if (isGridSplited(props.grid)) {
+  const { grid } = props
+  if (isGridSplited(grid)) {
     return <SplitContainer {...props} />
   }
-  if (props.grid.type === 'poly') {
+  if (grid.type === 'poly') {
     return <PolyGrid {...props as PolyGridProps} />
   }
-  else if (props.grid.type === 'rect') {
+  else if (grid.type === 'rect') {
     return <RectGrid {...props as RectGridProps} />
   }
   else {

@@ -1,7 +1,7 @@
 'use client'
 import type { ComicConfig } from './core/type'
 import type { ActionType } from '@/components/action-bar'
-import React, { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import ActionBar from '@/components/action-bar'
 import { CloseIcon } from '@/components/action-bar/Icons'
 import Background from '@/components/background'

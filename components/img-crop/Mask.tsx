@@ -1,3 +1,4 @@
+import type { FC, RefObject } from 'react'
 import type { Point } from '@/components/canvas/types'
 import { motion } from 'framer-motion'
 import { useImperativeHandle, useRef } from 'react'
@@ -9,7 +10,14 @@ export interface MaskRef {
   getMaskPosStyle: () => { left: number, top: number }
 }
 
-function Mask({ ref, gridSize, svgPath, maskType }) {
+interface MaskProps {
+  ref: RefObject<MaskRef | null>
+  gridSize: { width: number, height: number }
+  svgPath: [Point, Point, Point, Point]
+  maskType: MaskType
+}
+
+const Mask: FC<MaskProps> = ({ ref, gridSize, svgPath, maskType }) => {
   const containerRef = useRef<HTMLDivElement>(null)
 
   const { width: windowWidth, height: windowHeight } = useWindowSize()
