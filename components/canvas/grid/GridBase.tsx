@@ -1,5 +1,5 @@
 import type { MouseEventHandler } from 'react'
-import type { CanvasPolyGridConfig } from '../types'
+import type { CanvasGridConfig } from '../types'
 import type { GridIconProps } from './GridIcon'
 import { useRef } from 'react'
 import { useEventListener } from '@/hooks'
@@ -15,12 +15,12 @@ import { GridIcon } from './GridIcon'
 import SplitLine from './SplitLine'
 import SplitPoint from './SplitPoint'
 
-export interface PolyGridProps {
-  grid: CanvasPolyGridConfig
+export interface GridBaseProps {
+  grid: CanvasGridConfig
   showAsFocused?: boolean
   borderOnly?: boolean
 };
-export default function PolyGrid({ grid, showAsFocused = false, borderOnly = false }: PolyGridProps) {
+export default function GridBase({ grid, showAsFocused = false, borderOnly = false }: GridBaseProps) {
   const gridRef = useRef<HTMLDivElement>(null)
   const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId)
   const { getCurrentGridId } = useComicStatusStore()
@@ -38,7 +38,10 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
     focusIconPosStyle,
   } = getGridStyle(grid)
   const svgPoints = getSvgPoints(svgPath)
-  const clipPath = getClipPath(svgPathWithBorder!)
+  let clipPath
+  if (svgPathWithBorder) {
+    clipPath = getClipPath(svgPathWithBorder)
+  }
 
   const gridStyle = {
     ...posStyleWithBorder,
@@ -60,8 +63,8 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
 
   const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
     setCurrentGridId(grid.id)
-    // e.nativeEvent.stopImmediatePropagation();
     e.stopPropagation()
+    // e.nativeEvent.stopImmediatePropagation();
   }
 
   useEventListener('click', handleClick, gridRef && gridRef.current)
@@ -84,9 +87,7 @@ export default function PolyGrid({ grid, showAsFocused = false, borderOnly = fal
             className={cn(isFocused && 'z-10')}
             disableMotion={!isFocused}
             gridId={grid.id}
-            style={{
-              ...gridStyle,
-            }}
+            style={gridStyle}
             clipPath={clipPath}
             ref={gridRef}
             url={grid.content?.url}
