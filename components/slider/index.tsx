@@ -1,7 +1,7 @@
 'use client'
 import type { CanvasPageConfig, PageId } from '@/components/canvas/types'
 import React from 'react'
-import { useAdjustComic } from '@/hooks/custom/useAdjustComic'
+import { useAdjustComic } from '@/hooks'
 import useComicStatusStore from '@/store'
 import AddPageDialog from './AddPageDialog'
 import SliderItem from './SliderItem'

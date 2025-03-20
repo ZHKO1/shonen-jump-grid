@@ -2,7 +2,7 @@
 import type { MaskType } from './Mask'
 import type { CanvasOriginImgConfig, CanvasPageConfig } from '@/components/canvas/types'
 import { getLogoStyle } from '@/components/canvas/utils'
-import { useAdjustComic } from '@/hooks/custom/useAdjustComic'
+import { useAdjustComic } from '@/hooks'
 import { cn } from '@/lib/utils'
 import LogoContent from '../canvas/logo/LogoContent'
 import ImgCrop from './ImgCrop'

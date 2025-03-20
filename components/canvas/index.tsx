@@ -1,6 +1,6 @@
 'use client'
 import { useRef } from 'react'
-import { useResizeScale } from '@/hooks/useResizeScale'
+import { useResizeScale } from '@/hooks'
 import { Height, Width } from '../comic/core/config'
 import Canvas from './Canvas'
 

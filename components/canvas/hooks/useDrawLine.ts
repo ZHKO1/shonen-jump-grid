@@ -1,7 +1,7 @@
 import type { Point } from '../types'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { ContainerContext } from '@/components/canvas/context/container'
-import { useLatest } from '@/hooks/useLatest'
+import { useLatest } from '@/hooks'
 import { defaultDocument, off, on } from '@/lib/utils'
 import { getAdjustedPoint } from '../utils'
 import { useMouse } from './useMouse'

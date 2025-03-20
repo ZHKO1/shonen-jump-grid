@@ -24,9 +24,21 @@ function Canvas({ scale }: { scale: number }) {
   const page = comicConfig && getPageFromComicConfig(comicConfig, pageId)
   const isLogoPage = page && getIsLogoPage(page) || false
   const logo = page?.logo
+  const refer = page?.refer
   const grids = page && page.grids
   const height = page && page.height
-  const extraProp = height ? { style: { height } } : {}
+  const extraProp = height
+    ? {
+        style: {
+          height,
+          ...(refer && {
+            backgroundImage: `url('${refer}')`,
+            backgroundSize: `100% auto`,
+            backgroundRepeat: `no-repeat`,
+          } || {}),
+        },
+      }
+    : {}
 
   useEffect(() => {
     addHistoryStep({
@@ -79,7 +91,7 @@ function Canvas({ scale }: { scale: number }) {
       {...extraProp}
     >
       <ContainerContext value={ContainerContextValue}>
-        <div className={cn(layerType !== 'grids' && 'pointer-events-none opacity-30')}>
+        <div className={cn(layerType !== 'grids' && 'pointer-events-none opacity-30', refer && 'opacity-80')}>
           {grids && grids.map(grid => (<Grid grid={grid} key={grid.id} />))}
         </div>
         {isLogoPage && <Logo focused={layerType === 'logo'} logo={logo} />}

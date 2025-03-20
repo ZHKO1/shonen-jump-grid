@@ -1,6 +1,6 @@
 import type { CanvasGridConfig } from '../types'
 import { useEffect } from 'react'
-import { useAdjustComic } from '@/hooks/custom/useAdjustComic'
+import { useAdjustComic } from '@/hooks'
 import { deepCopy } from '@/lib/utils'
 import { getGridsBySplit } from '../utils'
 import { useDrawLine } from './useDrawLine'

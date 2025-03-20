@@ -13,12 +13,14 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
+import { useAdjustComic, useFileDialog } from '@/hooks'
 import useComicStatusStore from '@/store'
 import { getGridFromComicConfig } from '../canvas/utils'
 import GridAttr from './GridAttr'
 import Layer from './Layer'
 
 export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
+  const [, open, reset] = useFileDialog()
   const pageId = page?.id || ''
   const height = page?.height || ''
   const isLogoPage = useComicStatusStore(state => state.currentPageStatus.type === 'logo-page')
@@ -31,6 +33,8 @@ export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
   const comicConfig = currentStep?.comicConfig
   const currentGridId = useComicStatusStore(state => state.currentPageStatus.gridId)
   const grid = comicConfig && getGridFromComicConfig(comicConfig, currentGridId)
+  const { adjustPage } = useAdjustComic()
+  const refer = page?.refer
 
   const handleLogoConfig = (e: React.MouseEvent) => {
     setShowImgCrop(true)
@@ -40,6 +44,26 @@ export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
   const handleLayerClick = (val: LayerType) => {
     setCurrentGridId('')
     setCurrentLayerType(val)
+  }
+
+  const onReferChange: React.MouseEventHandler<HTMLButtonElement> = async (e) => {
+    e.stopPropagation()
+    e.preventDefault()
+    const files = await open()
+    const imgFile = files![0]!
+    const dataUrl = URL.createObjectURL(imgFile)
+    adjustPage(pageId, {
+      refer: dataUrl,
+    })
+  }
+
+  const onReferClear: React.MouseEventHandler<HTMLButtonElement> = async (e) => {
+    e.stopPropagation()
+    e.preventDefault()
+    reset()
+    adjustPage(pageId, {
+      refer: void 0,
+    })
   }
 
   return (
@@ -54,22 +78,26 @@ export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
             <CardContent>
               <form>
                 <div className="grid w-full items-center gap-1 text-xs">
-                  <div className="grid grid-cols-4 gap-1">
-                    <div className="grid col-span-4 grid-cols-5 gap-1">
-                      <Label className="col-span-2 text-xs">id:</Label>
-                      <Label className="col-span-3 text-xs">{pageId}</Label>
-                    </div>
+                  <div className="grid col-span-4 grid-cols-5 gap-1">
+                    <Label className="col-span-2 text-xs">id:</Label>
+                    <Label className="col-span-3 text-xs">{pageId}</Label>
                   </div>
-                  <div className="grid grid-cols-4 gap-1">
-                    <div className="grid col-span-4 grid-cols-5 gap-1">
-                      <Label className="col-span-2 text-xs">height:</Label>
-                      <Label className="col-span-3 text-xs">{height}</Label>
+                  <div className="grid col-span-4 grid-cols-5 gap-1">
+                    <Label className="col-span-2 text-xs">height:</Label>
+                    <Label className="col-span-3 text-xs">{height}</Label>
+                  </div>
+                  <div className="grid col-span-4 grid-cols-5 gap-1">
+                    <Label className="col-span-2 text-xs flex items-center">refer:</Label>
+                    <div className="grid col-span-3 text-xs">
+                      {
+                        refer ? <Button variant="outline" size="sm" className="h-6" onClick={onReferClear}>clear</Button> : <Button variant="outline" size="sm" className="h-6" onClick={onReferChange}>config</Button>
+                      }
                     </div>
                   </div>
                   {
                     isLogoPage && (
                       <>
-                        <div className="grid gap-1">
+                        <div className="grid col-span-4 gap-1">
                           <Label className="text-xs flex items-center">layer:</Label>
                           <div className="text-xs">
                             <Layer onClick={handleLayerClick} />
@@ -78,7 +106,7 @@ export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
                         {
                           layerType === 'logo' && (
                             <>
-                              <div className="grid grid-cols-5 gap-1">
+                              <div className="grid col-span-4 grid-cols-5 gap-1">
                                 <Label className="col-span-2 text-xs flex items-center">logo:</Label>
                                 <div className="grid col-span-3 text-xs">
                                   <Button variant="outline" size="sm" className="h-6" onClick={handleLogoConfig}>config</Button>

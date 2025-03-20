@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
-import { useAdjustComic } from '@/hooks/custom/useAdjustComic'
+import { useAdjustComic } from '@/hooks'
 import useComicStatusStore from '@/store'
 
 function AnimationSelect({ value, onChange }: { value: string, onChange: (value: string) => void }) {

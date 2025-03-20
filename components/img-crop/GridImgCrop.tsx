@@ -4,7 +4,7 @@ import type { CanvasGridConfig, CanvasOriginImgConfig } from '@/components/canva
 import { GridBorder } from '@/components/canvas/grid/GridBorder'
 import { GridContent } from '@/components/canvas/grid/GridContent'
 import { getClipPath, getGridStyle, getSvgPoints } from '@/components/canvas/utils'
-import { useAdjustComic } from '@/hooks/custom/useAdjustComic'
+import { useAdjustComic } from '@/hooks'
 import { cn } from '@/lib/utils'
 import ImgCrop from './ImgCrop'
 

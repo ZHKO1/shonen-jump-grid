@@ -40,6 +40,7 @@ export interface CanvasPageConfig extends PageConfig {
   height: number
   readonly?: boolean
   grids: CanvasGridConfig[]
+  refer?: string
   logo?: PageConfig['logo'] & {
     originImg?: CanvasOriginImgConfig
   }

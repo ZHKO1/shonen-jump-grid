@@ -1,7 +1,7 @@
 import type { MouseEventHandler } from 'react'
 import type { CanvasGridConfig, Point } from '../types'
 import { useEffect, useState } from 'react'
-import { useAdjustComic } from '@/hooks/custom/useAdjustComic'
+import { useAdjustComic } from '@/hooks'
 import { deepCopy } from '@/lib/utils'
 import useComicStatusStore from '@/store'
 import { Grid } from '.'
