@@ -49,8 +49,8 @@ export default function Preview({ config, onClose }: { config: ComicConfig | nul
           >
             {
               loading && (
-                <div className="absolute w-26 right-10 bottom-10 grid grid-cols-4">
-                  <div className="col-span-1 flex flex-wrap items-center justify-center w-10 h-10">
+                <div className="absolute w-26 right-10 bottom-10 flex h-10">
+                  <div className="flex flex-wrap items-center justify-center w-10 h-10">
                     {
                       [0, 1, 2, 3].map((i) => {
                         return (
@@ -66,7 +66,7 @@ export default function Preview({ config, onClose }: { config: ComicConfig | nul
                       })
                     }
                   </div>
-                  <span className="col-span-3 text-2xl pl-1">Loading...</span>
+                  <span className="text-2xl pl-1 leading-10">Loading...</span>
                 </div>
               )
             }
