@@ -93,26 +93,24 @@ const ImgCrop: React.FC<ImgCropProps> = ({ originImg, maskCropPath, renderConten
     const { x, y, width: imageWidth, height: imageHeight } = image.getBoundingClientRect()
     const { left: maskX, top: maskY } = mask.getMaskPosStyle()
 
-    const scaleX = image.naturalWidth / imageWidth
-    const scaleY = image.naturalHeight / imageHeight
     const pixelRatio = window.devicePixelRatio
     const { width: cropWidth, height: cropHeight } = sizeStyle
-    canvas.width = Math.floor(cropWidth * scaleX * pixelRatio)
-    canvas.height = Math.floor(cropHeight * scaleY * pixelRatio)
+    canvas.width = Math.floor(cropWidth * pixelRatio)
+    canvas.height = Math.floor(cropHeight * pixelRatio)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.scale(pixelRatio, pixelRatio)
     ctx.imageSmoothingQuality = 'high'
 
-    const cropX = (maskX - x) * scaleX
-    const cropY = (maskY - y) * scaleY
-    const centerX = image.naturalWidth / 2
-    const centerY = image.naturalHeight / 2
+    const cropX = (maskX - x)
+    const cropY = (maskY - y)
+    const centerX = imageWidth / 2
+    const centerY = imageHeight / 2
 
     ctx.save()
     ctx.translate(-cropX, -cropY)
     ctx.translate(centerX, centerY)
     ctx.translate(-centerX, -centerY)
-    ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, image.naturalWidth, image.naturalHeight)
+    ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, imageWidth, imageHeight)
     ctx.restore()
 
     const url = canvas.toDataURL('image/png')
