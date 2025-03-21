@@ -86,14 +86,18 @@ export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
                     <Label className="col-span-2 text-xs">height:</Label>
                     <Label className="col-span-3 text-xs">{height}</Label>
                   </div>
-                  <div className="grid col-span-4 grid-cols-5 gap-1">
-                    <Label className="col-span-2 text-xs flex items-center">refer:</Label>
-                    <div className="grid col-span-3 text-xs">
-                      {
-                        refer ? <Button variant="outline" size="sm" className="h-6" onClick={onReferClear}>clear</Button> : <Button variant="outline" size="sm" className="h-6" onClick={onReferChange}>config</Button>
-                      }
-                    </div>
-                  </div>
+                  {
+                    false && (
+                      <div className="grid col-span-4 grid-cols-5 gap-1">
+                        <Label className="col-span-2 text-xs flex items-center">refer:</Label>
+                        <div className="grid col-span-3 text-xs">
+                          {
+                            refer ? <Button variant="outline" size="sm" className="h-6" onClick={onReferClear}>clear</Button> : <Button variant="outline" size="sm" className="h-6" onClick={onReferChange}>config</Button>
+                          }
+                        </div>
+                      </div>
+                    )
+                  }
                   {
                     isLogoPage && (
                       <>
