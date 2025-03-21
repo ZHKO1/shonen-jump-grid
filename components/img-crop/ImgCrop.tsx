@@ -1,6 +1,5 @@
 'use client'
 import type { ReactNode } from 'react'
-import type { ImgTarget } from './Img'
 import type { MaskRef, MaskType } from './Mask'
 import type { ActionType } from '@/components/action-bar'
 import type { CanvasOriginImgConfig, Point } from '@/components/canvas/types'
@@ -28,7 +27,7 @@ export interface ImgCropProps {
 const ImgCrop: React.FC<ImgCropProps> = ({ originImg, maskCropPath, renderContent, onClean, onSubmit, onClose }) => {
   const maskRef = useRef<MaskRef>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const imageRef = useRef<ImgTarget>(null)
+  const imageRef = useRef<HTMLImageElement>(null)
   const [maskType, setMaskType] = useState<MaskType>('full')
   const [imgUrl, setImgUrl] = useState<string>(originImg?.url || '')
   const [originImgSize, setOriginImgSize] = useState({
@@ -117,8 +116,8 @@ const ImgCrop: React.FC<ImgCropProps> = ({ originImg, maskCropPath, renderConten
 
     onSubmit(url, {
       url: imgUrl,
-      width: image.getImgStyle().width,
-      height: image.getImgStyle().height,
+      width: imageWidth,
+      height: imageHeight,
       dragX,
       dragY,
       zoom,

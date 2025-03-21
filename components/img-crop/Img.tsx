@@ -1,13 +1,9 @@
 import type { HTMLMotionProps } from 'framer-motion'
 import { motion } from 'framer-motion'
-import { useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useIsomorphicLayoutEffect, useWindowSize } from '@/hooks'
 import { cn } from '@/lib/utils'
 import { getImageSize } from './utils'
-
-export type ImgTarget = {
-  getImgStyle: () => { width: number, height: number, left: number, top: number }
-} & HTMLImageElement
 
 interface ImgProps extends HTMLMotionProps<'img'> {
   url: string
@@ -18,8 +14,7 @@ interface ImgProps extends HTMLMotionProps<'img'> {
   defaultHeight?: number
 }
 
-function Img({ ref, url, dragX, dragY, zoom, defaultWidth = 0, defaultHeight = 0, className, style, ...props }: ImgProps & { ref?: React.RefObject<ImgTarget | null> }) {
-  const imgRef = useRef<HTMLImageElement>(null)
+function Img({ ref, url, dragX, dragY, zoom, defaultWidth = 0, defaultHeight = 0, className, style, ...props }: ImgProps & { ref?: React.RefObject<HTMLImageElement | null> }) {
   const [dimensions, setDimensions] = useState({ left: 0, top: 0, width: defaultWidth, height: defaultHeight })
   const { width: windowWidth, height: windowHeight } = useWindowSize()
 
@@ -62,14 +57,6 @@ function Img({ ref, url, dragX, dragY, zoom, defaultWidth = 0, defaultHeight = 0
     })
   }
 
-  useImperativeHandle(ref, () => {
-    return Object.assign(imgRef.current!, {
-      getImgStyle: () => {
-        return dimensions
-      },
-    })
-  })
-
   useIsomorphicLayoutEffect(() => {
     let promise = Promise.resolve()
     if (dimensions.width === 0 || dimensions.height === 0) {
@@ -107,7 +94,7 @@ function Img({ ref, url, dragX, dragY, zoom, defaultWidth = 0, defaultHeight = 0
         width: dimensions.width,
         height: dimensions.height,
       }}
-      ref={imgRef}
+      ref={ref}
       {...props}
     />
   )
