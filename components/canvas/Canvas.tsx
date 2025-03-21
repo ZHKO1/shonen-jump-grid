@@ -94,7 +94,7 @@ function Canvas({ scale }: { scale: number }) {
         <div className={cn(layerType !== 'grids' && 'pointer-events-none opacity-30', refer && 'opacity-80')}>
           {grids && grids.map(grid => (<Grid grid={grid} key={grid.id} />))}
         </div>
-        {isLogoPage && <Logo focused={layerType === 'logo'} logo={logo} />}
+        {isLogoPage && layerType === 'logo' && <Logo logo={logo} />}
       </ContainerContext>
     </div>
   )
