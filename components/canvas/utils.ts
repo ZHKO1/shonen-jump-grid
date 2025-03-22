@@ -1107,9 +1107,6 @@ export function isGridFlushable(grid: CanvasGridConfig) {
   }
   const leftAlign = isGridLeftAligned(grid)
   const rightAlign = isGridRightAligned(grid)
-  if (leftAlign && rightAlign) {
-    return false
-  }
   if (leftAlign || rightAlign) {
     return true
   }
