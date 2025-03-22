@@ -10,3 +10,6 @@ dist/
 # IDE
 !.vscode/extensions.json
 .idea
+
+# Local Netlify folder
+.netlify

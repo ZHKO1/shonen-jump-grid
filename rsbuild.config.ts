@@ -18,6 +18,9 @@ export default defineConfig({
         target: import.meta.env.PUBLIC_API_UPLOAD,
         changeOrigin: true,
         pathRewrite: { '^/proxy': '' },
+        onProxyRes: (proxyRes) => {
+          proxyRes.headers['Cache-Control'] = 'public, max-age=3600';
+        },
       },
     },
   },
