@@ -1,6 +1,7 @@
 import type { CanvasComicConfig, CanvasGridConfig, CanvasPageConfig, CanvasPolyGridConfig, CanvasRectGridConfig, GridId, PageId, Point, PolyGridPoint, RectGridPoint } from './types'
 import type { ComicConfig, GridConfig, PageConfig, PolyGridConfig, RectGridConfig } from '@/components/comic/core/type'
-import { deepCopy } from '@/lib/utils'
+import { uploadImage } from '@/api'
+import { dataURLtoBlob, deepCopy, isDataUrl } from '@/lib/utils'
 import { LogoDefaultCenterX, LogoDefaultCenterY, LogoDefaultHeight, LogoDefaultWidth } from '../comic/core/config'
 import { BLANK_GRID_MARGIN, BORDER_WIDTH, CANVAS_WIDTH } from './constant'
 
@@ -978,6 +979,61 @@ export function getComicConfigFromCanvas(canvasComicConfig: CanvasComicConfig): 
       }
       allGrids.push(grid)
     }
+  }
+}
+
+/**
+ * 将canvas的配置转化为可分享的canvas配置
+ * 1. 如果content.url是dataUrl，就上传到图床并更新content.url字段
+ * 2. 删去无关字段，比如originImg
+ * @param {CanvasComicConfig} canvasComicConfig
+ * @returns {CanvasComicConfig}
+ */
+export async function getShareCanvasConfig(canvasComicConfig: CanvasComicConfig): Promise<CanvasComicConfig> {
+  if (!canvasComicConfig) {
+    throw new Error('canvasComicConfig is null')
+  }
+  const result = deepCopy(canvasComicConfig)
+  for (let i = 0; i < result.pages.length; i++) {
+    const canvasPageConfig = result.pages[i]
+    if (canvasPageConfig.logo) {
+      if (isDataUrl(canvasPageConfig.logo.url)) {
+        canvasPageConfig.logo.url = await dataUrlToProxy(canvasPageConfig.logo.url)
+      }
+      if (canvasPageConfig?.logo?.originImg) {
+        delete canvasPageConfig?.logo?.originImg
+      }
+    }
+    for (let j = 0; j < canvasPageConfig.grids.length; j++) {
+      const canvasGrid = canvasPageConfig.grids[j]
+      await checkGridConfig(canvasGrid)
+    }
+  }
+  return result
+
+  async function checkGridConfig(canvasGrid: CanvasGridConfig) {
+    if (isGridSplited(canvasGrid)) {
+      for (let i = 0; i < canvasGrid.splitResult!.length; i++) {
+        const grid_ = canvasGrid.splitResult![i]
+        await checkGridConfig(grid_)
+      }
+    }
+    else {
+      if (canvasGrid?.content?.url) {
+        if (isDataUrl(canvasGrid?.content?.url)) {
+          canvasGrid.content.url = await dataUrlToProxy(canvasGrid.content.url)
+        }
+        if (canvasGrid?.content?.originImg) {
+          delete canvasGrid.content.originImg
+        }
+      }
+    }
+  }
+
+  async function dataUrlToProxy(dataUrl: string) {
+    const blob = dataURLtoBlob(dataUrl)
+    const url = await uploadImage(blob)
+    return url.replace(import.meta.env.PUBLIC_API_UPLOAD, '/proxy')
   }
 }
 

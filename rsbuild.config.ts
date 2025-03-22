@@ -12,4 +12,13 @@ export default defineConfig({
     },
   },
   plugins: [pluginReact()],
+  server: {
+    proxy: {
+      '/proxy': {
+        target: import.meta.env.PUBLIC_API_UPLOAD,
+        changeOrigin: true,
+        pathRewrite: { '^/proxy': '' },
+      },
+    },
+  },
 });

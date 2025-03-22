@@ -21,6 +21,7 @@ export function getComicGridImage({ url, x = 0, y = 0, width = 0, height = 0 }: 
     const ctx = canvas.getContext('2d')!
 
     const image = new Image()
+    image.crossOrigin = 'anonymous'
     image.src = url
     image.onload = function () {
       if (!width) {
