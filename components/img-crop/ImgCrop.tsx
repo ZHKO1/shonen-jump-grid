@@ -89,7 +89,9 @@ const ImgCrop: React.FC<ImgCropProps> = ({ originImg, maskCropPath, renderConten
       return
     }
 
-    const { x, y, width: imageWidth, height: imageHeight } = image.getBoundingClientRect()
+    const { x, y } = image.getBoundingClientRect()
+    const imageWidth = image.offsetWidth
+    const imageHeight = image.offsetHeight
     const { left: maskX, top: maskY } = mask.getMaskPosStyle()
 
     const pixelRatio = window.devicePixelRatio
@@ -102,14 +104,14 @@ const ImgCrop: React.FC<ImgCropProps> = ({ originImg, maskCropPath, renderConten
 
     const cropX = (maskX - x)
     const cropY = (maskY - y)
-    const centerX = imageWidth / 2
-    const centerY = imageHeight / 2
+    const centerX = imageWidth * zoom / 2
+    const centerY = imageHeight * zoom / 2
 
     ctx.save()
     ctx.translate(-cropX, -cropY)
     ctx.translate(centerX, centerY)
     ctx.translate(-centerX, -centerY)
-    ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, imageWidth, imageHeight)
+    ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, imageWidth * zoom, imageHeight * zoom)
     ctx.restore()
 
     const url = canvas.toDataURL('image/png')
