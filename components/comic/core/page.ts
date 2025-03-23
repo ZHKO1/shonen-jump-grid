@@ -56,7 +56,7 @@ export class Page extends Container {
       if (this.focus.type.type === 'move') {
         let x = 0
         if (this.focus.type.direction === 'left-to-right') {
-          x = -1 * (this.focus.grid.getWidth() + GridLineWidth)
+          x = -1 * (this.focus.grid.getLeftToRightInitalPosX() + GridLineWidth)
         }
         else if (this.focus.type.direction === 'right-to-left') {
           x = Width

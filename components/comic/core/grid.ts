@@ -56,14 +56,14 @@ export class Grid extends Container {
     const container = new Container()
     this.addChild(container)
     const image = Sprite.from(url)
-    const gridWidth = this.getWidth()
-    image.scale = (gridWidth / image.width)
     image.x = 0
     image.y = 0
     if (config.type === 'poly') {
       image.x = Math.min.apply(null, config.path.map(item => item.x - this.x))
       image.y = Math.min.apply(null, config.path.map(item => item.y - this.y))
     }
+    const gridWidth = this.getMaxWidth()
+    image.scale = (gridWidth / image.width)
     container.addChild(image)
     image.anchor.set(0)
     const mask = new Graphics()
@@ -99,7 +99,7 @@ export class Grid extends Container {
     return context
   }
 
-  getWidth() {
+  getLeftToRightInitalPosX() {
     const config = this.config
     if (config.type === 'rect') {
       const width = config.rb_x - config.lt_x
@@ -113,6 +113,19 @@ export class Grid extends Container {
         width = Math.max(width, Math.abs(point.x - firstx))
       }
       return width
+    }
+  }
+
+  getMaxWidth() {
+    const config = this.config
+    if (config.type === 'rect') {
+      const width = config.rb_x - config.lt_x
+      return width
+    }
+    else {
+      const minX = Math.min.apply(null, config.path.map(point => point.x))
+      const maxX = Math.max.apply(null, config.path.map(point => point.x))
+      return maxX - minX
     }
   }
 
