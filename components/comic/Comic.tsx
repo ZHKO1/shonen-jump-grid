@@ -9,6 +9,7 @@ export interface ComicProps {
 }
 
 export interface ComicRef {
+  replay: () => void
   play: () => void
   pause: () => void
   setCurrentTime: (time: number) => void
@@ -20,6 +21,11 @@ function ComicComponent({ ref, config, autoPlay, onLoad }: ComicProps & { ref?: 
   const comic = comicRef.current
 
   useImperativeHandle(ref, () => ({
+    replay() {
+      if (comic) {
+        comic.replay()
+      }
+    },
     play() {
       if (comic) {
         comic.play()

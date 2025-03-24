@@ -43,8 +43,9 @@ export class Comic {
     this.app.stage.addChild(this.whiteOverlay)
 
     this.blackOverlay.alpha = 1
+    this.downloadScreenshot = this.downloadScreenshot.bind(this)
     await this.loadAsset()
-    await this.initPages()
+    this.initPages()
     this.initTimeline()
     this.handleEvent()
   }
@@ -81,7 +82,7 @@ export class Comic {
     }
   }
 
-  private async initPages() {
+  private initPages() {
     const pageConfigs = this.comicConfig.pages || []
     let prePageY = Height
     for (let i = 0; i < pageConfigs.length; i++) {
@@ -131,6 +132,17 @@ export class Comic {
       page.initTimeLine()
       tl.add(page.timeline)
     }
+  }
+
+  public replay() {
+    this.pause()
+    this.blackOverlay.alpha = 1
+    this.comicStage.y = 0
+    this.comicStage.removeChildren()
+    this.initPages()
+    this.initTimeline()
+    this.handleEvent()
+    this.play()
   }
 
   public play() {

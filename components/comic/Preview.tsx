@@ -1,9 +1,10 @@
 'use client'
+import type { ComicRef } from './Comic'
 import type { ComicConfig } from './core/type'
 import type { ActionType } from '@/components/action-bar'
 import { useCallback, useRef, useState } from 'react'
 import ActionBar from '@/components/action-bar'
-import { CloseIcon } from '@/components/action-bar/Icons'
+import { CloseIcon, ReplayIcon } from '@/components/action-bar/Icons'
 import Background from '@/components/background'
 import { useResizeScale } from '@/hooks'
 import Comic from './Comic'
@@ -11,8 +12,15 @@ import { Height, Width } from './core/config'
 
 export default function Preview({ config, onClose }: { config: ComicConfig | null, onClose: () => void }) {
   const comicContianerRef = useRef(null)
+  const comicRef = useRef<ComicRef>(null)
   const [loading, setLoading] = useState(true)
   const { scaleX, scaleY } = useResizeScale(Width, Height, comicContianerRef)
+
+  const handleReplay = () => {
+    if (comicRef.current) {
+      comicRef.current.replay()
+    }
+  }
 
   const handleClose = () => {
     onClose()
@@ -26,6 +34,10 @@ export default function Preview({ config, onClose }: { config: ComicConfig | nul
   }, [setLoading])
 
   const actions = [
+    {
+      Icon: ReplayIcon,
+      onClick: handleReplay,
+    },
     {
       Icon: CloseIcon,
       onClick: handleClose,
@@ -70,7 +82,7 @@ export default function Preview({ config, onClose }: { config: ComicConfig | nul
                 </div>
               )
             }
-            <Comic config={config} autoPlay onLoad={onLoad} />
+            <Comic config={config} autoPlay onLoad={onLoad} ref={comicRef} />
           </div>
         </div>
       </Background>
