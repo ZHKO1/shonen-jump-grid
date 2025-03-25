@@ -63,26 +63,19 @@ export class Comic {
         const gridConfig = gridConfigs[j]
         if (gridConfig.content) {
           const contentCopy = deepCopy(gridConfig.content)
-          promiseArray.push(getComicGridImage(gridConfig.content).then((url) => {
-            gridConfig.content!.url = url
-          }).then(() => {
-            return Assets.load(gridConfig.content!.url)
-          }))
-          const focus = gridConfig.content.focus
-          if (focus) {
-            if (focus.type === 'change-background') {
-              promiseArray.push(getComicGridImage(contentCopy, []).then((focusUrl) => {
-                focus.focusUrl = focusUrl
-              }).then(() => {
-                return Assets.load(focus.focusUrl!)
-              }))
-              promiseArray.push(getComicGridImage(contentCopy, ['gray', 'white-transparent']).then((url) => {
-                gridConfig.content!.url = url
-              }).then(() => {
-                return Assets.load(gridConfig.content!.url)
-              }))
+          promiseArray.push((async () => {
+            gridConfig.content!.url = await getComicGridImage(contentCopy)
+            await Assets.load(gridConfig.content!.url)
+            const focus = gridConfig.content?.focus
+            if (focus) {
+              if (focus.type === 'change-background') {
+                focus.focusUrl = await getComicGridImage(contentCopy, [])
+                await Assets.load(focus.focusUrl!)
+                gridConfig.content!.url = await getComicGridImage(contentCopy, ['gray', 'white-transparent'])
+                await Assets.load(gridConfig.content!.url)
+              }
             }
-          }
+          })())
         }
       }
     }
