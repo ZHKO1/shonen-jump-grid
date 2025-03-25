@@ -993,12 +993,15 @@ export async function getShareCanvasConfig(canvasComicConfig: CanvasComicConfig)
   if (!canvasComicConfig) {
     throw new Error('canvasComicConfig is null')
   }
+  const promiseArray = []
   const result = deepCopy(canvasComicConfig)
   for (let i = 0; i < result.pages.length; i++) {
     const canvasPageConfig = result.pages[i]
     if (canvasPageConfig.logo) {
       if (isDataUrl(canvasPageConfig.logo.url)) {
-        canvasPageConfig.logo.url = await dataUrlToProxy(canvasPageConfig.logo.url)
+        promiseArray.push(dataUrlToProxy(canvasPageConfig.logo.url).then((url) => {
+          canvasPageConfig.logo!.url = url
+        }))
       }
       if (canvasPageConfig?.logo?.originImg) {
         delete canvasPageConfig?.logo?.originImg
@@ -1006,22 +1009,25 @@ export async function getShareCanvasConfig(canvasComicConfig: CanvasComicConfig)
     }
     for (let j = 0; j < canvasPageConfig.grids.length; j++) {
       const canvasGrid = canvasPageConfig.grids[j]
-      await checkGridConfig(canvasGrid)
+      checkGridConfig(canvasGrid)
     }
   }
+  await Promise.all(promiseArray)
   return result
 
-  async function checkGridConfig(canvasGrid: CanvasGridConfig) {
+  function checkGridConfig(canvasGrid: CanvasGridConfig) {
     if (isGridSplited(canvasGrid)) {
       for (let i = 0; i < canvasGrid.splitResult!.length; i++) {
         const grid_ = canvasGrid.splitResult![i]
-        await checkGridConfig(grid_)
+        checkGridConfig(grid_)
       }
     }
     else {
       if (canvasGrid?.content?.url) {
         if (isDataUrl(canvasGrid?.content?.url)) {
-          canvasGrid.content.url = await dataUrlToProxy(canvasGrid.content.url)
+          promiseArray.push(dataUrlToProxy(canvasGrid.content.url).then((url) => {
+            canvasGrid.content!.url = url
+          }))
         }
         if (canvasGrid?.content?.originImg) {
           delete canvasGrid.content.originImg

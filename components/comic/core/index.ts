@@ -51,35 +51,42 @@ export class Comic {
   }
 
   private async loadAsset() {
+    const promiseArray = []
     const pageConfigs = this.comicConfig.pages || []
     for (let i = 0; i < pageConfigs.length; i++) {
       const pageConfig = pageConfigs[i]
       if (pageConfig.logo) {
-        await Assets.load(pageConfig.logo.url)
+        promiseArray.push(Assets.load(pageConfig.logo!.url))
       }
       const gridConfigs = pageConfig.grids
       for (let j = 0; j < gridConfigs.length; j++) {
         const gridConfig = gridConfigs[j]
         if (gridConfig.content) {
           const contentCopy = deepCopy(gridConfig.content)
-          gridConfig.content.url = await getComicGridImage(gridConfig.content)
-          await Assets.load(gridConfig.content.url)
-
+          promiseArray.push(getComicGridImage(gridConfig.content).then((url) => {
+            gridConfig.content!.url = url
+          }).then(() => {
+            return Assets.load(gridConfig.content!.url)
+          }))
           const focus = gridConfig.content.focus
           if (focus) {
             if (focus.type === 'change-background') {
-              const focusUrl = await getComicGridImage(contentCopy, [])
-              await Assets.load(focusUrl)
-              focus.focusUrl = focusUrl
-
-              gridConfig.content.url = await getComicGridImage(contentCopy, ['gray', 'white-transparent'])
-              await Assets.load(gridConfig.content.url)
+              promiseArray.push(getComicGridImage(contentCopy, []).then((focusUrl) => {
+                focus.focusUrl = focusUrl
+              }).then(() => {
+                return Assets.load(focus.focusUrl!)
+              }))
+              promiseArray.push(getComicGridImage(contentCopy, ['gray', 'white-transparent']).then((url) => {
+                gridConfig.content!.url = url
+              }).then(() => {
+                return Assets.load(gridConfig.content!.url)
+              }))
             }
-            gridConfig.content.focus = focus
           }
         }
       }
     }
+    await Promise.all(promiseArray)
   }
 
   private initPages() {
