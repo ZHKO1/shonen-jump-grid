@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { cn, off, on } from '@/lib/utils'
 import useComicStatusStore from '@/store'
-import { LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT } from './constant'
+// import { LOGO_PAGE_GRIDS_CONFIG, LOGO_PAGE_HEIGHT } from './constant'
 import { ContainerContext } from './context/container'
 import { Grid } from './grid'
 import Logo from './logo'
@@ -41,22 +41,31 @@ function Canvas({ scale }: { scale: number }) {
     : {}
 
   useEffect(() => {
-    addHistoryStep({
-      type: 'init',
-      comicConfig: {
-        pages: [{
-          id: 'page0',
-          height: LOGO_PAGE_HEIGHT,
-          readonly: true,
-          logo: {
-            url: '/logo.png',
-          },
-          grids: LOGO_PAGE_GRIDS_CONFIG,
-        }],
-      },
+    // addHistoryStep({
+    //   type: 'init',
+    //   comicConfig: {
+    //     pages: [{
+    //       id: 'page0',
+    //       height: LOGO_PAGE_HEIGHT,
+    //       readonly: true,
+    //       logo: {
+    //         url: '/logo.png',
+    //       },
+    //       grids: LOGO_PAGE_GRIDS_CONFIG,
+    //     }],
+    //   },
+    // })
+
+    fetch('./onepiece.json').then(res => res.json()).then((comicConfig) => {
+      addHistoryStep({
+        type: 'init',
+        comicConfig,
+      })
+
+      setCurrentPageId('page0')
+      setCurrentLayerType('logo')
     })
-    setCurrentPageId('page0')
-    setCurrentLayerType('logo')
+
     return () => {
       cleanAllHistoryStep()
     }
