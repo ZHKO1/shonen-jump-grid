@@ -13,3 +13,8 @@ dist/
 
 # Local Netlify folder
 .netlify
+
+
+.agents/
+.cursor/
+.github/skills
