@@ -9,6 +9,8 @@
     "preview": "rsbuild preview",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
     "prepare": "simple-git-hooks"
   },
   "dependencies": {
@@ -55,7 +57,8 @@
     "postcss": "^8",
     "simple-git-hooks": "^2.11.1",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^4.0.18"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"
