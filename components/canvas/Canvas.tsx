@@ -56,7 +56,7 @@ function Canvas({ scale }: { scale: number }) {
     //   },
     // })
 
-    fetch('./onepiece.json').then(res => res.json()).then((comicConfig) => {
+    fetch('./demo/onepiece/grid.json').then(res => res.json()).then((comicConfig) => {
       addHistoryStep({
         type: 'init',
         comicConfig,
