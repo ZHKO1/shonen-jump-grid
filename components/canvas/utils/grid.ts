@@ -1,6 +1,7 @@
 import type { CanvasComicConfig, CanvasGridConfig, CanvasPolyGridConfig, CanvasRectGridConfig, GridId, GridStyle, Point, SplitOptions } from './types'
 import { deepCopy } from '@/lib/utils'
 import { isGridFlushable } from './align'
+import { splitPolygonByLine, sutherlandHodgmanClip } from './clip'
 import { getXFromConentLineFunc, getYFromConentLineFunc } from './geometry'
 import { getAutoFlushedPolyGridConfig, getPolyContainerPoint, getPolyGridStyle, getPolyType } from './poly'
 import { getAutoFlushedRectGridConfig, getRectGridStyle } from './rect'
@@ -83,7 +84,7 @@ export function getGridsBySplit(grid: CanvasGridConfig, line: [Point, Point], op
     return getGridsBySplitRect(grid, line, options)
   }
   else if (grid.type === 'poly') {
-    return getGridsBySplitPoly(grid, line, options)
+    return getGridsBySplitPoly_(grid, line, options)
   }
   return null
 }
@@ -299,6 +300,84 @@ export function getGridsBySplitPoly(grid: CanvasPolyGridConfig, line: [Point, Po
   }
 
   return null
+}
+
+export function getGridsBySplitPoly_(
+  grid: CanvasPolyGridConfig,
+  line: [Point, Point],
+  options: SplitOptions,
+): { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null {
+  const polyType = getPolyType(grid.path)
+  const isHorizon = polyType === 'horizon'
+  const isVertical = polyType === 'vertical'
+
+  const lineIsHorizontal = line[0].y === line[1].y
+  const lineIsVertical = line[0].x === line[1].x
+
+  const lt = getPolyContainerPoint(grid.path, 'lt')
+  const rb = getPolyContainerPoint(grid.path, 'rb')
+
+  if (isHorizon && lineIsHorizontal && line[0].y > lt.y && line[0].y < rb.y) {
+    return getGridsBySplitPoly(grid, line, options)
+  }
+
+  if (isVertical && lineIsVertical && line[0].x > lt.x && line[0].x < rb.x) {
+    return getGridsBySplitPoly(grid, line, options)
+  }
+
+  if (isHorizon && lineIsVertical) {
+    return getGridsBySplitPoly(grid, line, options)
+  }
+
+  if (isVertical && lineIsHorizontal) {
+    return getGridsBySplitPoly(grid, line, options)
+  }
+
+  const polygon = grid.path
+  const splitResult = splitPolygonByLine(polygon, line)
+
+  if (!splitResult)
+    return null
+
+  const [poly1, poly2] = splitResult
+  if (poly1.length < 3 || poly2.length < 3)
+    return null
+
+  const { spaceWidth } = options
+  const recursion = options.recursion ?? true
+  const adjust = Math.floor(spaceWidth / 2)
+
+  const dx = line[1].x - line[0].x
+  const dy = line[1].y - line[0].y
+  const len = Math.sqrt(dx * dx + dy * dy)
+  if (len === 0)
+    return null
+
+  const nx = -dy / len
+  const ny = dx / len
+
+  const lineLeft: [Point, Point] = [
+    { x: line[0].x + nx * adjust, y: line[0].y + ny * adjust },
+    { x: line[1].x + nx * adjust, y: line[1].y + ny * adjust },
+  ]
+  const lineRight: [Point, Point] = [
+    { x: line[0].x - nx * adjust, y: line[0].y - ny * adjust },
+    { x: line[1].x - nx * adjust, y: line[1].y - ny * adjust },
+  ]
+
+  const grid1 = sutherlandHodgmanClip(poly1, lineRight[1], lineRight[0])
+  const grid2 = sutherlandHodgmanClip(poly2, lineLeft[0], lineLeft[1])
+
+  if (!grid1 || !grid2 || grid1.length < 3 || grid2.length < 3)
+    return null
+
+  return {
+    grids: updateSubGridsBySplit(grid, [
+      { type: 'poly', path: grid1 as [Point, Point, Point, Point], id: `${grid.id}_0` },
+      { type: 'poly', path: grid2 as [Point, Point, Point, Point], id: `${grid.id}_1` },
+    ], recursion),
+    line,
+  }
 }
 
 /**
