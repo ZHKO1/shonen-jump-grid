@@ -2,8 +2,29 @@
 
 ## 项目概述
 
-这是一个漫画过场动画编辑器应用，灵感来自任天堂 NDS 平台游戏《Jump Ultimate Stars》的过场动画，再次重现阅读漫画时的感动。
-用户可以创建和编辑每一页，在每页划分漫画格子，同时在格子里上传图片并调整裁剪，最后可以通过预览按钮来看到自己把每个格子，每一页组合起来的效果。
+漫画过场动画编辑器应用，灵感来自任天堂 NDS 平台游戏《Jump Ultimate Stars》的过场动画。用户可以创建和编辑漫画页面，划分格子，上传并裁剪图片，预览最终效果。
+
+---
+
+## 常用命令
+
+```bash
+# 开发
+pnpm dev              # 启动开发服务器 (自动打开浏览器)
+pnpm build            # 构建生产版本
+pnpm preview          # 预览生产构建
+
+# 代码质量 (pnpm lint --fix 会自动修复大部分格式问题)
+pnpm lint             # ESLint 检查并自动修复
+pnpm lint --fix       # 强制修复所有可自动修复的问题
+pnpm typecheck        # TypeScript 类型检查
+
+# 测试
+pnpm test             # 启动测试监听模式
+pnpm test:run         # 运行测试并退出
+pnpm test -- src/foo.test.ts    # 运行单个测试文件
+pnpm test -- --reporter=verbose # 详细输出
+```
 
 ---
 
@@ -19,6 +40,7 @@
 | Radix UI | 无障碍 UI 组件 |
 | Pixi.js | Canvas 渲染 |
 | framer-motion / GSAP | 动画效果 |
+| Vitest | 测试框架 |
 
 ---
 
@@ -48,22 +70,14 @@ grid-demo/
 
 ---
 
-## 开发指南
-
-### 启动开发服务器
+## 验证代码质量
 
 ```bash
-pnpm install
-pnpm dev
+pnpm lint --fix   # ESLint 自动修复 (首选)
+pnpm typecheck    # TypeScript 类型检查
+pnpm test:run     # 运行测试
 ```
 
-### 构建生产版本
+**Lint 会自动修复**: import 顺序、空格、分号、括号、代码风格等。
 
-```bash
-pnpm build
-```
-
-### 代码规范
-
-- 使用 ESLint（@antfu/eslint-config）进行代码检查
-- 提交前自动运行 lint-staged
+---
