@@ -15,15 +15,14 @@ pnpm build            # 构建生产版本
 pnpm preview          # 预览生产构建
 
 # 代码质量 (pnpm lint --fix 会自动修复大部分格式问题)
-pnpm lint             # ESLint 检查并自动修复
-pnpm lint --fix       # 强制修复所有可自动修复的问题
+pnpm lint             # ESLint 检查
+pnpm lint:fix         # ESLint 检查并自动修复
 pnpm typecheck        # TypeScript 类型检查
+pnpm allcheck         # 一次性执行 lint:fix + typecheck + test:run
 
 # 测试
 pnpm test             # 启动测试监听模式
 pnpm test:run         # 运行测试并退出
-pnpm test -- src/foo.test.ts    # 运行单个测试文件
-pnpm test -- --reporter=verbose # 详细输出
 ```
 
 ---
@@ -72,10 +71,14 @@ grid-demo/
 
 ## 验证代码质量
 
+修改代码后，务必按以下顺序执行验证命令：
+
 ```bash
-pnpm lint --fix   # ESLint 自动修复 (首选)
-pnpm typecheck    # TypeScript 类型检查
-pnpm test:run     # 运行测试
+pnpm allcheck         # 一次性执行 lint:fix + typecheck + test:run (推荐)
+# 或者单独执行
+pnpm lint:fix         # 1. ESLint 自动修复
+pnpm typecheck        # 2. TypeScript 类型检查
+pnpm test:run         # 3. 运行测试
 ```
 
 **Lint 会自动修复**: import 顺序、空格、分号、括号、代码风格等。

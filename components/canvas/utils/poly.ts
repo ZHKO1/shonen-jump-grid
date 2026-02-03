@@ -1,8 +1,8 @@
 import type { CanvasPolyGridConfig, GridStyle, Point, PolyGridPoint, PolyType, Pos } from './types'
+import offsetPolygon from 'offset-polygon'
 import { deepCopy } from '@/lib/utils'
 import { BORDER_WIDTH, CANVAS_WIDTH } from '../constant'
 import { isGridLeftAligned, isGridRightAligned } from './align'
-import { getXFromConentLineFunc, getYFromConentLineFunc } from './geometry'
 import { getAutoFlushedGridConfig } from './grid'
 
 /**
@@ -102,56 +102,27 @@ export function getPolyPointBySort(path: [Point, Point, Point, Point]): [Point, 
 }
 
 /**
+ * 精度处理，保留指定小数位
+ */
+function roundPoint(p: Point, decimals: number = 5): Point {
+  const factor = 10 ** decimals
+  return {
+    x: Math.round(p.x * factor) / factor,
+    y: Math.round(p.y * factor) / factor,
+  }
+}
+
+/**
  * 返回poly的绘制点
  * @param {PolyGridPoint['path']} path
  * @param {number} borderWidth
  * @returns {{ outside: PolyGridPoint['path'], inside: PolyGridPoint['path'] }}
  */
 export function getPolyGridPoint(path: PolyGridPoint['path'], borderWidth: number): { outside: PolyGridPoint['path'], inside: PolyGridPoint['path'] } {
-  const adjust = Math.floor(borderWidth / 2)
-  const lt_x = getPolyContainerPoint(path, 'lt').x
-  const lt_y = getPolyContainerPoint(path, 'lt').y
-  const rb_x = getPolyContainerPoint(path, 'rb').x
-  const rb_y = getPolyContainerPoint(path, 'rb').y
-  let point0, point1, point2, point3
-  if (getPolyType(path) === 'horizon') {
-    return {
-      outside: getPointFromHorizonPoly('out'),
-      inside: getPointFromHorizonPoly('in'),
-    }
-  }
-  else {
-    return {
-      outside: getPointFromVerticalPoly('out'),
-      inside: getPointFromVerticalPoly('in'),
-    }
-  }
-
-  function getPointFromHorizonPoly(type: 'out' | 'in'): PolyGridPoint['path'] {
-    const one = type === 'out' ? -1 : 1
-    const getConentLeftLineX = getXFromConentLineFunc(path[0], path[3], adjust, type !== 'out')
-    const getConentRightLineX = getXFromConentLineFunc(path[1], path[2], adjust, type === 'out')
-
-    point0 = { x: getConentLeftLineX(lt_y + one * adjust), y: lt_y + one * adjust }
-    point1 = { x: getConentRightLineX(lt_y + one * adjust), y: lt_y + one * adjust }
-    point2 = { x: getConentRightLineX(rb_y - one * adjust), y: rb_y - one * adjust }
-    point3 = { x: getConentLeftLineX(rb_y - one * adjust), y: rb_y - one * adjust }
-
-    return [point0, point1, point2, point3]
-  }
-
-  function getPointFromVerticalPoly(type: 'out' | 'in'): PolyGridPoint['path'] {
-    const one = type === 'out' ? -1 : 1
-    const getConentTopLineY = getYFromConentLineFunc(path[0], path[1], adjust, type !== 'out')
-    const getConentBottomLineY = getYFromConentLineFunc(path[3], path[2], adjust, type === 'out')
-
-    point0 = { y: getConentTopLineY(lt_x + one * adjust), x: lt_x + one * adjust }
-    point1 = { y: getConentTopLineY(rb_x - one * adjust), x: rb_x - one * adjust }
-    point2 = { y: getConentBottomLineY(rb_x - one * adjust), x: rb_x - one * adjust }
-    point3 = { y: getConentBottomLineY(lt_x + one * adjust), x: lt_x + one * adjust }
-
-    return [point0, point1, point2, point3]
-  }
+  const offset = borderWidth / 2
+  const outside = offsetPolygon(path as Point[], offset).map(p => roundPoint(p, 5))
+  const inside = offsetPolygon(path as Point[], -offset).map(p => roundPoint(p, 5))
+  return { outside: outside as [Point, Point, Point, Point], inside: inside as [Point, Point, Point, Point] }
 }
 
 /**
