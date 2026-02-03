@@ -34,7 +34,7 @@ export interface RectGridConfig extends GridShareConfig, RectGridPoint {
 }
 
 export interface PolyGridPoint {
-  path: [Point, Point, Point, Point]
+  path: Point[]
 }
 
 export interface PolyGridConfig extends GridShareConfig, PolyGridPoint {

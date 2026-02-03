@@ -15,7 +15,7 @@ export function isGridLeftAligned(grid: CanvasGridConfig) {
   }
   if (grid.type === 'poly') {
     const polyType = getPolyType(grid.path)
-    if (polyType === 'vertical') {
+    if (polyType === 'vertical' || polyType === 'other') {
       return false
     }
     else {
@@ -40,7 +40,7 @@ export function isGridRightAligned(grid: CanvasGridConfig) {
   }
   if (grid.type === 'poly') {
     const polyType = getPolyType(grid.path)
-    if (polyType === 'vertical') {
+    if (polyType === 'vertical' || polyType === 'other') {
       return false
     }
     else {

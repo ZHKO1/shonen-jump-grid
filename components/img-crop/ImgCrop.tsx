@@ -17,7 +17,7 @@ import Mask from './Mask'
 
 export interface ImgCropProps {
   originImg: CanvasOriginImgConfig
-  maskCropPath: [Point, Point, Point, Point]
+  maskCropPath: Point[]
   renderContent: (mask: MaskType, onAnimationComplete: () => void) => ReactNode
   onClean: () => void
   onSubmit: (url: string, originImg: CanvasOriginImgConfig) => void

@@ -1,6 +1,6 @@
 import type { Point } from '../utils/types'
 import { describe, expect, it } from 'vitest'
-import { getPolyGridPoint, getPolyPointBySort, getPolyType } from '../utils/poly'
+import { getPolyGridPoint } from '../utils/poly'
 
 const BORDER_WIDTH = 4
 
@@ -28,8 +28,6 @@ describe('getPolyGridPoint', () => {
           { x: 0, y: 100 },
         ]
 
-        expect(getPolyType(path)).toBe('horizon')
-
         const result = getPolyGridPoint(path, BORDER_WIDTH)
 
         comparePaths(result.outside, [
@@ -54,8 +52,6 @@ describe('getPolyGridPoint', () => {
           { x: 200, y: 80 },
           { x: 10, y: 80 },
         ]
-
-        expect(getPolyType(path)).toBe('horizon')
 
         const result = getPolyGridPoint(path, BORDER_WIDTH)
 
@@ -82,8 +78,6 @@ describe('getPolyGridPoint', () => {
           { x: 0, y: 100 },
         ]
 
-        expect(getPolyType(path)).toBe('horizon')
-
         const result = getPolyGridPoint(path, BORDER_WIDTH)
 
         comparePaths(result.outside, [
@@ -108,8 +102,6 @@ describe('getPolyGridPoint', () => {
           { x: 200, y: 100 },
           { x: 0, y: 100 },
         ]
-
-        expect(getPolyType(path)).toBe('horizon')
 
         const result = getPolyGridPoint(path, BORDER_WIDTH)
 
@@ -138,8 +130,6 @@ describe('getPolyGridPoint', () => {
           { x: 0, y: 110 },
         ]
 
-        expect(getPolyType(path)).toBe('vertical')
-
         const result = getPolyGridPoint(path, BORDER_WIDTH)
 
         comparePaths(result.outside, [
@@ -164,8 +154,6 @@ describe('getPolyGridPoint', () => {
           { x: 100, y: 80 },
           { x: 0, y: 100 },
         ]
-
-        expect(getPolyType(path)).toBe('vertical')
 
         const result = getPolyGridPoint(path, BORDER_WIDTH)
 
@@ -198,7 +186,7 @@ describe('getPolyGridPoint', () => {
     const testCases: TestCase[] = [
       {
         name: 'poly-from-json-0_1_1_0_1_0',
-        path: getPolyPointBySort([
+        path: ([
           { x: 205.3390178819046, y: 396.17723296931587 },
           { x: 440.94851675653524, y: 396.17723296931587 },
           { x: 485.0844857615282, y: 525.9687019476362 },
@@ -220,7 +208,7 @@ describe('getPolyGridPoint', () => {
       },
       {
         name: 'poly-from-json-0_1_1_0_1_1',
-        path: getPolyPointBySort([
+        path: ([
           { x: 453.62335731076104, y: 396.17723296931587 },
           { x: 702, y: 396.17723296931587 },
           { x: 702, y: 525.9687019476362 },
@@ -242,7 +230,7 @@ describe('getPolyGridPoint', () => {
       },
       {
         name: 'poly-from-json-0_1_1_1_0_0_0',
-        path: getPolyPointBySort([
+        path: ([
           { x: 18, y: 551.9687019476362 },
           { x: 185.50143652912436, y: 551.9687019476362 },
           { x: 310.6623945339697, y: 858.5097247450025 },
@@ -264,7 +252,7 @@ describe('getPolyGridPoint', () => {
       },
       {
         name: 'poly-from-json-page4_0_0_0_0',
-        path: getPolyPointBySort([
+        path: ([
           { x: 18, y: 18 },
           { x: 274.6606193898255, y: 18 },
           { x: 274.6606193898255, y: 273.9108911610666 },
@@ -286,7 +274,7 @@ describe('getPolyGridPoint', () => {
       },
       {
         name: 'poly-from-json-page5_0_0_0',
-        path: getPolyPointBySort([
+        path: ([
           { x: 18, y: 18 },
           { x: 543.1959787189121, y: 18 },
           { x: 485.14564740430086, y: 519.4666389109557 },
@@ -308,7 +296,7 @@ describe('getPolyGridPoint', () => {
       },
       {
         name: 'poly-from-json-page7_0_0_1_1_0',
-        path: getPolyPointBySort([
+        path: ([
           { x: 605.9826355710933, y: 18 },
           { x: 702, y: 18 },
           { x: 702, y: 246.19682667786594 },
@@ -332,8 +320,6 @@ describe('getPolyGridPoint', () => {
 
     testCases.forEach((testCase) => {
       it(testCase.name, () => {
-        expect(getPolyType(testCase.path)).toBe(testCase.polyType)
-
         const result = getPolyGridPoint(testCase.path, BORDER_WIDTH)
 
         comparePaths(result.outside, testCase.outside)

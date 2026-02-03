@@ -13,7 +13,7 @@ export interface MaskRef {
 interface MaskProps {
   ref: RefObject<MaskRef | null>
   gridSize: { width: number, height: number }
-  svgPath: [Point, Point, Point, Point]
+  svgPath: Point[]
   maskType: MaskType
 }
 
@@ -32,7 +32,7 @@ const Mask: FC<MaskProps> = ({ ref, gridSize, svgPath, maskType }) => {
   const maskSvgPoints = getSvgPoints(svgPath.map(({ x, y }) => ({
     x: x + maskSvgPosStyle.left,
     y: y + maskSvgPosStyle.top,
-  })) as [Point, Point, Point, Point])
+  })))
 
   useImperativeHandle(ref, () => ({
     getMaskPosStyle: () => {

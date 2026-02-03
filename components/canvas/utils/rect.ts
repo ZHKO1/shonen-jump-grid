@@ -1,4 +1,4 @@
-import type { CanvasRectGridConfig, GridStyle, Point, RectGridPoint } from './types'
+import type { CanvasRectGridConfig, GridStyle, RectGridPoint } from './types'
 import { deepCopy } from '@/lib/utils'
 import { BORDER_WIDTH, CANVAS_WIDTH } from '../constant'
 import { isGridLeftAligned, isGridRightAligned } from './align'
@@ -76,7 +76,7 @@ export function getRectGridStyle(grid: CanvasRectGridConfig): GridStyle {
     height,
   }
   const svgPath = ([{ x: lt_x, y: lt_y }, { x: rb_x, y: lt_y }, { x: rb_x, y: rb_y }, { x: lt_x, y: rb_y }])
-    .map(p => ({ x: p.x - left, y: p.y - top })) as [Point, Point, Point, Point]
+    .map(p => ({ x: p.x - left, y: p.y - top }))
 
   const focusIconPosStyle = {
     left: 10,

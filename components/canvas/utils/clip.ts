@@ -37,14 +37,10 @@ export function computeIntersection(
   lineStart: Point,
   lineEnd: Point,
 ): Point {
-  const x1 = p1.x
-  const y1 = p1.y
-  const x2 = p2.x
-  const y2 = p2.y
-  const x3 = lineStart.x
-  const y3 = lineStart.y
-  const x4 = lineEnd.x
-  const y4 = lineEnd.y
+  const { x: x1, y: y1 } = p1
+  const { x: x2, y: y2 } = p2
+  const { x: x3, y: y3 } = lineStart
+  const { x: x4, y: y4 } = lineEnd
 
   const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
 
@@ -59,6 +55,27 @@ export function computeIntersection(
     x: x1 + t * (x2 - x1),
     y: y1 + t * (y2 - y1),
   }
+}
+
+/**
+ * 重新排序多边形点，从左上角开始，顺时针排列
+ */
+export function reorderPolygonClockwise(points: Point[]): Point[] {
+  if (points.length <= 3)
+    return points
+
+  const topLeftIndex = points.reduce((minIdx, p, i, arr) => {
+    if (p.y < arr[minIdx].y - 1e-10)
+      return i
+    if (Math.abs(p.y - arr[minIdx].y) < 1e-10 && p.x < arr[minIdx].x)
+      return i
+    return minIdx
+  }, 0)
+
+  if (topLeftIndex === 0)
+    return points
+
+  return points.slice(topLeftIndex).concat(points.slice(0, topLeftIndex))
 }
 
 /**
@@ -78,38 +95,27 @@ export function sutherlandHodgmanClip(
     return []
 
   const outputList: Point[] = []
+  let prev = polygon[polygon.length - 1]
+  let prevInside = isInside(prev, lineStart, lineEnd)
 
-  // 遍历多边形的每条边
-  for (let i = 0; i < polygon.length; i++) {
-    const current = polygon[i]
-    const next = polygon[(i + 1) % polygon.length]
-
+  for (const current of polygon) {
     const currentInside = isInside(current, lineStart, lineEnd)
-    const nextInside = isInside(next, lineStart, lineEnd)
 
     if (currentInside) {
-      if (nextInside) {
-        // Case 1: 两点都在内侧 → 输出 next
-        outputList.push(next)
+      if (!prevInside) {
+        outputList.push(computeIntersection(prev, current, lineStart, lineEnd))
       }
-      else {
-        // Case 2: current 在内侧，next 在外侧 → 输出交点
-        const intersection = computeIntersection(current, next, lineStart, lineEnd)
-        outputList.push(intersection)
-      }
+      outputList.push(current)
     }
-    else {
-      if (nextInside) {
-        // Case 3: current 在外侧，next 在内侧 → 输出交点和 next
-        const intersection = computeIntersection(current, next, lineStart, lineEnd)
-        outputList.push(intersection)
-        outputList.push(next)
-      }
-      // Case 4: 两点都在外侧 → 不输出任何点
+    else if (prevInside) {
+      outputList.push(computeIntersection(prev, current, lineStart, lineEnd))
     }
+
+    prev = current
+    prevInside = currentInside
   }
 
-  return outputList
+  return reorderPolygonClockwise(outputList)
 }
 
 /**

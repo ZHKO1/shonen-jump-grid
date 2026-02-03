@@ -80,11 +80,11 @@ export function getAdjustedPoint(start: Point, end: Point, options: { direction:
   }
 }
 
-export function getSvgPoints(path: [Point, Point, Point, Point]) {
+export function getSvgPoints(path: Point[]) {
   return path.map(p => `${p.x},${p.y}`).join(' ')
 }
 
-export function getClipPath(path: [Point, Point, Point, Point]) {
+export function getClipPath(path: Point[]) {
   return `polygon(${path.map(p => `${p.x}px ${p.y}px`).join(',')})`
 }
 

@@ -1,4 +1,4 @@
-import type { CanvasPageConfig, LogoStyle, Point } from './types'
+import type { CanvasPageConfig, LogoStyle } from './types'
 import { LogoDefaultCenterX, LogoDefaultCenterY, LogoDefaultHeight, LogoDefaultWidth } from '../../comic/core/config'
 
 /**
@@ -31,7 +31,7 @@ export function getLogoStyle(logo: CanvasPageConfig['logo']): LogoStyle {
   const rb = { x: posStyle.left + sizeStyle.width, y: posStyle.top + sizeStyle.height }
 
   const svgPath = ([{ x: lt.x, y: lt.y }, { x: rb.x, y: lt.y }, { x: rb.x, y: rb.y }, { x: lt.x, y: rb.y }])
-    .map(p => ({ x: p.x - left, y: p.y - top })) as [Point, Point, Point, Point]
+    .map(p => ({ x: p.x - left, y: p.y - top }))
 
   return {
     posStyle,

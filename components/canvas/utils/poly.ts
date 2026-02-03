@@ -3,15 +3,16 @@ import offsetPolygon from 'offset-polygon'
 import { deepCopy } from '@/lib/utils'
 import { BORDER_WIDTH, CANVAS_WIDTH } from '../constant'
 import { isGridLeftAligned, isGridRightAligned } from './align'
+import { reorderPolygonClockwise } from './clip'
 import { getAutoFlushedGridConfig } from './grid'
 
 /**
- * 获取四边形所在容器的四个点的坐标
- * @param {[Point, Point, Point, Point]} path
+ * 获取多边形所在容器的四个点的坐标
+ * @param {Point[]} path
  * @param {Pos} pos
  * @returns {Point}
  */
-export function getPolyContainerPoint(path: [Point, Point, Point, Point], pos: Pos): Point {
+export function getPolyContainerPoint(path: Point[], pos: Pos): Point {
   const point = { x: path[0].x, y: path[0].y }
   path.forEach((p) => {
     switch (pos) {
@@ -42,19 +43,23 @@ export function getPolyContainerPoint(path: [Point, Point, Point, Point], pos: P
  * @param {'lt' | 'rt' | 'lb' | 'rb'} corner
  * @returns {boolean}
  */
-export function isPolyCornerRightAngle(path: [Point, Point, Point, Point], corner: 'lt' | 'rt' | 'lb' | 'rb'): boolean {
-  const [p0, p1, p2, p3] = path
-  switch (corner) {
-    case 'lt':
-      return (p0.x === p3.x) && (p0.y === p1.y)
-    case 'rt':
-      return (p1.x === p2.x) && (p0.y === p1.y)
-    case 'lb':
-      return (p0.x === p3.x) && (p2.y === p3.y)
-    case 'rb':
-      return (p2.y === p3.y) && (p1.x === p2.x)
+export function isPolyCornerRightAngle(path: Point[], corner: 'lt' | 'rt' | 'lb' | 'rb'): boolean {
+  if (getPolyType(path) !== 'other') {
+    const [p0, p1, p2, p3] = path
+    switch (corner) {
+      case 'lt':
+        return (p0.x === p3.x) && (p0.y === p1.y)
+      case 'rt':
+        return (p1.x === p2.x) && (p0.y === p1.y)
+      case 'lb':
+        return (p0.x === p3.x) && (p2.y === p3.y)
+      case 'rb':
+        return (p2.y === p3.y) && (p1.x === p2.x)
+    }
   }
-  throw new Error('unknown corner')
+  else {
+    return false
+  }
 }
 
 /**
@@ -62,43 +67,24 @@ export function isPolyCornerRightAngle(path: [Point, Point, Point, Point], corne
  * @param {[Point, Point, Point, Point]} path
  * @returns {PolyType}
  */
-export function getPolyType(path: [Point, Point, Point, Point]): PolyType {
-  const lt = getPolyContainerPoint(path, 'lt')
-  const rb = getPolyContainerPoint(path, 'rb')
-  const isAdjust = (attr: 'x' | 'y') => {
-    return (path.filter(point => point[attr] === lt[attr]).length > 1) && (path.filter(point => point[attr] === rb[attr]).length > 1)
+export function getPolyType(path: Point[]): PolyType {
+  if (path.length === 4) {
+    const lt = getPolyContainerPoint(path, 'lt')
+    const rb = getPolyContainerPoint(path, 'rb')
+    const isAdjust = (attr: 'x' | 'y') => {
+      return (path.filter(point => point[attr] === lt[attr]).length > 1) && (path.filter(point => point[attr] === rb[attr]).length > 1)
+    }
+    if (isAdjust('x') && isAdjust('y')) {
+      return 'rect'
+    }
+    if (isAdjust('y')) {
+      return 'horizon'
+    }
+    if (isAdjust('x')) {
+      return 'vertical'
+    }
   }
-  if (isAdjust('y')) {
-    return 'horizon'
-  }
-  if (isAdjust('x')) {
-    return 'vertical'
-  }
-  throw new Error('Invalid poly type')
-}
-
-/**
- * 返回从左上角开始顺时针排序的四个点
- * @param {[Point, Point, Point, Point]} path
- * @returns {[Point, Point, Point, Point]}
- */
-export function getPolyPointBySort(path: [Point, Point, Point, Point]): [Point, Point, Point, Point] {
-  let result = []
-  if (getPolyType(path) === 'horizon') {
-    const lt_y = getPolyContainerPoint(path, 'lt').y
-    const rb_y = getPolyContainerPoint(path, 'rb').y
-    const topLine = path.filter(point => point.y === lt_y).sort((a, b) => a.x - b.x)
-    const bottomLine = path.filter(point => point.y === rb_y).sort((a, b) => b.x - a.x)
-    result = [...topLine, ...bottomLine]
-  }
-  else {
-    const lt_x = getPolyContainerPoint(path, 'lt').x
-    const rb_x = getPolyContainerPoint(path, 'rb').x
-    const leftLine = path.filter(point => point.x === lt_x).sort((a, b) => a.y - b.y)
-    const rightLine = path.filter(point => point.x === rb_x).sort((a, b) => a.y - b.y)
-    result = [leftLine[0], ...rightLine, leftLine[1]]
-  }
-  return result as [Point, Point, Point, Point]
+  return 'other'
 }
 
 /**
@@ -122,7 +108,7 @@ export function getPolyGridPoint(path: PolyGridPoint['path'], borderWidth: numbe
   const offset = borderWidth / 2
   const outside = offsetPolygon(path as Point[], offset).map(p => roundPoint(p, 5))
   const inside = offsetPolygon(path as Point[], -offset).map(p => roundPoint(p, 5))
-  return { outside: outside as [Point, Point, Point, Point], inside: inside as [Point, Point, Point, Point] }
+  return { outside, inside }
 }
 
 /**
@@ -168,11 +154,12 @@ export function getPolyGridStyle(grid: CanvasPolyGridConfig): GridStyle {
   const top = lt_outside.y
   const width = rb_outside.x - lt_outside.x
   const height = rb_outside.y - lt_outside.y
-  const sortPath = getPolyPointBySort(outside)
+  const sortPath = reorderPolygonClockwise(outside)
   const svgPathWithBorder = sortPath.map(p => ({
     x: p.x - left,
     y: p.y - top,
-  })) as [Point, Point, Point, Point]
+  }))
+
   const posStyle = {
     left: lt.x,
     top: lt.y,
