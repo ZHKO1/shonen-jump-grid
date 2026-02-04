@@ -2,6 +2,7 @@ import type { CanvasGridConfig, CanvasPolyGridConfig, CanvasRectGridConfig, Poin
 import { describe, expect, it } from 'vitest'
 import gridJsonData from '../../../public/demo/onepiece/grid.json'
 import { getGridsBySplit } from '../utils'
+import splitCase1Data from './splitCase1.json'
 
 const DEFAULT_OPTIONS = { spaceWidth: 12, recursion: false }
 
@@ -42,6 +43,80 @@ function expectGridsMatch(actual: [CanvasGridConfig, CanvasGridConfig], expected
   const isReverseOrder = gridsMatch(actual0, expected1) && gridsMatch(actual1, expected0)
 
   expect(isNormalOrder || isReverseOrder).toBe(true)
+}
+
+interface SplitTestCase {
+  pageId: string
+  gridId: string | number
+  grid: CanvasGridConfig
+  line: [Point, Point]
+  spaceWidth: number
+  expectedResult: [CanvasGridConfig, CanvasGridConfig]
+}
+
+function collectSplitCases(
+  grid: CanvasGridConfig,
+  pageId: string,
+  cases: SplitTestCase[],
+  allowUndefinedSpaceWidth?: boolean,
+): void {
+  const hasSpaceWidth = allowUndefinedSpaceWidth
+    ? grid.splitSpaceWidth !== undefined
+    : grid.splitSpaceWidth
+
+  if (grid.splitLine && grid.splitResult && hasSpaceWidth) {
+    const cleanGrid = { ...grid }
+    delete cleanGrid.splitLine
+    delete cleanGrid.splitResult
+    delete cleanGrid.splitSpaceWidth
+
+    cases.push({
+      pageId,
+      gridId: grid.id,
+      grid: cleanGrid,
+      line: grid.splitLine,
+      spaceWidth: grid.splitSpaceWidth!,
+      expectedResult: grid.splitResult as [CanvasGridConfig, CanvasGridConfig],
+    })
+
+    grid.splitResult.forEach((subGrid) => {
+      collectSplitCases(subGrid, pageId, cases, allowUndefinedSpaceWidth)
+    })
+  }
+}
+
+function runSnapshotTests(
+  describeName: string,
+  dataSource: { pages: any[] },
+  testNameSuffix: string,
+  allowUndefinedSpaceWidth?: boolean,
+): void {
+  describe(describeName, () => {
+    const cases: SplitTestCase[] = []
+    dataSource.pages.forEach((page) => {
+      page.grids.forEach((grid: CanvasGridConfig) => {
+        collectSplitCases(grid, page.id, cases, allowUndefinedSpaceWidth)
+      })
+    })
+
+    cases.forEach((testCase, index) => {
+      it(`[${index + 1}/${cases.length}] ${testCase.pageId}:${testCase.gridId} - ${testCase.grid.type} ${testNameSuffix}`, () => {
+        const result = getGridsBySplit(testCase.grid, testCase.line, {
+          spaceWidth: testCase.spaceWidth,
+          recursion: false,
+        })
+
+        expect(result).not.toBeNull()
+        expect(result!.grids).toHaveLength(2)
+
+        expectGridsMatch(result!.grids, testCase.expectedResult)
+      })
+    })
+
+    it(`总计测试了 ${cases.length} 个分割场景`, () => {
+      expect(cases.length).toBeGreaterThan(0)
+    })
+  })
 }
 
 describe('getGridsBySplit', () => {
@@ -179,7 +254,6 @@ describe('getGridsBySplit', () => {
     }
 
     it('分割线不穿过格子（在格子外部） -> null', () => {
-      // 分割线完全在格子上方
       const line: [Point, Point] = [{ x: 0, y: -50 }, { x: 100, y: -50 }]
       const result = getGridsBySplit(baseRect, line, DEFAULT_OPTIONS)
 
@@ -187,7 +261,6 @@ describe('getGridsBySplit', () => {
     })
 
     it('分割线只触及边界（不穿过） -> null', () => {
-      // 分割线在格子顶边
       const line: [Point, Point] = [{ x: 0, y: 0 }, { x: 100, y: 0 }]
       const result = getGridsBySplit(baseRect, line, DEFAULT_OPTIONS)
 
@@ -195,7 +268,6 @@ describe('getGridsBySplit', () => {
     })
 
     it('分割线斜向但不完全穿过 -> null', () => {
-      // 斜线只穿过一边
       const line: [Point, Point] = [{ x: -50, y: 50 }, { x: 50, y: -50 }]
       const result = getGridsBySplit(baseRect, line, DEFAULT_OPTIONS)
 
@@ -203,70 +275,8 @@ describe('getGridsBySplit', () => {
     })
   })
 
-  describe('快照测试：真实数据场景 (grid.json)', () => {
-    interface SplitTestCase {
-      pageId: string
-      gridId: string | number
-      grid: CanvasGridConfig
-      line: [Point, Point]
-      spaceWidth: number
-      expectedResult: [CanvasGridConfig, CanvasGridConfig]
-    }
-
-    function collectSplitCases(
-      grid: CanvasGridConfig,
-      pageId: string,
-      cases: SplitTestCase[],
-    ): void {
-      if (grid.splitLine && grid.splitResult && grid.splitSpaceWidth) {
-        // 创建不含 splitLine/splitResult 的纯净 grid 用于测试
-        const cleanGrid = { ...grid }
-        delete cleanGrid.splitLine
-        delete cleanGrid.splitResult
-        delete cleanGrid.splitSpaceWidth
-
-        cases.push({
-          pageId,
-          gridId: grid.id,
-          grid: cleanGrid,
-          line: grid.splitLine,
-          spaceWidth: grid.splitSpaceWidth,
-          expectedResult: grid.splitResult,
-        })
-
-        // 递归检查子 grid
-        grid.splitResult.forEach((subGrid) => {
-          collectSplitCases(subGrid, pageId, cases)
-        })
-      }
-    }
-
-    const allCases: SplitTestCase[] = []
-    gridJsonData.pages.forEach((page: any) => {
-      page.grids.forEach((grid: CanvasGridConfig) => {
-        collectSplitCases(grid, page.id, allCases)
-      })
-    })
-
-    // 为每个分割场景生成测试
-    allCases.forEach((testCase, index) => {
-      it(`[${index + 1}/${allCases.length}] ${testCase.pageId}:${testCase.gridId} - ${testCase.grid.type} 分割`, () => {
-        const result = getGridsBySplit(testCase.grid, testCase.line, {
-          spaceWidth: testCase.spaceWidth,
-          recursion: false,
-        })
-
-        expect(result).not.toBeNull()
-        expect(result!.grids).toHaveLength(2)
-
-        expectGridsMatch(result!.grids, testCase.expectedResult)
-      })
-    })
-
-    it(`总计测试了 ${allCases.length} 个分割场景`, () => {
-      expect(allCases.length).toBeGreaterThan(0)
-    })
-  })
+  runSnapshotTests('快照测试：真实数据场景 (grid.json)', gridJsonData as any, '分割')
+  runSnapshotTests('快照测试：复杂嵌套分割场景 (splitCase1.json)', splitCase1Data as any, '复杂分割', true)
 
   describe('recursion 选项测试', () => {
     it('recursion=true 时应递归处理已有分割', () => {
