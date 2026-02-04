@@ -71,14 +71,12 @@ grid-demo/
 
 ## 验证代码质量
 
-修改代码后，务必按以下顺序执行验证命令：
+**修改代码后，务必执行 `pnpm allcheck` 验证代码！**
+
+这是强制要求，不要跳过。
 
 ```bash
-pnpm allcheck         # 一次性执行 lint:fix + typecheck + test:run (推荐)
-# 或者单独执行
-pnpm lint:fix         # 1. ESLint 自动修复
-pnpm typecheck        # 2. TypeScript 类型检查
-pnpm test:run         # 3. 运行测试
+pnpm allcheck         # 一次性执行 lint:fix + typecheck + test:run (每次修改后必须执行)
 ```
 
 **Lint 会自动修复**: import 顺序、空格、分号、括号、代码风格等。

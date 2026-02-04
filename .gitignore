@@ -17,4 +17,5 @@ dist/
 
 .agents/
 .cursor/
+.opencode/
 .github/skills

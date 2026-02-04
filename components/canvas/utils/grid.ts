@@ -2,7 +2,7 @@ import type { CanvasComicConfig, CanvasGridConfig, CanvasPolyGridConfig, CanvasR
 import { deepCopy } from '@/lib/utils'
 import { fixedEqual } from '@/lib/utils/is'
 import { isGridFlushable } from './align'
-import { splitPolygonByLine, sutherlandHodgmanClip } from './clip'
+import { splitPolygonByLine } from './clip'
 import { getAutoFlushedPolyGridConfig, getPolyGridStyle, getPolyType } from './poly'
 
 /**
@@ -117,46 +117,16 @@ export function getGridsBySplitPoly(
   { spaceWidth, recursion = true }: SplitOptions,
 ): { grids: [CanvasGridConfig, CanvasGridConfig], line: [Point, Point] } | null {
   const polygon = grid.path
-  let splitResult: [Point[], Point[]] | null
 
-  if (spaceWidth && spaceWidth > 0) {
-    const dx = line[1].x - line[0].x
-    const dy = line[1].y - line[0].y
-    const length = Math.sqrt(dx * dx + dy * dy)
-    if (length === 0)
-      return null
+  const result = splitPolygonByLine(polygon, line, spaceWidth)
+  if (!result || !result.polygons)
+    return null
 
-    const unitX = -dy / length
-    const unitY = dx / length
-    const offset = Math.floor(spaceWidth / 2)
-
-    const line1: [Point, Point] = [
-      { x: line[0].x + unitX * offset, y: line[0].y + unitY * offset },
-      { x: line[1].x + unitX * offset, y: line[1].y + unitY * offset },
-    ]
-    const line2: [Point, Point] = [
-      { x: line[0].x - unitX * offset, y: line[0].y - unitY * offset },
-      { x: line[1].x - unitX * offset, y: line[1].y - unitY * offset },
-    ]
-
-    const poly1 = sutherlandHodgmanClip(polygon, line2[1], line2[0])
-    const poly2 = sutherlandHodgmanClip(polygon, line1[0], line1[1])
-    if (poly1.length < 3 || poly2.length < 3)
-      return null
-
-    splitResult = [poly1, poly2]
-  }
-  else {
-    splitResult = splitPolygonByLine(polygon, line)
-    if (!splitResult)
-      return null
-
-    const [poly1, poly2] = splitResult
-    if (poly1.length < 3 || poly2.length < 3)
-      return null
+  const [poly1, poly2] = result.polygons
+  if (result.intersections) {
+    line = result.intersections
   }
 
-  const [poly1, poly2] = splitResult
   return {
     grids: updateSubGridsBySplit(grid, [
       makePolyToRect({ type: 'poly', path: poly1, id: `${grid.id}_0` }),

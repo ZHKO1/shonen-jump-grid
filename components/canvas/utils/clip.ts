@@ -119,27 +119,88 @@ export function sutherlandHodgmanClip(
 }
 
 /**
+ * 计算线段与多边形的两个交点
+ * @param polygon 多边形顶点数组
+ * @param line 分割线 [起点, 终点]
+ * @returns [交点1, 交点2] 或 null（如果不相交）
+ */
+export function getLinePolygonIntersections(
+  polygon: Point[],
+  line: [Point, Point],
+): [Point, Point] | null {
+  const intersections: Point[] = []
+
+  for (let i = 0; i < polygon.length; i++) {
+    const p1 = polygon[i]
+    const p2 = polygon[(i + 1) % polygon.length]
+
+    const d1 = crossProduct(line[0], line[1], p1)
+    const d2 = crossProduct(line[0], line[1], p2)
+
+    if (d1 * d2 < 0) {
+      const intersection = computeIntersection(p1, p2, line[0], line[1])
+      intersections.push(intersection)
+    }
+    else if (Math.abs(d1) < 1e-10) {
+      intersections.push(p1)
+    }
+  }
+
+  if (intersections.length >= 2) {
+    return [intersections[0], intersections[1]]
+  }
+  return null
+}
+
+/**
  * 用一条直线将多边形分割成两个多边形
  * @param polygon 输入多边形的顶点数组
  * @param line 分割线 [起点, 终点]
- * @returns [左侧多边形, 右侧多边形] 或 null（如果直线不穿过多边形）
+ * @param spaceWidth 分割空间宽度（可选）
+ * @returns { intersections: [Point, Point] | null, polygons: [Point[], Point[]] | null }
  */
 export function splitPolygonByLine(
   polygon: Point[],
   line: [Point, Point],
-): [Point[], Point[]] | null {
+  spaceWidth?: number,
+): { intersections: [Point, Point] | null, polygons: [Point[], Point[]] | null } {
   const [lineStart, lineEnd] = line
 
-  // 裁剪得到左侧多边形
-  const leftPolygon = sutherlandHodgmanClip(polygon, lineStart, lineEnd)
+  let leftPolygon: Point[]
+  let rightPolygon: Point[]
 
-  // 反转裁剪线方向，裁剪得到右侧多边形
-  const rightPolygon = sutherlandHodgmanClip(polygon, lineEnd, lineStart)
+  if (spaceWidth && spaceWidth > 0) {
+    const dx = lineEnd.x - lineStart.x
+    const dy = lineEnd.y - lineStart.y
+    const length = Math.sqrt(dx * dx + dy * dy)
+    if (length === 0)
+      return { intersections: null, polygons: null }
 
-  // 如果任一侧为空，说明直线没有真正分割多边形
-  if (leftPolygon.length < 3 || rightPolygon.length < 3) {
-    return null
+    const unitX = -dy / length
+    const unitY = dx / length
+    const offset = Math.floor(spaceWidth / 2)
+
+    const line1: [Point, Point] = [
+      { x: lineStart.x + unitX * offset, y: lineStart.y + unitY * offset },
+      { x: lineEnd.x + unitX * offset, y: lineEnd.y + unitY * offset },
+    ]
+    const line2: [Point, Point] = [
+      { x: lineStart.x - unitX * offset, y: lineStart.y - unitY * offset },
+      { x: lineEnd.x - unitX * offset, y: lineEnd.y - unitY * offset },
+    ]
+
+    leftPolygon = sutherlandHodgmanClip(polygon, line2[1], line2[0])
+    rightPolygon = sutherlandHodgmanClip(polygon, line1[0], line1[1])
+  }
+  else {
+    leftPolygon = sutherlandHodgmanClip(polygon, lineStart, lineEnd)
+    rightPolygon = sutherlandHodgmanClip(polygon, lineEnd, lineStart)
   }
 
-  return [leftPolygon, rightPolygon]
+  if (leftPolygon.length < 3 || rightPolygon.length < 3) {
+    return { intersections: null, polygons: null }
+  }
+
+  const intersections = getLinePolygonIntersections(polygon, line)
+  return { intersections, polygons: [leftPolygon, rightPolygon] }
 }
