@@ -51,10 +51,13 @@ function Canvas({ scale }: { scale: number }) {
     //       logo: {
     //         url: '/logo.png',
     //       },
+    //       grids: [NEW_PAGE_GRID_CONFIG],
     //       grids: LOGO_PAGE_GRIDS_CONFIG,
     //     }],
     //   },
     // })
+    // setCurrentPageId('page0')
+    // setCurrentLayerType('logo')
 
     fetch('./demo/onepiece/grid.json').then(res => res.json()).then((comicConfig) => {
       addHistoryStep({

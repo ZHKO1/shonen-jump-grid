@@ -1,6 +1,7 @@
 import type { CanvasPolyGridConfig, GridStyle, Point, PolyGridPoint, PolyType, Pos } from './types'
 import offsetPolygon from 'offset-polygon'
 import { deepCopy } from '@/lib/utils'
+import { fixedEqual } from '@/lib/utils/is'
 import { BORDER_WIDTH, CANVAS_WIDTH } from '../constant'
 import { isGridLeftAligned, isGridRightAligned } from './align'
 import { reorderPolygonClockwise } from './clip'
@@ -72,7 +73,7 @@ export function getPolyType(path: Point[]): PolyType {
     const lt = getPolyContainerPoint(path, 'lt')
     const rb = getPolyContainerPoint(path, 'rb')
     const isAdjust = (attr: 'x' | 'y') => {
-      return (path.filter(point => point[attr] === lt[attr]).length > 1) && (path.filter(point => point[attr] === rb[attr]).length > 1)
+      return (path.filter(point => fixedEqual(point[attr], lt[attr])).length > 1) && (path.filter(point => fixedEqual(point[attr], rb[attr])).length > 1)
     }
     if (isAdjust('x') && isAdjust('y')) {
       return 'rect'
@@ -119,7 +120,15 @@ export function getPolyGridPoint(path: PolyGridPoint['path'], borderWidth: numbe
 export function getAutoFlushedPolyGridConfig(grid: CanvasPolyGridConfig) {
   const config = deepCopy(grid)
   const [p0, p1, p2, p3] = config.path
-  if (isGridLeftAligned(grid)) {
+  if (isGridLeftAligned(grid) && isGridRightAligned(grid)) {
+    config.path = [
+      { ...p0, x: -BORDER_WIDTH },
+      { ...p1, x: CANVAS_WIDTH + BORDER_WIDTH },
+      { ...p2, x: CANVAS_WIDTH + BORDER_WIDTH },
+      { ...p3, x: -BORDER_WIDTH },
+    ]
+  }
+  else if (isGridLeftAligned(grid)) {
     config.path = [
       { ...p0, x: -BORDER_WIDTH },
       p1,
@@ -127,7 +136,7 @@ export function getAutoFlushedPolyGridConfig(grid: CanvasPolyGridConfig) {
       { ...p3, x: -BORDER_WIDTH },
     ]
   }
-  if (isGridRightAligned(grid)) {
+  else if (isGridRightAligned(grid)) {
     config.path = [
       p0,
       { ...p1, x: CANVAS_WIDTH + BORDER_WIDTH },

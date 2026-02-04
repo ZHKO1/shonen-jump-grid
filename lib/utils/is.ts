@@ -18,3 +18,7 @@ export const emptyObject = {}
 
 export const isBrowser = typeof window !== 'undefined'
 export const isNavigator = typeof navigator !== 'undefined'
+
+export function fixedEqual(a: number, b: number, decimals: number = 5): boolean {
+  return a.toFixed(decimals) === b.toFixed(decimals)
+}

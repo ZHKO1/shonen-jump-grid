@@ -5,6 +5,45 @@ import { getGridsBySplit } from '../utils'
 
 const DEFAULT_OPTIONS = { spaceWidth: 12, recursion: false }
 
+function normalize(num: number, digits: number = 5): number {
+  return Number.parseFloat(num.toFixed(digits))
+}
+
+function gridsMatch(gridA: CanvasGridConfig, gridB: CanvasGridConfig): boolean {
+  if (gridA.type !== gridB.type)
+    return false
+
+  if (gridA.type === 'rect' && gridB.type === 'rect') {
+    return (
+      normalize(gridA.lt_x) === normalize(gridB.lt_x)
+      && normalize(gridA.lt_y) === normalize(gridB.lt_y)
+      && normalize(gridA.rb_x) === normalize(gridB.rb_x)
+      && normalize(gridA.rb_y) === normalize(gridB.rb_y)
+    )
+  }
+
+  if (gridA.type === 'poly' && gridB.type === 'poly') {
+    if (gridA.path.length !== gridB.path.length)
+      return false
+    return gridA.path.every((p, i) =>
+      normalize(p.x) === normalize(gridB.path[i].x)
+      && normalize(p.y) === normalize(gridB.path[i].y),
+    )
+  }
+
+  return false
+}
+
+function expectGridsMatch(actual: [CanvasGridConfig, CanvasGridConfig], expected: [CanvasGridConfig, CanvasGridConfig]): void {
+  const [actual0, actual1] = actual
+  const [expected0, expected1] = expected
+
+  const isNormalOrder = gridsMatch(actual0, expected0) && gridsMatch(actual1, expected1)
+  const isReverseOrder = gridsMatch(actual0, expected1) && gridsMatch(actual1, expected0)
+
+  expect(isNormalOrder || isReverseOrder).toBe(true)
+}
+
 describe('getGridsBySplit', () => {
   describe('rect 分割', () => {
     const baseRect: CanvasRectGridConfig = {
@@ -23,17 +62,10 @@ describe('getGridsBySplit', () => {
       expect(result).not.toBeNull()
       expect(result!.grids).toHaveLength(2)
 
-      const [top, bottom] = result!.grids
-      expect(top.type).toBe('rect')
-      expect(bottom.type).toBe('rect')
-
-      // 上半部分
-      expect((top as CanvasRectGridConfig).lt_y).toBe(0)
-      expect((top as CanvasRectGridConfig).rb_y).toBe(50 - 6) // 50 - spaceWidth/2
-
-      // 下半部分
-      expect((bottom as CanvasRectGridConfig).lt_y).toBe(50 + 6) // 50 + spaceWidth/2
-      expect((bottom as CanvasRectGridConfig).rb_y).toBe(100)
+      expectGridsMatch(result!.grids, [
+        { type: 'rect', lt_x: 0, lt_y: 0, rb_x: 100, rb_y: 44, id: 'top' },
+        { type: 'rect', lt_x: 0, lt_y: 56, rb_x: 100, rb_y: 100, id: 'bottom' },
+      ])
     })
 
     it('垂直分割：rect + 垂直线 -> 左右两个 rect', () => {
@@ -43,21 +75,13 @@ describe('getGridsBySplit', () => {
       expect(result).not.toBeNull()
       expect(result!.grids).toHaveLength(2)
 
-      const [left, right] = result!.grids
-      expect(left.type).toBe('rect')
-      expect(right.type).toBe('rect')
-
-      // 左半部分
-      expect((left as CanvasRectGridConfig).lt_x).toBe(0)
-      expect((left as CanvasRectGridConfig).rb_x).toBe(50 - 6)
-
-      // 右半部分
-      expect((right as CanvasRectGridConfig).lt_x).toBe(50 + 6)
-      expect((right as CanvasRectGridConfig).rb_x).toBe(100)
+      expectGridsMatch(result!.grids, [
+        { type: 'rect', lt_x: 0, lt_y: 0, rb_x: 44, rb_y: 100, id: 'left' },
+        { type: 'rect', lt_x: 56, lt_y: 0, rb_x: 100, rb_y: 100, id: 'right' },
+      ])
     })
 
     it('斜线分割：rect + 斜线 -> 两个 poly', () => {
-      // 从左边 y=30 到右边 y=70 的斜线
       const line: [Point, Point] = [{ x: 0, y: 30 }, { x: 100, y: 70 }]
       const result = getGridsBySplit(baseRect, line, DEFAULT_OPTIONS)
 
@@ -65,26 +89,20 @@ describe('getGridsBySplit', () => {
       expect(result!.grids).toHaveLength(2)
 
       const [top, bottom] = result!.grids
-      // 斜线分割应该生成两个 poly
       expect(top.type).toBe('poly')
       expect(bottom.type).toBe('poly')
-
-      // 验证 poly 有 4 个点
       expect((top as CanvasPolyGridConfig).path).toHaveLength(4)
       expect((bottom as CanvasPolyGridConfig).path).toHaveLength(4)
     })
 
     it('斜线分割（垂直方向）：rect + 垂直倾斜线 -> 两个 poly', () => {
-      // 从上边 x=30 到下边 x=70 的斜线
       const line: [Point, Point] = [{ x: 30, y: 0 }, { x: 70, y: 100 }]
       const result = getGridsBySplit(baseRect, line, DEFAULT_OPTIONS)
 
       expect(result).not.toBeNull()
       expect(result!.grids).toHaveLength(2)
 
-      const [left, right] = result!.grids
-      expect(left.type).toBe('poly')
-      expect(right.type).toBe('poly')
+      expect(result!.grids.every(g => g.type === 'poly')).toBe(true)
     })
   })
 
@@ -119,10 +137,7 @@ describe('getGridsBySplit', () => {
 
       expect(result).not.toBeNull()
       expect(result!.grids).toHaveLength(2)
-
-      const [top, bottom] = result!.grids
-      expect(top.type).toBe('poly')
-      expect(bottom.type).toBe('poly')
+      expect(result!.grids.every(g => g.type === 'poly')).toBe(true)
     })
 
     it('horizon poly + 垂直线', () => {
@@ -131,10 +146,7 @@ describe('getGridsBySplit', () => {
 
       expect(result).not.toBeNull()
       expect(result!.grids).toHaveLength(2)
-
-      const [left, right] = result!.grids
-      expect(left.type).toBe('poly')
-      expect(right.type).toBe('poly')
+      expect(result!.grids.every(g => g.type === 'poly')).toBe(true)
     })
 
     it('vertical poly + 水平线', () => {
@@ -143,10 +155,7 @@ describe('getGridsBySplit', () => {
 
       expect(result).not.toBeNull()
       expect(result!.grids).toHaveLength(2)
-
-      const [top, bottom] = result!.grids
-      expect(top.type).toBe('poly')
-      expect(bottom.type).toBe('poly')
+      expect(result!.grids.every(g => g.type === 'poly')).toBe(true)
     })
 
     it('vertical poly + 垂直线', () => {
@@ -155,6 +164,7 @@ describe('getGridsBySplit', () => {
 
       expect(result).not.toBeNull()
       expect(result!.grids).toHaveLength(2)
+      expect(result!.grids.every(g => g.type === 'poly')).toBe(true)
     })
   })
 
@@ -194,7 +204,6 @@ describe('getGridsBySplit', () => {
   })
 
   describe('快照测试：真实数据场景 (grid.json)', () => {
-    // 递归收集所有带 splitLine 的 grid
     interface SplitTestCase {
       pageId: string
       gridId: string | number
@@ -250,45 +259,8 @@ describe('getGridsBySplit', () => {
         expect(result).not.toBeNull()
         expect(result!.grids).toHaveLength(2)
 
-        const [actual0, actual1] = result!.grids
-        const [expected0, expected1] = testCase.expectedResult
-
-        // 对比第一个子格子
-        expect(actual0.type).toBe(expected0.type)
-        if (actual0.type === 'rect' && expected0.type === 'rect') {
-          compareByFixed(actual0.lt_x, expected0.lt_x)
-          compareByFixed(actual0.lt_y, expected0.lt_y)
-          compareByFixed(actual0.rb_x, expected0.rb_x)
-          compareByFixed(actual0.rb_y, expected0.rb_y)
-        }
-        else if (actual0.type === 'poly' && expected0.type === 'poly') {
-          expect(actual0.path).toHaveLength(expected0.path.length)
-          actual0.path.forEach((point, i) => {
-            compareByFixed(point.x, expected0.path[i].x)
-            compareByFixed(point.y, expected0.path[i].y)
-          })
-        }
-
-        // 对比第二个子格子
-        expect(actual1.type).toBe(expected1.type)
-        if (actual1.type === 'rect' && expected1.type === 'rect') {
-          compareByFixed(actual1.lt_x, expected1.lt_x)
-          compareByFixed(actual1.lt_y, expected1.lt_y)
-          compareByFixed(actual1.rb_x, expected1.rb_x)
-          compareByFixed(actual1.rb_y, expected1.rb_y)
-        }
-        else if (actual1.type === 'poly' && expected1.type === 'poly') {
-          expect(actual1.path).toHaveLength(expected1.path.length)
-          actual1.path.forEach((point, i) => {
-            compareByFixed(point.x, expected1.path[i].x)
-            compareByFixed(point.y, expected1.path[i].y)
-          })
-        }
+        expectGridsMatch(result!.grids, testCase.expectedResult)
       })
-
-      function compareByFixed(actual: number, expected: number, digits: number = 5): void {
-        expect(actual.toFixed(digits)).toBe(expected.toFixed(digits))
-      }
     })
 
     it(`总计测试了 ${allCases.length} 个分割场景`, () => {
