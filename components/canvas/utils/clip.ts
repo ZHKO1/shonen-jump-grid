@@ -189,8 +189,27 @@ export function splitPolygonByLine(
       { x: lineEnd.x - unitX * offset, y: lineEnd.y - unitY * offset },
     ]
 
-    leftPolygon = sutherlandHodgmanClip(polygon, line2[1], line2[0])
-    rightPolygon = sutherlandHodgmanClip(polygon, line1[0], line1[1])
+    const poly1 = sutherlandHodgmanClip(polygon, line2[1], line2[0])
+    const poly2 = sutherlandHodgmanClip(polygon, line1[0], line1[1])
+
+    const centroid1 = {
+      x: poly1.reduce((sum, p) => sum + p.x, 0) / poly1.length,
+      y: poly1.reduce((sum, p) => sum + p.y, 0) / poly1.length,
+    }
+    const centroid2 = {
+      x: poly2.reduce((sum, p) => sum + p.x, 0) / poly2.length,
+      y: poly2.reduce((sum, p) => sum + p.y, 0) / poly2.length,
+    }
+
+    const lineMidY = (lineStart.y + lineEnd.y) / 2
+    if (centroid1.y > lineMidY && centroid2.y < lineMidY) {
+      leftPolygon = poly2
+      rightPolygon = poly1
+    }
+    else {
+      leftPolygon = poly1
+      rightPolygon = poly2
+    }
   }
   else {
     leftPolygon = sutherlandHodgmanClip(polygon, lineStart, lineEnd)
