@@ -35,6 +35,27 @@ function gridsMatch(gridA: CanvasGridConfig, gridB: CanvasGridConfig): boolean {
   return false
 }
 
+function linesMatch(lineA: [Point, Point], lineB: [Point, Point]): boolean {
+  const [l1_start, l1_end] = lineA
+  const [l2_start, l2_end] = lineB
+
+  const normalOrder = (
+    normalize(l1_start.x) === normalize(l2_start.x)
+    && normalize(l1_start.y) === normalize(l2_start.y)
+    && normalize(l1_end.x) === normalize(l2_end.x)
+    && normalize(l1_end.y) === normalize(l2_end.y)
+  )
+
+  const reverseOrder = (
+    normalize(l1_start.x) === normalize(l2_end.x)
+    && normalize(l1_start.y) === normalize(l2_end.y)
+    && normalize(l1_end.x) === normalize(l2_start.x)
+    && normalize(l1_end.y) === normalize(l2_start.y)
+  )
+
+  return normalOrder || reverseOrder
+}
+
 function expectGridsMatch(actual: [CanvasGridConfig, CanvasGridConfig], expected: [CanvasGridConfig, CanvasGridConfig]): void {
   const [actual0, actual1] = actual
   const [expected0, expected1] = expected
@@ -43,6 +64,10 @@ function expectGridsMatch(actual: [CanvasGridConfig, CanvasGridConfig], expected
   const isReverseOrder = gridsMatch(actual0, expected1) && gridsMatch(actual1, expected0)
 
   expect(isNormalOrder || isReverseOrder).toBe(true)
+}
+
+function expectLineMatch(actual: [Point, Point], expected: [Point, Point]): void {
+  expect(linesMatch(actual, expected)).toBe(true)
 }
 
 interface SplitTestCase {
@@ -110,6 +135,7 @@ function runSnapshotTests(
         expect(result!.grids).toHaveLength(2)
 
         expectGridsMatch(result!.grids, testCase.expectedResult)
+        expectLineMatch(result!.line, testCase.line)
       })
     })
 
