@@ -9,9 +9,8 @@ import Preview from './Preview'
 export default function ComicContainer() {
   const showComic = useComicStatusStore(state => state.showComic)
   const setShowComic = useComicStatusStore(state => state.setShowComic)
-  const currentStep = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex])
-  const canvasComicConfig = currentStep?.comicConfig
-  const comicConfig = getComicConfigFromCanvas(canvasComicConfig)
+  const canvasComicConfig = useComicStatusStore(state => showComic ? state.historySteps[state.currentHistoryStepIndex]?.comicConfig : null)
+  const comicConfig = showComic && canvasComicConfig ? getComicConfigFromCanvas(canvasComicConfig) : null
 
   if (defaultDocument) {
     if (showComic) {

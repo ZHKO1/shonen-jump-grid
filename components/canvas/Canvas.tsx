@@ -12,8 +12,11 @@ function Canvas({ scale }: { scale: number }) {
   const containerRef = useRef(null)
   const ContainerContextValue = useMemo(() => ({ container: containerRef, scale }), [containerRef, scale])
   const pageId = useComicStatusStore(state => state.currentPageStatus.id)
-  const { getCurrentLayerType } = useComicStatusStore()
-  const layerType = getCurrentLayerType()
+  const layerType = useComicStatusStore((state) => {
+    return state.currentPageStatus.type === 'logo-page'
+      ? state.currentPageStatus.layerType
+      : 'grids'
+  })
   const setCurrentPageId = useComicStatusStore(state => state.setCurrentPageId)
   const resetCurrentGridId = useComicStatusStore(state => state.resetCurrentGridId)
   const addHistoryStep = useComicStatusStore(state => state.addHistoryStep)

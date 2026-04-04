@@ -14,8 +14,7 @@ export default function SplitContainer({ grid }: SplitContainerProps) {
   const { adjustGrid } = useAdjustComic()
   const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId)
   const resetCurrentGridId = useComicStatusStore(state => state.resetCurrentGridId)
-  const { getCurrentGridId } = useComicStatusStore()
-  const isFocused = getCurrentGridId() === grid.id
+  const isFocused = useComicStatusStore(state => state.currentPageStatus.gridId === grid.id)
 
   const splitResult = grid.splitResult!
   const splitLine = grid.splitLine!

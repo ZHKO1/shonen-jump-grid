@@ -5,10 +5,8 @@ import PageAttr from './PageAttr'
 
 export default function AttrCard() {
   const showAttrCard = useComicStatusStore(state => state.showAttrCard)
-  const currentPageId = useComicStatusStore(state => state.currentPageStatus.id)
-
-  const currentStep = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex])
-  const comicConfig = currentStep?.comicConfig
+  const currentPageId = useComicStatusStore(state => showAttrCard ? state.currentPageStatus.id : '')
+  const comicConfig = useComicStatusStore(state => showAttrCard ? state.historySteps[state.currentHistoryStepIndex]?.comicConfig : null)
 
   const page = comicConfig && getPageFromComicConfig(comicConfig, currentPageId) || void 0
 

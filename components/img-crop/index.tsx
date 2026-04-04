@@ -9,13 +9,17 @@ import GridImgCrop from './GridImgCrop'
 import LogoImgCrop from './LogoImgCrop'
 
 export default function ImgCropContainer() {
-  const pageId = useComicStatusStore(state => state.currentPageStatus.id)
-  const focusId = useComicStatusStore(state => state.currentPageStatus.gridId)
   const showImgCrop = useComicStatusStore(state => state.showImgCrop)
+  const pageId = useComicStatusStore(state => showImgCrop ? state.currentPageStatus.id : '')
+  const focusId = useComicStatusStore(state => showImgCrop ? state.currentPageStatus.gridId : '')
   const setShowImgCrop = useComicStatusStore(state => state.setShowImgCrop)
-  const currentStep = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex])
-  const layerType = useComicStatusStore(state => (state.currentPageStatus as LogoPageStatus).layerType || 'grids')
-  const comicConfig = currentStep?.comicConfig
+  const layerType = useComicStatusStore((state) => {
+    if (!showImgCrop) {
+      return 'grids'
+    }
+    return (state.currentPageStatus as LogoPageStatus).layerType || 'grids'
+  })
+  const comicConfig = useComicStatusStore(state => showImgCrop ? state.historySteps[state.currentHistoryStepIndex]?.comicConfig : null)
   const page = comicConfig && getPageFromComicConfig(comicConfig, pageId)
   const logo = page?.logo
   const grid = comicConfig && getGridFromComicConfig(comicConfig, focusId)

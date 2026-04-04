@@ -19,8 +19,6 @@ export default function HeaderBar() {
   const setShowComic = useComicStatusStore(state => state.setShowComic)
   const addHistoryStep = useComicStatusStore(state => state.addHistoryStep)
   const cleanAllHistoryStep = useComicStatusStore(state => state.cleanAllHistoryStep)
-  const currentStep = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex])
-  const comicConfig = currentStep?.comicConfig
 
   const onImport = async () => {
     reset()
@@ -45,6 +43,11 @@ export default function HeaderBar() {
   }
 
   const onExport = async () => {
+    const { currentHistoryStepIndex, historySteps } = useComicStatusStore.getState()
+    const comicConfig = historySteps[currentHistoryStepIndex]?.comicConfig
+    if (!comicConfig) {
+      return
+    }
     const result = await getShareCanvasConfig(comicConfig)
     downloadText('jump.save', JSON.stringify(result))
   }

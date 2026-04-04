@@ -9,12 +9,12 @@ const LOGO_PAGE_LAYERS: Record<'name', LayerType>[] = [
 ]
 
 export default function Layer({ onClick }: { onClick: (val: LayerType) => void }) {
-  const status = useComicStatusStore(state => state.currentPageStatus)
+  const currentLayerType = useComicStatusStore((state) => {
+    return state.currentPageStatus.type === 'logo-page'
+      ? state.currentPageStatus.layerType
+      : 'grids'
+  })
   const layers = LOGO_PAGE_LAYERS
-  let currentLayerType = 'grids'
-  if (status.type === 'logo-page') {
-    currentLayerType = status.layerType
-  }
 
   const handleClick = (val: LayerType) => {
     onClick(val)

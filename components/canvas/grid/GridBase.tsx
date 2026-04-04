@@ -3,6 +3,7 @@ import type { CanvasGridConfig } from '../types'
 import type { GridIconProps } from './GridIcon'
 import { useRef } from 'react'
 import { useEventListener } from '@/hooks'
+import { trackGridBaseRender } from '@/lib/debug/gridBaseRenderStats'
 import { cn } from '@/lib/utils'
 import useComicStatusStore from '@/store'
 import { Grid } from '.'
@@ -21,10 +22,11 @@ export interface GridBaseProps {
   borderOnly?: boolean
 };
 export default function GridBase({ grid, showAsFocused = false, borderOnly = false }: GridBaseProps) {
+  trackGridBaseRender(grid.id)
+
   const gridRef = useRef<HTMLDivElement>(null)
   const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId)
-  const { getCurrentGridId } = useComicStatusStore()
-  const isFocused = getCurrentGridId() === grid.id
+  const isFocused = useComicStatusStore(state => state.currentPageStatus.gridId === grid.id)
   const { grids: splitGrids, startPoint, endPoint } = useSplit(grid, isFocused, BORDER_WIDTH * 2)
   const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused
   const getSplitGridId = (index: number) => `${grid.id}_split_${index}`

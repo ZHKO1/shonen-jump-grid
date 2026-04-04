@@ -1,7 +1,7 @@
 'use client'
 import type { CanvasPageConfig } from '@/components/canvas/types'
 
-import type { LayerType, LogoPageStatus } from '@/store'
+import type { LayerType } from '@/store'
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -27,7 +27,11 @@ export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
   const setShowImgCrop = useComicStatusStore(state => state.setShowImgCrop)
   const setCurrentLayerType = useComicStatusStore(state => state.setCurrentLayerType)
   const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId)
-  const layerType = useComicStatusStore(state => (state.currentPageStatus as LogoPageStatus).layerType || 'grids')
+  const layerType = useComicStatusStore((state) => {
+    return state.currentPageStatus.type === 'logo-page'
+      ? state.currentPageStatus.layerType
+      : 'grids'
+  })
 
   const currentStep = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex])
   const comicConfig = currentStep?.comicConfig

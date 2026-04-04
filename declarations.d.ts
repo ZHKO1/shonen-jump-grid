@@ -9,3 +9,9 @@ declare module 'normalize-wheel' {
   ) => { spinX: number, spinY: number, pixelX: number, pixelY: number }
   export default normalizeWheel
 }
+
+interface Window {
+  __gridBaseRenderStats?: Record<string, number>
+  __getGridBaseRenderStats?: () => Array<{ gridId: string, renders: number }>
+  __resetGridBaseRenderStats?: () => void
+}
