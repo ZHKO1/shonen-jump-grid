@@ -1,9 +1,9 @@
 import type { MouseEventHandler } from 'react'
 import type { CanvasGridConfig } from '../types'
 import type { GridIconProps } from './GridIcon'
-import { useRef } from 'react'
+import { Profiler, useRef } from 'react'
 import { useEventListener } from '@/hooks'
-import { trackGridBaseRender } from '@/lib/debug/gridBaseRenderStats'
+import { trackGridBaseCommit, trackGridBaseRender } from '@/lib/debug/gridBaseRenderStats'
 import { cn } from '@/lib/utils'
 import useComicStatusStore from '@/store'
 import { Grid } from '.'
@@ -72,69 +72,71 @@ export default function GridBase({ grid, showAsFocused = false, borderOnly = fal
   useEventListener('click', handleClick, gridRef && gridRef.current)
 
   return (
-    <div>
-      {
-        splitGrids && startPoint && endPoint && (
-          <SplitLine
-            startPoint={startPoint}
-            endPoint={endPoint}
-            showed
-            splitSpaceWidth={grid.splitSpaceWidth}
-          />
-        )
-      }
-      {
-        !(splitGrids || borderOnly) && (
-          <GridContent
-            className={cn(isFocused && 'z-10')}
-            disableMotion={!isFocused}
-            gridId={grid.id}
-            style={gridStyle}
-            clipPath={clipPath}
-            ref={gridRef}
-            url={grid.content?.url}
-            imgStyle={imgStyle}
-          >
-            {animation && (
-              <GridIcon
-                className={focusIconPosStyle && 'absolute'}
-                iconType={animation}
-                style={focusIconPosStyle}
-              />
-            )}
-          </GridContent>
-        )
-      }
+    <Profiler id={String(grid.id)} onRender={() => trackGridBaseCommit(grid.id)}>
+      <div>
+        {
+          splitGrids && startPoint && endPoint && (
+            <SplitLine
+              startPoint={startPoint}
+              endPoint={endPoint}
+              showed
+              splitSpaceWidth={grid.splitSpaceWidth}
+            />
+          )
+        }
+        {
+          !(splitGrids || borderOnly) && (
+            <GridContent
+              className={cn(isFocused && 'z-10')}
+              disableMotion={!isFocused}
+              gridId={grid.id}
+              style={gridStyle}
+              clipPath={clipPath}
+              ref={gridRef}
+              url={grid.content?.url}
+              imgStyle={imgStyle}
+            >
+              {animation && (
+                <GridIcon
+                  className={focusIconPosStyle && 'absolute'}
+                  iconType={animation}
+                  style={focusIconPosStyle}
+                />
+              )}
+            </GridContent>
+          )
+        }
 
-      {splitGrids?.map((grid_, index) => (
-        <Grid
-          grid={{ ...grid_, id: getSplitGridId(index) }}
-          key={getSplitGridId(index)}
-          showAsFocused
-        />
-      ))}
-
-      {
-        !splitGrids && (
-          <GridBorder
-            className={cn(isFocused && 'z-10')}
-            disableMotion={!isFocused}
-            gridId={grid.id}
-            svgPoints={svgPoints}
-            containerStyle={posStyleWithBorder}
-            svgStyle={sizeStyleWithBorder}
-            focused={shouldShowBorder}
+        {splitGrids?.map((grid_, index) => (
+          <Grid
+            grid={{ ...grid_, id: getSplitGridId(index) }}
+            key={getSplitGridId(index)}
+            showAsFocused
           />
-        )
-      }
-      {
-        splitGrids && startPoint && endPoint && (
-          <>
-            <SplitPoint point={startPoint} />
-            <SplitPoint point={endPoint} />
-          </>
-        )
-      }
-    </div>
+        ))}
+
+        {
+          !splitGrids && (
+            <GridBorder
+              className={cn(isFocused && 'z-10')}
+              disableMotion={!isFocused}
+              gridId={grid.id}
+              svgPoints={svgPoints}
+              containerStyle={posStyleWithBorder}
+              svgStyle={sizeStyleWithBorder}
+              focused={shouldShowBorder}
+            />
+          )
+        }
+        {
+          splitGrids && startPoint && endPoint && (
+            <>
+              <SplitPoint point={startPoint} />
+              <SplitPoint point={endPoint} />
+            </>
+          )
+        }
+      </div>
+    </Profiler>
   )
 }

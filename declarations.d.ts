@@ -11,7 +11,7 @@ declare module 'normalize-wheel' {
 }
 
 interface Window {
-  __gridBaseRenderStats?: Record<string, number>
-  __getGridBaseRenderStats?: () => Array<{ gridId: string, renders: number }>
+  __gridBaseRenderStats?: Record<string, { renders: number, commits: number }>
+  __getGridBaseRenderStats?: () => Array<{ gridId: string, renders: number, commits: number }>
   __resetGridBaseRenderStats?: () => void
 }

@@ -1,6 +1,6 @@
 import type { MouseEventHandler } from 'react'
 import type { CanvasGridConfig, Point } from '../types'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useAdjustComic } from '@/hooks'
 import { deepCopy } from '@/lib/utils'
 import useComicStatusStore from '@/store'
@@ -27,16 +27,10 @@ export default function SplitContainer({ grid }: SplitContainerProps) {
       setEndPoint(splitLine[1])
     }
   }, [splitLine, isDrawing])
-  const [middlePoint, setMiddlePoint] = useState({
+  const middlePoint = useMemo(() => ({
     x: (startPoint.x + endPoint.x) / 2,
     y: (startPoint.y + endPoint.y) / 2,
-  })
-  useEffect(() => {
-    setMiddlePoint({
-      x: (startPoint.x + endPoint.x) / 2,
-      y: (startPoint.y + endPoint.y) / 2,
-    })
-  }, [startPoint, endPoint])
+  }), [startPoint.x, startPoint.y, endPoint.x, endPoint.y])
 
   const defaultSplitResult = { grids: splitResult, line: grid.splitLine }
   const { grids: splitGrids, line } = isDrawing && (startPoint && endPoint) && getGridsBySplit(grid, [startPoint, endPoint], { spaceWidth: grid.splitSpaceWidth!, recursion: true }) || defaultSplitResult
@@ -73,7 +67,6 @@ export default function SplitContainer({ grid }: SplitContainerProps) {
           offset = { x: point.x - middlePoint.x, y: point.y - middlePoint.y }
           setStartPoint({ x: startPoint.x + offset.x, y: startPoint.y + offset.y })
           setEndPoint({ x: endPoint.x + offset.x, y: endPoint.y + offset.y })
-          setMiddlePoint(point)
           break
         default:
           break

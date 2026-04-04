@@ -25,6 +25,7 @@ export interface LogoPageStatus extends PageShareStatus {
 
 interface CurrentStatusSlice {
   currentPageStatus: PageStatus | LogoPageStatus
+  initializeComic: (comicConfig: CanvasComicConfig, pageId: PageId, options?: { layerType?: LayerType }) => void
   setCurrentPageId: (pageId: PageId) => void
   getCurrentPageId: () => PageId
   setCurrentGridId: (id: GridId) => void
@@ -71,6 +72,18 @@ interface HistoryStepSlice {
 
 type ALLStore = CurrentStatusSlice & ShowComponentSlice & HistoryStepSlice
 
+function getInitialPageStatus(comicConfig: CanvasComicConfig, pageId: PageId, layerType?: LayerType): PageStatus | LogoPageStatus {
+  const page = getPageFromComicConfig(comicConfig, pageId) || void 0
+  const isLogoPage = page && getIsLogoPage(page) || false
+
+  return {
+    id: pageId,
+    gridId: '',
+    type: isLogoPage ? 'logo-page' : 'custom-page',
+    ...(isLogoPage ? { layerType: layerType || 'grids' } : {}),
+  } as PageStatus | LogoPageStatus
+}
+
 const createCurrentStatusSlice: StateCreator<
   ALLStore,
   [],
@@ -82,18 +95,26 @@ const createCurrentStatusSlice: StateCreator<
     gridId: '',
     type: 'custom-page',
   },
+  initializeComic: (comicConfig: CanvasComicConfig, pageId: PageId, options?: { layerType?: LayerType }) => {
+    set(() => ({
+      historySteps: [{
+        type: 'init',
+        comicConfig,
+      }],
+      currentHistoryStepIndex: 0,
+      isCurrentHistoryStepTmp: false,
+      currentPageStatus: getInitialPageStatus(comicConfig, pageId, options?.layerType),
+    }))
+  },
   setCurrentPageId: (pageId: PageId) => {
     const currentStep = get().historySteps[get().currentHistoryStepIndex]
     const comicConfig = currentStep?.comicConfig
-    const page = comicConfig && getPageFromComicConfig(comicConfig, pageId) || void 0
-    const isLogoPage = page && getIsLogoPage(page) || false
+    if (!comicConfig) {
+      return
+    }
+
     set(() => ({
-      currentPageStatus: {
-        id: pageId,
-        gridId: '',
-        type: isLogoPage ? 'logo-page' : 'custom-page',
-        ...(isLogoPage ? { layerType: 'grids' } : {}),
-      } as PageStatus | LogoPageStatus,
+      currentPageStatus: getInitialPageStatus(comicConfig, pageId),
     }))
   },
   getCurrentPageId: () => {

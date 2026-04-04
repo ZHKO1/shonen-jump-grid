@@ -17,11 +17,9 @@ function Canvas({ scale }: { scale: number }) {
       ? state.currentPageStatus.layerType
       : 'grids'
   })
-  const setCurrentPageId = useComicStatusStore(state => state.setCurrentPageId)
+  const initializeComic = useComicStatusStore(state => state.initializeComic)
   const resetCurrentGridId = useComicStatusStore(state => state.resetCurrentGridId)
-  const addHistoryStep = useComicStatusStore(state => state.addHistoryStep)
   const cleanAllHistoryStep = useComicStatusStore(state => state.cleanAllHistoryStep)
-  const setCurrentLayerType = useComicStatusStore(state => state.setCurrentLayerType)
   const step = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex])
   const comicConfig = step?.comicConfig
   const page = comicConfig && getPageFromComicConfig(comicConfig, pageId)
@@ -44,38 +42,32 @@ function Canvas({ scale }: { scale: number }) {
     : {}
 
   useEffect(() => {
-    // addHistoryStep({
-    //   type: 'init',
-    //   comicConfig: {
-    //     pages: [{
-    //       id: 'page0',
-    //       height: LOGO_PAGE_HEIGHT,
-    //       readonly: true,
-    //       logo: {
-    //         url: '/logo.png',
-    //       },
-    //       grids: [NEW_PAGE_GRID_CONFIG],
-    //       grids: LOGO_PAGE_GRIDS_CONFIG,
-    //     }],
-    //   },
-    // })
-    // setCurrentPageId('page0')
-    // setCurrentLayerType('logo')
+    const controller = new AbortController()
+    let disposed = false
 
-    fetch('./demo/onepiece/grid.json').then(res => res.json()).then((comicConfig) => {
-      addHistoryStep({
-        type: 'init',
-        comicConfig,
+    fetch('./demo/onepiece/grid.json', { signal: controller.signal })
+      .then(res => res.json())
+      .then((comicConfig) => {
+        if (disposed) {
+          return
+        }
+
+        initializeComic(comicConfig, 'page0', { layerType: 'logo' })
+      })
+      .catch((error) => {
+        if (disposed || error.name === 'AbortError') {
+          return
+        }
+
+        console.error('load demo config failed', error)
       })
 
-      setCurrentPageId('page0')
-      setCurrentLayerType('logo')
-    })
-
     return () => {
+      disposed = true
+      controller.abort()
       cleanAllHistoryStep()
     }
-  }, [setCurrentPageId, setCurrentLayerType, addHistoryStep, cleanAllHistoryStep])
+  }, [initializeComic, cleanAllHistoryStep])
 
   const container = containerRef.current
   useEffect(() => {

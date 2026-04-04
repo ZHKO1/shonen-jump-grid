@@ -35,7 +35,13 @@ export function useDrawLine(isFocused: boolean) {
   useEffect(() => {
     if (!isFocused) {
       mouseDownTimeRef.current = 0
-      setDrawState({ isDrawing: false, start: null, end: null })
+      setDrawState((prev) => {
+        if (!prev.isDrawing && !prev.start && !prev.end) {
+          return prev
+        }
+
+        return { isDrawing: false, start: null, end: null }
+      })
       return
     }
 
