@@ -154,5 +154,5 @@ export async function getShareCanvasConfig(canvasComicConfig: CanvasComicConfig)
  * @returns {boolean}
  */
 export function getIsLogoPage(page: CanvasPageConfig) {
-  return page.id === 'page0' && page?.logo
+  return !!page.logo
 }

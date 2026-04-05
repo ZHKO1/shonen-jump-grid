@@ -52,7 +52,10 @@ function Canvas({ scale }: { scale: number }) {
           return
         }
 
-        initializeComic(comicConfig, 'page0', { layerType: 'logo' })
+        const firstPage = Array.isArray(comicConfig.pages) ? comicConfig.pages[0] : undefined
+        const firstPageId = firstPage?.id ?? ''
+        const layerType = firstPage && getIsLogoPage(firstPage) ? 'logo' : 'grids'
+        initializeComic(comicConfig, firstPageId, { layerType })
       })
       .catch((error) => {
         if (disposed || error.name === 'AbortError') {

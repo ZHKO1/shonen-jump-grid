@@ -61,6 +61,7 @@ export default function ImgCropContainer() {
       <AnimatePresence>
         {showImgCrop && (
           <LogoImgCrop
+            pageId={pageId}
             logo={logo}
             onClose={onClose}
           />

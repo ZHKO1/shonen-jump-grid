@@ -1,13 +1,13 @@
 'use client'
 import type { MaskType } from './Mask'
-import type { CanvasOriginImgConfig, CanvasPageConfig } from '@/components/canvas/types'
+import type { CanvasOriginImgConfig, CanvasPageConfig, PageId } from '@/components/canvas/types'
 import { getLogoStyle } from '@/components/canvas/utils'
 import { useAdjustComic } from '@/hooks'
 import { cn } from '@/lib/utils'
 import LogoContent from '../canvas/logo/LogoContent'
 import ImgCrop from './ImgCrop'
 
-export default function LogoImgCrop({ logo, onClose }: { logo: CanvasPageConfig['logo'], onClose: () => void }) {
+export default function LogoImgCrop({ pageId, logo, onClose }: { pageId: PageId, logo: CanvasPageConfig['logo'], onClose: () => void }) {
   const {
     sizeStyle,
     svgPath,
@@ -34,7 +34,7 @@ export default function LogoImgCrop({ logo, onClose }: { logo: CanvasPageConfig[
   const { adjustPage } = useAdjustComic()
 
   const onSubmit = (url: string, originImg: CanvasOriginImgConfig) => {
-    adjustPage('page0', {
+    adjustPage(pageId, {
       logo: {
         url,
         originImg,
@@ -43,7 +43,7 @@ export default function LogoImgCrop({ logo, onClose }: { logo: CanvasPageConfig[
   }
 
   const onClean = () => {
-    adjustPage('page0', {
+    adjustPage(pageId, {
       logo: {
         url: '',
       },
