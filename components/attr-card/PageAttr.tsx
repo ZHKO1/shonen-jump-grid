@@ -54,7 +54,10 @@ export default function PageAttr({ page }: { page?: CanvasPageConfig }) {
     e.stopPropagation()
     e.preventDefault()
     const files = await open()
-    const imgFile = files![0]!
+    const imgFile = files?.[0]
+    if (!imgFile) {
+      return
+    }
     const dataUrl = URL.createObjectURL(imgFile)
     adjustPage(pageId, {
       refer: dataUrl,

@@ -38,10 +38,16 @@ export const useFileDialog: UseFileDialog = (
       setFiles(result.files)
       resolveFileOpenPromiseRef.current?.(result.files)
     }
+    input.oncancel = () => {
+      setFiles(null)
+      resolveFileOpenPromiseRef.current?.(null)
+    }
     return input
   }, [])
 
-  inputRef.current = initFn()
+  if (!inputRef.current) {
+    inputRef.current = initFn()
+  }
 
   const open = async (localOptions?: Partial<UseFileDialogOptions>) => {
     if (!inputRef.current) {

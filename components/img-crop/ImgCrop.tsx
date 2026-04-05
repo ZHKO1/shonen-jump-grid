@@ -128,9 +128,13 @@ const ImgCrop: React.FC<ImgCropProps> = ({ originImg, maskCropPath, renderConten
   }
 
   const handleSelectImg = async () => {
-    handleClearImg()
     const files = await open()
-    const imgFile = files![0]!
+    const imgFile = files?.[0]
+    if (!imgFile) {
+      return
+    }
+
+    handleClearImg()
     const dataUrl = URL.createObjectURL(imgFile)
     setImgUrl(dataUrl)
   }

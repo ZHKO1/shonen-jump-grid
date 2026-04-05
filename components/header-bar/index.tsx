@@ -22,7 +22,10 @@ export default function HeaderBar() {
   const onImport = async () => {
     reset()
     const files = await open()
-    const textFile = files![0]!
+    const textFile = files?.[0]
+    if (!textFile) {
+      return
+    }
     const reader = new FileReader()
     reader.onload = (event) => {
       const fileContent = event.target?.result as string
