@@ -27,6 +27,9 @@ export default function GridBase({ grid, showAsFocused = false, borderOnly = fal
   const gridRef = useRef<HTMLDivElement>(null)
   const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId)
   const isFocused = useComicStatusStore(state => state.currentPageStatus.gridId === grid.id)
+  // 聚焦的 grid 需要在 showImgCrop 变化时 re-render，
+  // 否则 Motion 的 root.isUpdating 不会被置为 true，shared layout 动画会被跳过
+  const isReadyMotionAnimate = useComicStatusStore(state => state.currentPageStatus.gridId === grid.id && state.showImgCrop)
   const { grids: splitGrids, startPoint, endPoint } = useSplit(grid, isFocused, BORDER_WIDTH * 2)
   const shouldShowBorder = (isFocused && !splitGrids) || showAsFocused
   const getSplitGridId = (index: number) => `${grid.id}_split_${index}`
@@ -70,6 +73,10 @@ export default function GridBase({ grid, showAsFocused = false, borderOnly = fal
   }
 
   useEventListener('click', handleClick, gridRef && gridRef.current)
+
+  if (isReadyMotionAnimate) {
+    return null
+  }
 
   return (
     <Profiler id={String(grid.id)} onRender={() => trackGridBaseCommit(grid.id)}>
