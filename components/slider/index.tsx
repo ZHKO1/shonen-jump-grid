@@ -10,6 +10,7 @@ export default function Slider() {
   const step = useComicStatusStore(state => state.historySteps[state.currentHistoryStepIndex])
   const comicConfig = step?.comicConfig
   const pages = comicConfig?.pages || []
+  const existingPageIds = new Set(pages.map(page => String(page.id)))
   const { addPage, deletePage } = useAdjustComic()
   const currentPageId = useComicStatusStore(state => state.currentPageStatus.id)
   const setCurrentPageId = useComicStatusStore(state => state.setCurrentPageId)
@@ -47,7 +48,7 @@ export default function Slider() {
             )
           })
         }
-        <AddPageDialog onSubmit={handleSubmit}>
+        <AddPageDialog existingPageIds={existingPageIds} onSubmit={handleSubmit}>
           <SliderItem
             key="add"
             add

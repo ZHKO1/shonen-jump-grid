@@ -23,7 +23,13 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-let GlobalPageId = 1
+function getDefaultPageId(existingPageIds: Set<string>) {
+  let index = 1
+  while (existingPageIds.has(`page${index}`)) {
+    index++
+  }
+  return `page${index}`
+}
 
 export function TemplateSelect({ value, onChange }: { value: string, onChange: (value: string) => void }) {
   return (
@@ -41,7 +47,11 @@ export function TemplateSelect({ value, onChange }: { value: string, onChange: (
   )
 }
 
-const AddPageDialog: React.FC<{ children: React.ReactNode, onSubmit: (data: CanvasPageConfig) => void }> = ({ children, onSubmit }) => {
+const AddPageDialog: React.FC<{
+  children: React.ReactNode
+  existingPageIds: Set<string>
+  onSubmit: (data: CanvasPageConfig) => void
+}> = ({ children, existingPageIds, onSubmit }) => {
   const [open, setOpen] = React.useState(false)
   const [id, setId] = useState('')
   const [height, setHeight] = useState(LOGO_PAGE_HEIGHT)
@@ -83,15 +93,14 @@ const AddPageDialog: React.FC<{ children: React.ReactNode, onSubmit: (data: Canv
       grids,
     })
     setOpen(false)
-    GlobalPageId++
     event.preventDefault()
   }
 
   useEffect(() => {
     if (open) {
-      setId(`page${GlobalPageId}`)
+      setId(getDefaultPageId(existingPageIds))
     }
-  }, [open])
+  }, [existingPageIds, open])
 
   return (
     <>
