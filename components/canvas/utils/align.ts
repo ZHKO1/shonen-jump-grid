@@ -1,5 +1,6 @@
 import type { CanvasGridConfig } from './types'
 import { BLANK_GRID_MARGIN, CANVAS_WIDTH } from '../constant'
+import { isGridSplited } from './grid'
 import { getPolyType } from './poly'
 
 /**
@@ -64,13 +65,6 @@ export function isGridFlushable(grid: CanvasGridConfig) {
   const leftAlign = isGridLeftAligned(grid)
   const rightAlign = isGridRightAligned(grid)
   if (leftAlign || rightAlign) {
-    return true
-  }
-  return false
-}
-
-function isGridSplited(grid: CanvasGridConfig) {
-  if (grid.splitLine && grid.splitResult && grid.splitResult.length > 0 && grid.splitSpaceWidth) {
     return true
   }
   return false

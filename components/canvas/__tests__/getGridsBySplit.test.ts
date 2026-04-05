@@ -1,7 +1,7 @@
 import type { CanvasGridConfig, CanvasPolyGridConfig, CanvasRectGridConfig, Point } from '../types'
 import { describe, expect, it } from 'vitest'
 import gridJsonData from '../../../public/demo/onepiece/grid.json'
-import { getGridsBySplit } from '../utils'
+import { getComicConfigFromCanvas, getGridsBySplit, isGridSplited } from '../utils'
 import splitCase1Data from './splitCase1.json'
 
 const DEFAULT_OPTIONS = { spaceWidth: 12, recursion: false }
@@ -334,6 +334,59 @@ describe('getGridsBySplit', () => {
       // 两者都应该返回结果，但内部结构可能不同
       expect(resultWithRecursion!.grids).toHaveLength(2)
       expect(resultWithoutRecursion!.grids).toHaveLength(2)
+    })
+  })
+
+  describe('splitSpaceWidth 为 0', () => {
+    it('仍然应被识别为已分割 grid', () => {
+      const splitGrid: CanvasGridConfig = {
+        type: 'rect',
+        lt_x: 0,
+        lt_y: 0,
+        rb_x: 100,
+        rb_y: 100,
+        id: 'split-grid-zero-width',
+        splitLine: [{ x: 50, y: 0 }, { x: 50, y: 100 }],
+        splitResult: [
+          { type: 'rect', lt_x: 0, lt_y: 0, rb_x: 50, rb_y: 100, id: 'split-grid-zero-width_0' },
+          { type: 'rect', lt_x: 50, lt_y: 0, rb_x: 100, rb_y: 100, id: 'split-grid-zero-width_1' },
+        ],
+        splitSpaceWidth: 0,
+      }
+
+      expect(isGridSplited(splitGrid)).toBe(true)
+    })
+
+    it('转成 comic 配置时仍然应递归展开子 grid', () => {
+      const splitGrid: CanvasGridConfig = {
+        type: 'rect',
+        lt_x: 0,
+        lt_y: 0,
+        rb_x: 100,
+        rb_y: 100,
+        id: 'split-grid-zero-width',
+        splitLine: [{ x: 50, y: 0 }, { x: 50, y: 100 }],
+        splitResult: [
+          { type: 'rect', lt_x: 0, lt_y: 0, rb_x: 50, rb_y: 100, id: 'split-grid-zero-width_0' },
+          { type: 'rect', lt_x: 50, lt_y: 0, rb_x: 100, rb_y: 100, id: 'split-grid-zero-width_1' },
+        ],
+        splitSpaceWidth: 0,
+      }
+
+      const comicConfig = getComicConfigFromCanvas({
+        pages: [{
+          id: 'page0',
+          height: 100,
+          grids: [splitGrid],
+        }],
+      })
+
+      expect(comicConfig).not.toBeNull()
+      expect(comicConfig!.pages[0].grids).toHaveLength(2)
+      expect(comicConfig!.pages[0].grids).toEqual([
+        { type: 'rect', lt_x: 0, lt_y: 0, rb_x: 50, rb_y: 100 },
+        { type: 'rect', lt_x: 50, lt_y: 0, rb_x: 100, rb_y: 100 },
+      ])
     })
   })
 })

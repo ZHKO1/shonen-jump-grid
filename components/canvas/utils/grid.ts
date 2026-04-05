@@ -142,7 +142,7 @@ export function getGridsBySplitPoly(
  * @returns {boolean}
  */
 export function isGridSplited(grid: CanvasGridConfig) {
-  if (grid.splitLine && grid.splitResult && grid.splitResult.length > 0 && grid.splitSpaceWidth) {
+  if (grid.splitLine && grid.splitResult && grid.splitResult.length > 0 && grid.splitSpaceWidth !== undefined) {
     return true
   }
   return false
