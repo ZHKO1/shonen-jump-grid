@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useFileDialog } from '@/hooks'
 import { downloadText } from '@/lib/utils'
 import useComicStatusStore from '@/store'
-import { getShareCanvasConfig } from '../canvas/utils'
+import { getIsLogoPage, getShareCanvasConfig } from '../canvas/utils'
 
 export default function HeaderBar() {
   const [,open, reset] = useFileDialog()
@@ -17,8 +17,7 @@ export default function HeaderBar() {
   const showAttrCard = useComicStatusStore(state => state.showAttrCard)
   const setShowAttrCard = useComicStatusStore(state => state.setShowAttrCard)
   const setShowComic = useComicStatusStore(state => state.setShowComic)
-  const addHistoryStep = useComicStatusStore(state => state.addHistoryStep)
-  const cleanAllHistoryStep = useComicStatusStore(state => state.cleanAllHistoryStep)
+  const initializeComic = useComicStatusStore(state => state.initializeComic)
 
   const onImport = async () => {
     reset()
@@ -29,11 +28,10 @@ export default function HeaderBar() {
       const fileContent = event.target?.result as string
       try {
         const comicConfig = JSON.parse(fileContent)
-        cleanAllHistoryStep()
-        addHistoryStep({
-          type: 'init',
-          comicConfig,
-        })
+        const firstPage = Array.isArray(comicConfig.pages) ? comicConfig.pages[0] : undefined
+        const firstPageId = firstPage?.id ?? 'page0'
+        const layerType = firstPage && getIsLogoPage(firstPage) ? 'logo' : 'grids'
+        initializeComic(comicConfig, firstPageId, { layerType })
       }
       catch (error) {
         console.error('reader failed', error)
