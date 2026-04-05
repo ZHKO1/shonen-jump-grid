@@ -162,6 +162,7 @@ const ImgCrop: React.FC<ImgCropProps> = ({ originImg, maskCropPath, renderConten
       >
         {imgUrl && (
           <Img
+            className={(maskType === 'grid') ? '' : 'hidden'}
             ref={imageRef}
             url={imgUrl}
             dragX={dragX}
