@@ -15,7 +15,7 @@ export interface MouseState {
 
 export function useMouse() {
   const context = useContext(ContainerContext)
-  const gridRef = context.container
+  const containerRef = context.container
 
   const stateRef = useRef<MouseState>({
     x: 0,
@@ -26,9 +26,8 @@ export function useMouse() {
     elementPositionY: 0,
   })
 
-  const grid = gridRef.current
-
   const handleMouseMove = useCallback((event: MouseEvent) => {
+    const grid = containerRef.current
     if (!grid) {
       return
     }
@@ -52,7 +51,7 @@ export function useMouse() {
     }
 
     stateRef.current = newState
-  }, [grid, context.scale])
+  }, [containerRef, context.scale])
 
   useEventListener('mousemove', handleMouseMove, defaultDocument)
 

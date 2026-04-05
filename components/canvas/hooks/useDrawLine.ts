@@ -13,7 +13,7 @@ interface DrawState {
 }
 
 export function useDrawLine(isFocused: boolean) {
-  const { current: container } = useContext(ContainerContext).container
+  const containerRef = useContext(ContainerContext).container
   const mouseStateRef = useMouse()
   const mouseDownTimeRef = useRef<number>(0)
   const [drawState, setDrawState] = useState<DrawState>({
@@ -42,6 +42,11 @@ export function useDrawLine(isFocused: boolean) {
 
         return { isDrawing: false, start: null, end: null }
       })
+      return
+    }
+
+    const container = containerRef.current
+    if (!container) {
       return
     }
 
@@ -114,10 +119,10 @@ export function useDrawLine(isFocused: boolean) {
 
     return () => {
       off(container, 'mousedown', handleMouseDown)
-      // off(defaultDocument, "mousemove", handleMouseMove); // 不确定这样是否合适，所以先注释
-      // off(defaultDocument, "mouseup", handleMouseUp); // 不确定这样是否合适，所以先注释
+      off(defaultDocument, 'mousemove', handleMouseMove)
+      off(defaultDocument, 'mouseup', handleMouseUp)
     }
-  }, [isFocused, container, latestDrawState, mouseStateRef])
+  }, [isFocused, containerRef, latestDrawState, mouseStateRef])
 
   return [drawState.start, drawState.end, drawState.isDrawing] as const
 }

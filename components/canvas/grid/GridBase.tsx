@@ -1,8 +1,7 @@
 import type { MouseEventHandler } from 'react'
 import type { CanvasGridConfig } from '../types'
 import type { GridIconProps } from './GridIcon'
-import { Profiler, useRef } from 'react'
-import { useEventListener } from '@/hooks'
+import { Profiler } from 'react'
 import { trackGridBaseCommit, trackGridBaseRender } from '@/lib/debug/gridBaseRenderStats'
 import { cn } from '@/lib/utils'
 import useComicStatusStore from '@/store'
@@ -24,7 +23,6 @@ export interface GridBaseProps {
 export default function GridBase({ grid, showAsFocused = false, borderOnly = false }: GridBaseProps) {
   trackGridBaseRender(grid.id)
 
-  const gridRef = useRef<HTMLDivElement>(null)
   const setCurrentGridId = useComicStatusStore(state => state.setCurrentGridId)
   const isFocused = useComicStatusStore(state => state.currentPageStatus.gridId === grid.id)
   // 聚焦的 grid 需要在 showImgCrop 变化时 re-render，
@@ -69,10 +67,7 @@ export default function GridBase({ grid, showAsFocused = false, borderOnly = fal
   const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
     setCurrentGridId(grid.id)
     e.stopPropagation()
-    // e.nativeEvent.stopImmediatePropagation();
   }
-
-  useEventListener('click', handleClick, gridRef && gridRef.current)
 
   if (isReadyMotionAnimate) {
     return null
@@ -99,7 +94,7 @@ export default function GridBase({ grid, showAsFocused = false, borderOnly = fal
               gridId={grid.id}
               style={gridStyle}
               clipPath={clipPath}
-              ref={gridRef}
+              onClick={handleClick}
               url={grid.content?.url}
               imgStyle={imgStyle}
             >

@@ -40,7 +40,6 @@ export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, defa
   const [dragPos, setDragPos] = useState<Point>({ x: defaultValue.dragX || 0, y: defaultValue.dragY || 0 })
   const [zoom, setZoom] = useState<number>(defaultValue.zoom || 1)
   const rafDragTimeoutRef = useRef<number>(0)
-  const { current: container } = containerRef
 
   const reset = useCallback(() => {
     setDragPos({ x: 0, y: 0 })
@@ -48,14 +47,15 @@ export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, defa
   }, [])
 
   const saveContainerPosition = useCallback(() => {
+    const container = containerRef.current
     if (container) {
       const bounds = container.getBoundingClientRect()
       containerPositionRef.current = { x: bounds.left, y: bounds.top }
     }
-  }, [container])
+  }, [containerRef])
 
   useEffect(() => {
-    const targetElement = container
+    const targetElement = containerRef.current
     if (!(targetElement && targetElement.addEventListener)) {
       return
     }
@@ -92,6 +92,10 @@ export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, defa
       const point = getMousePoint(e)
       const { pixelY } = normalizeWheel(e)
       const newZoom = Math.min(Math.max(zoom - (pixelY * ZOOMSPEED) / 200, MIN_ZOOM), MAX_ZOOM)
+      const container = containerRef.current
+      if (!container) {
+        return
+      }
       const zoomPoint = getPointOnContainer(point, container, containerPositionRef.current)
       const zoomTarget = getPointOnMedia(zoomPoint, { x: dragPos.x, y: dragPos.y }, zoom)
       const requestedPosition = {
@@ -123,7 +127,7 @@ export function useDragZoom(containerRef: RefObject<HTMLDivElement | null>, defa
       off(targetElement, 'mousedown', onMouseDown)
       off(targetElement, 'wheel', onWheel, { passive: false })
     }
-  }, [container, dragPos.x, dragPos.y, zoom, saveContainerPosition])
+  }, [containerRef, dragPos.x, dragPos.y, zoom, saveContainerPosition])
 
   return [dragPos.x, dragPos.y, zoom, reset] as const
 }
