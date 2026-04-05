@@ -72,6 +72,7 @@ const AddPageDialog: React.FC<{
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     if (!template || !height) {
       console.error('Incorrect input')
+      return
     }
     const grids = template === 'logo'
       ? LOGO_PAGE_GRIDS_CONFIG.map((grid, index) => {
