@@ -18,27 +18,26 @@ export interface ComicRef {
 function ComicComponent({ ref, config, autoPlay, onLoad }: ComicProps & { ref?: React.RefObject<ComicRef | null> }) {
   const container = useRef<HTMLDivElement>(null)
   const comicRef = useRef<Comic>(null)
-  const comic = comicRef.current
 
   useImperativeHandle(ref, () => ({
     replay() {
-      if (comic) {
-        comic.replay()
+      if (comicRef.current) {
+        comicRef.current.replay()
       }
     },
     play() {
-      if (comic) {
-        comic.play()
+      if (comicRef.current) {
+        comicRef.current.play()
       }
     },
     pause() {
-      if (comic) {
-        comic.pause()
+      if (comicRef.current) {
+        comicRef.current.pause()
       }
     },
     setCurrentTime(time: number) {
-      if (comic) {
-        comic.setCurrentTime(time)
+      if (comicRef.current) {
+        comicRef.current.setCurrentTime(time)
       }
     },
   }))
