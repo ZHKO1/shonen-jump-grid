@@ -2,6 +2,7 @@
 import type { HTMLMotionProps } from 'framer-motion'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import useComicStatusStore from '@/store'
 
 export interface LogoContentProps extends HTMLMotionProps<'div'> {
   disableMotion?: boolean
@@ -11,6 +12,7 @@ export interface LogoContentProps extends HTMLMotionProps<'div'> {
 const LogoContent: React.FC<LogoContentProps> = ({ className, url, disableMotion, ...props }) => {
   const Comp = (disableMotion ? 'div' : motion.div) as (typeof motion.div)
   const extraProps = (disableMotion ? {} : { layoutId: `grid-logo` })
+  useComicStatusStore(state => state.showImgCrop)
 
   return (
     <Comp
