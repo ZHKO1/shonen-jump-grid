@@ -1,7 +1,7 @@
 import type { StateCreator } from 'zustand'
 import type { CanvasComicConfig, GridId, PageId } from '@/components/canvas/types'
 import { create } from 'zustand'
-import { getIsLogoPage, getPageFromComicConfig } from '@/components/canvas/utils'
+import { getGridFromComicConfig, getIsLogoPage, getPageFromComicConfig } from '@/components/canvas/utils'
 
 interface PageShareStatus {
   id: PageId
@@ -82,6 +82,66 @@ function getInitialPageStatus(comicConfig: CanvasComicConfig, pageId: PageId, la
     type: isLogoPage ? 'logo-page' : 'custom-page',
     ...(isLogoPage ? { layerType: layerType || 'grids' } : {}),
   } as PageStatus | LogoPageStatus
+}
+
+function normalizeCurrentPageStatus(
+  comicConfig: CanvasComicConfig,
+  currentPageStatus: PageStatus | LogoPageStatus,
+): PageStatus | LogoPageStatus {
+  const currentPage = getPageFromComicConfig(comicConfig, currentPageStatus.id)
+  const currentPageIndex = comicConfig.pages.findIndex(page => page.id === currentPageStatus.id)
+  let fallbackPage = comicConfig.pages[0]
+
+  if (currentPageIndex >= 0) {
+    fallbackPage = comicConfig.pages[currentPageIndex]
+  }
+  else if (comicConfig.pages.length > 0) {
+    const nextPageNumber = Number.parseInt(String(currentPageStatus.id).match(/\d+/)?.[0] || '', 10)
+
+    if (Number.isFinite(nextPageNumber)) {
+      let fallbackPageIndex = -1
+
+      for (let pageNumber = nextPageNumber - 1; pageNumber >= 0; pageNumber--) {
+        fallbackPageIndex = comicConfig.pages.findIndex(page => page.id === `page${pageNumber}`)
+        if (fallbackPageIndex >= 0) {
+          break
+        }
+      }
+
+      if (fallbackPageIndex < 0) {
+        for (let pageNumber = nextPageNumber + 1; pageNumber < nextPageNumber + comicConfig.pages.length + 1; pageNumber++) {
+          fallbackPageIndex = comicConfig.pages.findIndex(page => page.id === `page${pageNumber}`)
+          if (fallbackPageIndex >= 0) {
+            break
+          }
+        }
+      }
+
+      if (fallbackPageIndex >= 0) {
+        fallbackPage = comicConfig.pages[fallbackPageIndex]
+      }
+    }
+  }
+
+  const targetPage = currentPage || fallbackPage
+
+  if (!targetPage) {
+    return {
+      id: '',
+      gridId: '',
+      type: 'custom-page',
+    }
+  }
+
+  const targetGridId = (targetPage.id === currentPageStatus.id && currentPageStatus.gridId !== '' && getGridFromComicConfig({ pages: [targetPage] }, currentPageStatus.gridId))
+    ? currentPageStatus.gridId
+    : ''
+
+  return {
+    id: targetPage.id,
+    gridId: targetGridId,
+    type: 'custom-page',
+  }
 }
 
 const createCurrentStatusSlice: StateCreator<
@@ -264,19 +324,41 @@ const createHistoryStepSlice: StateCreator<
     const currentHistoryStepIndex = get().currentHistoryStepIndex
     if (currentHistoryStepIndex < 0)
       return null
-    set(state => ({
-      historySteps: [...state.historySteps.slice(0, state.currentHistoryStepIndex), step],
-    }))
+    set((state) => {
+      const historySteps = [...state.historySteps.slice(0, state.currentHistoryStepIndex), step]
+      return {
+        historySteps,
+        currentPageStatus: normalizeCurrentPageStatus(step.comicConfig, state.currentPageStatus),
+      }
+    })
   },
   nextHistoryStep: () => {
-    set(state => ({
-      currentHistoryStepIndex: Math.min(state.currentHistoryStepIndex + 1, state.historySteps.length - 1),
-    }))
+    set((state) => {
+      const nextHistoryStepIndex = Math.min(state.currentHistoryStepIndex + 1, state.historySteps.length - 1)
+      const nextStep = state.historySteps[nextHistoryStepIndex]
+      return {
+        currentHistoryStepIndex: nextHistoryStepIndex,
+        ...(nextStep
+          ? {
+              currentPageStatus: normalizeCurrentPageStatus(nextStep.comicConfig, state.currentPageStatus),
+            }
+          : {}),
+      }
+    })
   },
   prevHistoryStep: () => {
-    set(state => ({
-      currentHistoryStepIndex: Math.max(state.currentHistoryStepIndex - 1, 0),
-    }))
+    set((state) => {
+      const prevHistoryStepIndex = Math.max(state.currentHistoryStepIndex - 1, 0)
+      const prevStep = state.historySteps[prevHistoryStepIndex]
+      return {
+        currentHistoryStepIndex: prevHistoryStepIndex,
+        ...(prevStep
+          ? {
+              currentPageStatus: normalizeCurrentPageStatus(prevStep.comicConfig, state.currentPageStatus),
+            }
+          : {}),
+      }
+    })
   },
 })
 
