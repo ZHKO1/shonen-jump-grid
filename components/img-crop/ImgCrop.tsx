@@ -63,8 +63,8 @@ const ImgCrop: React.FC<ImgCropProps> = ({ originImg, maskCropPath, renderConten
   }
 
   const handleClose = () => {
-    handleClearImg()
-    setMaskType('full')
+    // handleClearImg()
+    // setMaskType('full')
     onClose()
   }
 
@@ -179,7 +179,7 @@ const ImgCrop: React.FC<ImgCropProps> = ({ originImg, maskCropPath, renderConten
         )}
       </Background>
       <div
-        className="fixed inset-0 grid place-items-center z-[100] pointer-events-none"
+        className="fixed inset-0 grid place-items-center z-[1000] pointer-events-none"
       >
         {
           renderContent(maskType, onAnimationComplete)
