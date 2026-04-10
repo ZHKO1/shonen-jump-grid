@@ -166,6 +166,7 @@ const ImgCrop: React.FC<ImgCropProps> = ({ originImg, maskCropPath, renderConten
       >
         {imgUrl && (
           <Img
+            key={imgUrl}
             className={(maskType === 'grid') ? '' : 'hidden'}
             ref={imageRef}
             url={imgUrl}
